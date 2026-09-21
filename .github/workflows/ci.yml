@@ -71,8 +71,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
         working-directory: .flama-ai
-      - name: Build and test
-        run: pnpm turbo run build test --filter=@flama/cli
+      # Two invocations, not `run build test`. The `test` task declares no
+      # `dependsOn`, so in one graph turbo starts it immediately and vitest
+      # resolves `@flama/shared` before its dist exists. The host's own CI
+      # splits them for the same reason.
+      - name: Build
+        run: pnpm turbo run build --filter=@flama/cli...
+        working-directory: .flama-ai
+      - name: Test
+        run: pnpm turbo run test --filter=@flama/cli
         working-directory: .flama-ai
       - name: Lint
         run: pnpm exec biome check apps/cli
