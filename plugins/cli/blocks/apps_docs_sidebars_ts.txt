@@ -1,0 +1,3 @@
+        // flama:begin cli
+        'tooling/cli',
+        // flama:end cli

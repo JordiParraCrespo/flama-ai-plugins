@@ -1,0 +1,16 @@
+    // flama:begin cli|mcp
+    {
+      type: 'category',
+      label: 'CLI & MCP',
+      items: [
+        'tooling/permissions',
+        // flama:begin cli
+        'tooling/cli',
+        // flama:end cli
+        // flama:plugins docs-tooling
+        // flama:begin mcp
+        'tooling/mcp',
+        // flama:end mcp
+      ],
+    },
+    // flama:end cli|mcp

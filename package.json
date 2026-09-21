@@ -1,0 +1,13 @@
+{
+  "name": "flama-ai-plugins",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "extract": "node scripts/extract.mjs",
+    "roundtrip": "node scripts/roundtrip.mjs",
+    "test": "node --test scripts/*.test.mjs && node scripts/roundtrip.mjs"
+  }
+}

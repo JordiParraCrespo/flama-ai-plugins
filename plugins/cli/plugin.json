@@ -1,0 +1,56 @@
+{
+  "id": "cli",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Command-line interface",
+    "summary": "apps/cli — `flama` CLI driven by scoped API tokens",
+    "identifiers": [
+      "apps/cli",
+      "@flama/cli"
+    ],
+    "paths": [
+      "apps/cli",
+      "apps/docs/docs/tooling/cli.md"
+    ],
+    "shared": [
+      {
+        "path": "apps/docs/docs/tooling/permissions.md",
+        "identifiers": [],
+        "neededBy": [
+          "cli",
+          "mcp"
+        ]
+      }
+    ]
+  },
+  "files": {
+    "apps/cli": "files/apps/cli",
+    "apps/docs/docs/tooling/cli.md": "files/apps/docs/docs/tooling/cli.md"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "apps/docs/sidebars.ts",
+      "anchor": "docs-tooling",
+      "source": "blocks/apps_docs_sidebars_ts.txt"
+    }
+  ],
+  "coOwned": [
+    {
+      "file": ".env.example",
+      "source": "blocks/co-owned/_env_example.txt"
+    },
+    {
+      "file": "AUTHORIZATION.md",
+      "source": "blocks/co-owned/AUTHORIZATION_md.txt"
+    },
+    {
+      "file": "apps/docs/sidebars.ts",
+      "source": "blocks/co-owned/apps_docs_sidebars_ts.txt"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  roundtrip:
+    name: Round trip against flama-ai
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      # A plugin only means anything inside a Flama repo, so the host is the
+      # fixture. `main` rather than a pin: a plugin that stops installing
+      # because the starter moved is exactly what this job exists to catch.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: JordiParraCrespo/flama-ai
+          ref: main
+          path: .flama-ai
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Unit tests
+        run: node --test scripts/*.test.mjs
+      # Install each plugin, run the host repo's own checks with it in, remove
+      # it, and require the tree to come back byte-identical.
+      - name: Round trip
+        run: node scripts/roundtrip.mjs --repo .flama-ai
