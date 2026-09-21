@@ -10,6 +10,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # The starter ref the round trip installs into. This must be `main`: a plugin
+  # that stops installing because the starter moved is what this job exists to
+  # catch, and pinning hides exactly that.
+  #
+  # It is a branch for now only because the installer itself is unmerged —
+  # flama-ai#148 adds scripts/plugins/plugin.mjs, without which the round trip
+  # cannot run at all. Set this back to `main` the moment that lands.
+  FLAMA_AI_REF: claude/compassionate-curie-2jvnwz
+
 jobs:
   roundtrip:
     name: Round trip against flama-ai
@@ -17,12 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       # A plugin only means anything inside a Flama repo, so the host is the
-      # fixture. `main` rather than a pin: a plugin that stops installing
-      # because the starter moved is exactly what this job exists to catch.
+      # fixture.
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: JordiParraCrespo/flama-ai
-          ref: main
+          ref: ${{ env.FLAMA_AI_REF }}
           path: .flama-ai
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
