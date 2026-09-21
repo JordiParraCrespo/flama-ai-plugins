@@ -1,8 +1,9 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { parseRules } from '../commands/roles';
 import { CliError, ExitCode } from '../lib/errors';
 import { formatDate, formatList, table } from '../lib/output';
-import { createProgram } from '../program';
+import { createProgram, VERSION } from '../program';
 
 describe('command tree', () => {
   const program = createProgram();
@@ -133,5 +134,16 @@ describe('exit codes', () => {
       NOT_FOUND: 5,
       UNREACHABLE: 6,
     });
+  });
+});
+
+describe('version', () => {
+  it('reports the version the package actually is', () => {
+    // `flama --version` is what version-gating scripts read, and it drifted:
+    // the constant said 0.1.0 while the package had moved to 0.2.0.
+    const manifest = JSON.parse(
+      readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
+    ) as { version: string };
+    expect(VERSION).toBe(manifest.version);
   });
 });

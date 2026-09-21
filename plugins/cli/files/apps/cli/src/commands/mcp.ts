@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir, platform } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { Command } from 'commander';
@@ -80,6 +80,10 @@ function installCommand(): Command {
       writeFileSync(path, `${JSON.stringify(config, null, 2)}\n`, {
         mode: 0o600,
       });
+      // The entry carries a bearer token. `mode` above only applies when the
+      // file is created, so an existing config keeps whatever permissions it
+      // had — tighten it either way, as `writeConfig` does.
+      chmodSync(path, 0o600);
 
       success(`Registered "${options.name}" in ${path}.`);
       process.stdout.write(

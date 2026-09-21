@@ -6,8 +6,8 @@ import { rolesCommand } from './commands/roles';
 import { tokensCommand } from './commands/tokens';
 import { usersCommand } from './commands/users';
 
-/** Version reported by `--version`; kept in step with the package. */
-export const VERSION = '0.1.0';
+/** Version reported by `--version`; a test pins it to package.json. */
+export const VERSION = '0.2.0';
 
 /**
  * Assemble the CLI. Kept separate from the entrypoint so tests can build the

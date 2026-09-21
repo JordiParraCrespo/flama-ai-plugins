@@ -26,7 +26,12 @@ export async function askSecret(question: string): Promise<string> {
 
   try {
     const secret = await new Promise<string>((resolve, reject) => {
-      let buffer = '';
+      // Bytes, not characters. `String.fromCharCode` per byte mangles anything
+      // outside ASCII — the two UTF-8 bytes of `é` become `Ã©` — so the typed
+      // passphrase and the stored one stop matching. The control keys below
+      // are all < 0x80, and no UTF-8 continuation byte is, so they stay
+      // unambiguous while the rest is decoded as a whole at the end.
+      const bytes: number[] = [];
 
       const onData = (chunk: Buffer) => {
         for (const byte of chunk) {
@@ -38,14 +43,16 @@ export async function askSecret(question: string): Promise<string> {
             case 0x0d: // Enter
             case 0x0a:
               cleanup();
-              resolve(buffer);
+              resolve(Buffer.from(bytes).toString('utf8'));
               return;
             case 0x7f: // Backspace
             case 0x08:
-              buffer = buffer.slice(0, -1);
+              // Drop one character: its continuation bytes, then its lead.
+              while (bytes.length && (bytes[bytes.length - 1] & 0xc0) === 0x80) bytes.pop();
+              bytes.pop();
               break;
             default:
-              buffer += String.fromCharCode(byte);
+              bytes.push(byte);
           }
         }
       };

@@ -42,3 +42,33 @@ jobs:
       # it, and require the tree to come back byte-identical.
       - name: Round trip
         run: node scripts/roundtrip.mjs --repo .flama-ai
+
+  installed:
+    name: Build and test an installed plugin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: JordiParraCrespo/flama-ai
+          ref: ${{ env.FLAMA_AI_REF }}
+          path: .flama-ai
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      # The round trip proves a plugin installs; it does not prove the code it
+      # installs compiles. Nothing else does either, now that `apps/cli` has
+      # left the starter — so its build, tests and lint run here, against the
+      # workspace it lands in.
+      - name: Install the plugin
+        run: node .flama-ai/scripts/plugins/plugin.mjs add cli --from .
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+        working-directory: .flama-ai
+      - name: Build and test
+        run: pnpm turbo run build test --filter=@flama/cli
+        working-directory: .flama-ai
+      - name: Lint
+        run: pnpm biome check apps/cli
+        working-directory: .flama-ai

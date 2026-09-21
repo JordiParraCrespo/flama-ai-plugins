@@ -137,10 +137,15 @@ function permissionsCommand(): Command {
         .get<PermissionCatalog>('/tokens/permissions')
         // Falling back to the built-in catalog keeps the command useful
         // against an older API; only `grantable` is genuinely server-side.
-        .catch(() => ({
-          groups: [...PERMISSION_GROUPS],
-          grantable: [] as Scope[],
-        }));
+        // Narrowly on 404, though: swallowing everything turned a bad
+        // credential or an unreachable API into an empty catalog and exit 0,
+        // which is the opposite of what the exit codes promise scripts.
+        .catch((error: unknown) => {
+          if (error instanceof CliError && error.exitCode === ExitCode.NOT_FOUND) {
+            return { groups: [...PERMISSION_GROUPS], grantable: [] as Scope[] };
+          }
+          throw error;
+        });
 
       const grantable = new Set(catalog.grantable);
       const rows = catalog.groups.flatMap((group) =>
@@ -165,9 +170,11 @@ function permissionsCommand(): Command {
         ]),
       );
 
-      process.stdout.write(
-        `\n${style.dim('✓ marks the permissions you may put on a token; a token can never exceed its creator.')}\n`,
-      );
+      if (!context.json) {
+        process.stdout.write(
+          `\n${style.dim('✓ marks the permissions you may put on a token; a token can never exceed its creator.')}\n`,
+        );
+      }
     });
 }
 
