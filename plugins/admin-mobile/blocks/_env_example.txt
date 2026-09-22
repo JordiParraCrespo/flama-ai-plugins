@@ -1,0 +1,6 @@
+# flama:begin admin-mobile
+# Deep-link scheme for apps/admin-mobile; also trusted by Better Auth
+ADMIN_MOBILE_SCHEME=flama-admin
+# Public Expo value used by the admin mobile auth client (keep it aligned)
+EXPO_PUBLIC_ADMIN_MOBILE_SCHEME=flama-admin
+# flama:end admin-mobile

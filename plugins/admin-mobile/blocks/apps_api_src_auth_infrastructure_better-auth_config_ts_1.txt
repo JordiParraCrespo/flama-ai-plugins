@@ -1,0 +1,3 @@
+    // flama:begin admin-mobile
+    `${adminMobileScheme}://`,
+    // flama:end admin-mobile

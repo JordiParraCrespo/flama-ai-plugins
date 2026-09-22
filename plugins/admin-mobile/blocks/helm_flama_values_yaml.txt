@@ -1,0 +1,3 @@
+    # flama:begin admin-mobile
+    ADMIN_MOBILE_SCHEME: flama-admin
+    # flama:end admin-mobile

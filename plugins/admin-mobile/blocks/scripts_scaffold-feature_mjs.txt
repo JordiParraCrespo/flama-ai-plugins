@@ -1,0 +1,9 @@
+  // flama:begin admin-mobile
+  'admin-mobile': {
+    dir: 'apps/admin-mobile',
+    features: 'features',
+    product: 'admin',
+    allow: [],
+    platform: 'mobile',
+  },
+  // flama:end admin-mobile

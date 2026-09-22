@@ -192,10 +192,14 @@ export function ownerOf(features, file, self) {
 
 function main() {
   const argv = process.argv.slice(2);
-  const id = argv.find((arg) => !arg.startsWith('--'));
+  const id = argv.find(
+    (arg, i) => !arg.startsWith('--') && !['--repo', '--also'].includes(argv[i - 1]),
+  );
   const repoFlag = argv.indexOf('--repo');
   const repo = resolve(repoFlag === -1 ? '../flama-ai' : argv[repoFlag + 1]);
-  if (!id) fail('usage: extract.mjs <feature-id> [--repo ../flama-ai]');
+  const alsoFlag = argv.indexOf('--also');
+  const also = alsoFlag === -1 ? [] : (argv[alsoFlag + 1] ?? '').split(',').filter(Boolean);
+  if (!id) fail('usage: extract.mjs <feature-id> [--repo ../flama-ai] [--also <id,id>]');
   if (!existsSync(join(repo, 'scripts/starter/features.json'))) fail(`${repo} is not a Flama repo`);
 
   const manifest = JSON.parse(readFileSync(join(repo, 'scripts/starter/features.json'), 'utf8'));
@@ -302,7 +306,25 @@ function main() {
         identifiers: entry.identifiers,
         neededBy: entry.neededBy,
       }));
-    for (const entry of shared) console.log(`  shared ${entry.path}`);
+    // A shared path outlives this feature while another dependant remains, so
+    // normally a plugin owns only its membership. But when every dependant is
+    // leaving to become a plugin too, the path goes with the last of them and
+    // somebody has to bring it back. Each carries it and the first one
+    // installed wins; the rest find it already there. `--also` names the
+    // others, because a prune of this feature alone cannot know.
+    const alsoLeaving = new Set([id, ...also]);
+    const sharedFiles = {};
+    for (const entry of shared) {
+      if (!entry.neededBy.every((dep) => alsoLeaving.has(dep))) {
+        console.log(`  shared ${entry.path}`);
+        continue;
+      }
+      const dest = `shared/${entry.path}`;
+      sharedFiles[entry.path] = dest;
+      mkdirSync(dirname(join(out, dest)), { recursive: true });
+      cpSync(join(repo, entry.path), join(out, dest), { recursive: true, verbatimSymlinks: true });
+      console.log(`  shared ${entry.path} (carried — every dependant is leaving)`);
+    }
 
     const plugin = {
       id,
@@ -322,6 +344,7 @@ function main() {
         ...(shared.length ? { shared } : {}),
       },
       files,
+      ...(Object.keys(sharedFiles).length ? { sharedFiles } : {}),
       ...(blocks.length ? { blocks } : {}),
       ...(coOwned.length ? { coOwned } : {}),
     };
