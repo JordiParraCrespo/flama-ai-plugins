@@ -28,6 +28,13 @@ export function UsersScreen() {
   const ban = useBanAdminUser();
   const unban = useUnbanAdminUser();
   const revoke = useRevokeAdminUserSessions();
+  // `undefined` until the query settles. React Hook Form reads `defaultValues`
+  // on the first render only, so mounting the dialog before the roles arrive
+  // would leave every box unchecked and a save would send an empty list,
+  // silently stripping the user's roles.
+  const roleUserAssigned = roleUser
+    ? roleQueries[rows.findIndex((row) => row.id === roleUser.id)]?.data
+    : undefined;
 
   function changeStatus(user: AdminUserEntity) {
     Alert.alert(
@@ -151,12 +158,12 @@ export function UsersScreen() {
         )}
       </ScrollView>
       <CreateUserDialog open={createOpen} onClose={() => setCreateOpen(false)} />
-      {roleUser && (
+      {roleUser && roleUserAssigned !== undefined && (
         <AssignRolesDialog
           key={roleUser.id}
           user={roleUser}
           roles={roles.data?.data ?? []}
-          assigned={roleQueries[rows.findIndex((row) => row.id === roleUser.id)]?.data ?? []}
+          assigned={roleUserAssigned}
           onClose={() => setRoleUser(null)}
         />
       )}

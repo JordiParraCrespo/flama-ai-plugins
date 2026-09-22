@@ -8,7 +8,11 @@ import { ActivityIndicator, View } from 'react-native';
 export function AuthGate() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuthState();
-  const { isLoading, isError, isFetching, refetch } = useSessionRestore();
+  // `isPending`, not `isLoading`: under PersistQueryClientProvider the query is
+  // pending but not fetching while the cache is being restored, so `isLoading`
+  // is false and the stack would render unauthenticated — bouncing a returning
+  // signed-in user to the login route. apps/web gates on `isPending` already.
+  const { isPending, isError, isFetching, refetch } = useSessionRestore();
 
   return (
     <>
@@ -41,7 +45,7 @@ export function AuthGate() {
         </View>
       ) : null}
 
-      {isLoading ? (
+      {isPending ? (
         <View className="absolute inset-0 z-50 items-center justify-center bg-background">
           <ActivityIndicator size="large" />
         </View>

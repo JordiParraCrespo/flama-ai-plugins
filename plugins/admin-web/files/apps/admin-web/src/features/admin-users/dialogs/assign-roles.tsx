@@ -6,6 +6,7 @@ import {
   DialogHero,
   DialogHeroPlate,
   DialogTitle,
+  Skeleton,
 } from '@flama/design-system-web';
 import { Shield } from '@flama/design-system-web/icons';
 import type { AdminUserEntity } from '@flama/frontend-admin';
@@ -47,9 +48,20 @@ export function AssignRolesDialog({
             {t('control.users.roles.description', { name: user.name })}
           </DialogDescription>
         </DialogHeader>
+        {/* React Hook Form reads `defaultValues` on the first render only, so
+            mounting the form before the assigned roles arrive would leave every
+            box unchecked and a save would send an empty list — silently
+            stripping the user's roles. Wait for the data, then mount. */}
+        {assignedRoles.data === undefined ? (
+          <div className="space-y-2 px-6 pb-6">
+            <Skeleton className="h-12 w-full rounded-xl" />
+            <Skeleton className="h-12 w-full rounded-xl" />
+            <Skeleton className="h-12 w-full rounded-xl" />
+          </div>
+        ) : (
         <AssignRolesForm
           roles={roles.data?.data ?? []}
-          assignedRoles={assignedRoles.data ?? []}
+          assignedRoles={assignedRoles.data}
           isPending={assign.isPending}
           error={assign.error}
           onCancel={onClose}
@@ -62,6 +74,7 @@ export function AssignRolesDialog({
             }
           }}
         />
+        )}
       </DialogContent>
     </Dialog>
   );

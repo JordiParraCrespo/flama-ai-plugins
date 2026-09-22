@@ -21,8 +21,30 @@ function ControlPlaneGate() {
     );
   }
 
+  // A profile that failed to load is not a profile that says no. Telling an
+  // authorized administrator they lack permission, and offering only logout,
+  // is the wrong answer to an unreachable API — the session-restore path
+  // already treats a network failure as retryable.
+  if (profile.isError) return <ProfileUnavailable retry={() => profile.refetch()} />;
+
   if (!profile.data?.canAccessControlPlane) return <AccessDenied />;
   return <AuthenticatedLayout />;
+}
+
+function ProfileUnavailable({ retry }: { retry: () => void }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex min-h-svh items-center justify-center bg-background p-6">
+      <Alert className="max-w-md">
+        <AlertTitle>{t('auth.session.errorTitle')}</AlertTitle>
+        <AlertDescription>{t('auth.session.errorMessage')}</AlertDescription>
+        <Button variant="secondary" size="sm" className="mt-4" onClick={retry}>
+          {t('auth.session.retry')}
+        </Button>
+      </Alert>
+    </div>
+  );
 }
 
 function AccessDenied() {

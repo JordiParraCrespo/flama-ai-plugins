@@ -8,7 +8,7 @@ the editor.
 ## Running it
 
 ```bash
-pnpm --filter @flama/docs dev      # http://localhost:3004
+pnpm --filter @flama/docs dev      # http://localhost:3002
 pnpm --filter @flama/docs build
 pnpm --filter @flama/docs lint
 ```
