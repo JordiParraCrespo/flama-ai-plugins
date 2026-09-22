@@ -1,7 +1,6 @@
 # flama:begin web|admin-web
 # ------------------------------------------------------------------------------
-# Web (apps/web, apps/admin-web) — VITE_* values are public and baked in at
-# build time
+# Web apps — VITE_* values are public and baked in at build time
 # ------------------------------------------------------------------------------
 
 # Leave empty in development: the Vite dev server proxies `/api` to the API

@@ -1,8 +1,7 @@
 # flama:begin mobile|admin-mobile
 # ------------------------------------------------------------------------------
-# Mobile (apps/mobile, apps/admin-mobile) — EXPO_PUBLIC_* values are public and
-# baked in at build time (each app's app.config.ts loads this file before Metro
-# bundles)
+# Mobile apps — EXPO_PUBLIC_* values are public and baked in at build time
+# (each app's app.config.ts loads this file before Metro bundles)
 # ------------------------------------------------------------------------------
 
 # Use http://localhost:3001 for the iOS simulator. On a physical device or
