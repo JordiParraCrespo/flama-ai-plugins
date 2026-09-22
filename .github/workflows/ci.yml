@@ -11,14 +11,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # The starter ref the round trip installs into. This must be `main`: a plugin
-  # that stops installing because the starter moved is what this job exists to
-  # catch, and pinning hides exactly that.
-  #
-  # It is a branch for now only because the installer itself is unmerged —
-  # flama-ai#148 adds scripts/plugins/plugin.mjs, without which the round trip
-  # cannot run at all. Set this back to `main` the moment that lands.
-  FLAMA_AI_REF: claude/compassionate-curie-2jvnwz
+  # The starter ref these jobs install into. It is `main` and should stay `main`:
+  # a plugin that stops installing because the starter moved is precisely what
+  # they exist to catch, and pinning to anything older hides it.
+  FLAMA_AI_REF: main
 
 jobs:
   roundtrip:
