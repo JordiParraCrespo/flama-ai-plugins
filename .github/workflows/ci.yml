@@ -11,14 +11,48 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # The starter ref these jobs install into. It is `main` and should stay `main`:
-  # a plugin that stops installing because the starter moved is precisely what
-  # they exist to catch, and pinning to anything older hides it.
+  # The starter ref these jobs install into. It is `main` and should stay
+  # `main`: a plugin that stops installing because the starter moved is
+  # precisely what they exist to catch, and pinning to anything older hides
+  # it. The one exception is a paired change — see the `starter` job.
   FLAMA_AI_REF: main
 
 jobs:
+  # A plugin is generated from the starter, so a plugin change and the starter
+  # change that makes room for it land together. Until the starter side is
+  # merged, `main` still owns the feature and the plugin cannot install — the
+  # round trip would be red for every paired pull request, which is exactly
+  # when it is worth running.
+  #
+  # So: if a branch of this pull request's own name exists in the starter, that
+  # is the other half of the pair, and the jobs install into it. The convention
+  # is already how the two repos are worked. Nothing else resolves this way —
+  # a push to `main` carries no head ref, and a pull request with no twin
+  # branch falls back to `main`.
+  starter:
+    name: Resolve the starter ref
+    runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.resolve.outputs.ref }}
+    steps:
+      - id: resolve
+        env:
+          FALLBACK: ${{ env.FLAMA_AI_REF }}
+          PAIRED: ${{ github.head_ref }}
+        run: |
+          ref="$FALLBACK"
+          if [ -n "$PAIRED" ] && git ls-remote --exit-code --heads \
+              https://github.com/JordiParraCrespo/flama-ai.git "$PAIRED" >/dev/null 2>&1; then
+            ref="$PAIRED"
+            echo "Paired with flama-ai@$PAIRED."
+          else
+            echo "No paired branch in flama-ai; using $ref."
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
   roundtrip:
     name: Round trip against flama-ai
+    needs: starter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -27,7 +61,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: JordiParraCrespo/flama-ai
-          ref: ${{ env.FLAMA_AI_REF }}
+          ref: ${{ needs.starter.outputs.ref }}
           path: .flama-ai
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
@@ -41,13 +75,14 @@ jobs:
 
   installed:
     name: Build and test an installed plugin
+    needs: starter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: JordiParraCrespo/flama-ai
-          ref: ${{ env.FLAMA_AI_REF }}
+          ref: ${{ needs.starter.outputs.ref }}
           path: .flama-ai
       # The pnpm version is the starter's, read from its own packageManager
       # pin — this repo has no pnpm of its own to pin, and hard-coding one
