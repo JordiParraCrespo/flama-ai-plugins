@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Documentation site",
-    "summary": "apps/docs — Docusaurus site (architecture, deployment, error catalog)",
+    "summary": "apps/docs \u2014 Docusaurus site (architecture, deployment, error catalog)",
     "identifiers": [
       "apps/docs",
       "@flama/docs",
@@ -59,6 +59,11 @@
       "file": "scripts/ci/affected.mjs",
       "anchor": "docs",
       "source": "blocks/scripts_ci_affected_mjs.txt"
+    },
+    {
+      "file": ".gitignore",
+      "anchor": "docs",
+      "source": "blocks/_gitignore.txt"
     }
   ]
 }

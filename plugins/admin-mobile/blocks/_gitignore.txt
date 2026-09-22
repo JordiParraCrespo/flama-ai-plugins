@@ -1,0 +1,4 @@
+# flama:begin admin-mobile
+apps/admin-mobile/ios/
+apps/admin-mobile/android/
+# flama:end admin-mobile

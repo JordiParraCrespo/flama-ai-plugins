@@ -202,13 +202,19 @@
       "file": "scripts/scaffold-feature.mjs",
       "anchor": "admin-mobile",
       "source": "blocks/scripts_scaffold-feature_mjs.txt"
+    },
+    {
+      "file": ".gitignore",
+      "anchor": "admin-mobile",
+      "source": "blocks/_gitignore.txt"
+    },
+    {
+      "file": ".agents/hooks/arch-check.sh",
+      "anchor": "admin-mobile",
+      "source": "blocks/_agents_hooks_arch-check_sh.txt"
     }
   ],
   "coOwned": [
-    {
-      "file": ".agents/hooks/arch-check.sh",
-      "source": "blocks/co-owned/_agents_hooks_arch-check_sh.txt"
-    },
     {
       "file": ".env.example",
       "source": "blocks/co-owned/_env_example.txt"
@@ -220,10 +226,6 @@
     {
       "file": ".github/workflows/ci.yml",
       "source": "blocks/co-owned/_github_workflows_ci_yml_1.txt"
-    },
-    {
-      "file": ".gitignore",
-      "source": "blocks/co-owned/_gitignore.txt"
     },
     {
       "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",

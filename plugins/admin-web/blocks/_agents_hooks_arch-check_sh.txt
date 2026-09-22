@@ -1,0 +1,3 @@
+# flama:begin admin-web
+frontend_changed+=$(git status --porcelain -- apps/admin-web 2>/dev/null)
+# flama:end admin-web

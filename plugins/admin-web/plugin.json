@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Admin control plane (web)",
-    "summary": "apps/admin-web — Vite control plane for users, roles and permissions",
+    "summary": "apps/admin-web \u2014 Vite control plane for users, roles and permissions",
     "identifiers": [
       "apps/admin-web",
       "@flama/admin-web",
@@ -218,13 +218,14 @@
       "file": "scripts/scaffold-feature.mjs",
       "anchor": "admin-web",
       "source": "blocks/scripts_scaffold-feature_mjs.txt"
+    },
+    {
+      "file": ".agents/hooks/arch-check.sh",
+      "anchor": "admin-web",
+      "source": "blocks/_agents_hooks_arch-check_sh.txt"
     }
   ],
   "coOwned": [
-    {
-      "file": ".agents/hooks/arch-check.sh",
-      "source": "blocks/co-owned/_agents_hooks_arch-check_sh.txt"
-    },
     {
       "file": ".env.example",
       "source": "blocks/co-owned/_env_example.txt"
