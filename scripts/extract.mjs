@@ -244,12 +244,11 @@ function main() {
         verbatimSymlinks: true,
       });
     }
-    const orphan = deleted.find((file) => !Object.keys(files).some((p) => file.startsWith(p)));
-    if (orphan) fail(`${orphan} was removed but no feature path covers it`);
 
     // Marked blocks in files that survive.
     mkdirSync(join(out, 'blocks'), { recursive: true });
     const blocks = [];
+    const jsonBlocks = [];
     for (const file of modified) {
       const after = readFileSync(join(scratch, file), 'utf8');
       // A feature can own several blocks in one file — `helm/values.yaml`
@@ -257,17 +256,34 @@ function main() {
       // restored at an anchor of its own, so each becomes its own entry.
       const found = removalHunks(git(scratch, 'diff', '-U0', '--', file));
       found.forEach((block, n) => {
+        const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
+        writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
+        const needs = ownerOf(manifest.features, file, id);
         const anchor = anchorAt(after, block.at);
-        if (!anchor) {
+        if (anchor) {
+          blocks.push({ file, anchor, source, ...(needs ? { needs } : {}) });
+          console.log(`  block  ${file} → ${anchor}${needs ? ` (only with ${needs})` : ''}`);
+          return;
+        }
+        // JSON holds no comments, so it can hold no anchor. The line the run
+        // followed is the anchor instead: content rather than a marker, which
+        // is why it has to be unique in the file — otherwise the installer
+        // would be choosing between identical places to put it back.
+        if (!file.endsWith('.json')) {
           fail(
             `${file}: no "flama:plugins <slot>" anchor after the block removed at line ${block.at} — add one where the block sits, or the installer has nowhere to put it back`,
           );
         }
-        const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
-        writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
-        const needs = ownerOf(manifest.features, file, id);
-        blocks.push({ file, anchor, source, ...(needs ? { needs } : {}) });
-        console.log(`  block  ${file} → ${anchor}${needs ? ` (only with ${needs})` : ''}`);
+        const lines = after.split('\n');
+        const preceding = lines[block.at - 1];
+        const occurrences = lines.filter((line) => line === preceding).length;
+        if (preceding === undefined || occurrences !== 1) {
+          fail(
+            `${file}: the line above the removed run appears ${occurrences} times, so it cannot say where the run goes back`,
+          );
+        }
+        jsonBlocks.push({ file, after: preceding, source, ...(needs ? { needs } : {}) });
+        console.log(`  json   ${file} (after ${preceding.trim()})`);
       });
     }
 
@@ -326,6 +342,12 @@ function main() {
       console.log(`  shared ${entry.path} (carried — every dependant is leaving)`);
     }
 
+    const covered = [...Object.keys(files), ...Object.keys(sharedFiles)];
+    const orphan = deleted.find((file) => !covered.some((p) => file.startsWith(p)));
+    if (orphan) {
+      fail(`${orphan} was removed but neither a feature path nor a carried shared path covers it`);
+    }
+
     const plugin = {
       id,
       flama: JSON.parse(readFileSync(join(repo, 'package.json'), 'utf8')).version ?? '0.0.0',
@@ -346,6 +368,7 @@ function main() {
       files,
       ...(Object.keys(sharedFiles).length ? { sharedFiles } : {}),
       ...(blocks.length ? { blocks } : {}),
+      ...(jsonBlocks.length ? { jsonBlocks } : {}),
       ...(coOwned.length ? { coOwned } : {}),
     };
     writeFileSync(join(out, 'plugin.json'), `${JSON.stringify(plugin, null, 2)}\n`);

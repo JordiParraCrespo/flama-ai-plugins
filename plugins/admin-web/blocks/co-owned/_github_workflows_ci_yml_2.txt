@@ -1,0 +1,19 @@
+      # flama:begin web|admin-web
+      # What a first-time visitor downloads before anything renders, against a
+      # committed budget. Vite's own chunk warning prints and passes. The
+      # check reads both SPAs' dist folders, so build both when either changed;
+      # the one already built above is a local cache hit.
+      - name: First-load budgets
+        if: contains(needs.changes.outputs.packages, '"@flama/web"') || contains(needs.changes.outputs.packages, '"@flama/admin-web"')
+        run: |
+          filters=()
+          # flama:begin web
+          filters+=(--filter=@flama/web)
+          # flama:end web
+          # flama:begin admin-web
+          filters+=(--filter=@flama/admin-web)
+          # flama:end admin-web
+          # flama:plugins admin-web
+          pnpm turbo run build "${filters[@]}"
+          pnpm check:bundle
+      # flama:end web|admin-web

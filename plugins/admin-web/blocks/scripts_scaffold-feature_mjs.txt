@@ -1,0 +1,9 @@
+  // flama:begin admin-web
+  'admin-web': {
+    dir: 'apps/admin-web',
+    features: 'src/features',
+    product: 'admin',
+    allow: [],
+    platform: 'web',
+  },
+  // flama:end admin-web

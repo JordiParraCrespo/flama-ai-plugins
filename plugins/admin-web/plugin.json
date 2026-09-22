@@ -1,0 +1,253 @@
+{
+  "id": "admin-web",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Admin control plane (web)",
+    "summary": "apps/admin-web — Vite control plane for users, roles and permissions",
+    "identifiers": [
+      "apps/admin-web",
+      "@flama/admin-web",
+      "flama-admin-web"
+    ],
+    "paths": [
+      "apps/admin-web",
+      "helm/flama/templates/admin-web-deployment.yaml"
+    ],
+    "shared": [
+      {
+        "path": "packages/frontend/design-system/web",
+        "identifiers": [
+          "packages/frontend/design-system/web",
+          "@flama/design-system-web"
+        ],
+        "neededBy": [
+          "web",
+          "admin-web",
+          "web-showcase"
+        ]
+      },
+      {
+        "path": "packages/frontend/core",
+        "identifiers": [
+          "packages/frontend/core",
+          "@flama/frontend-core"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "admin-web"
+        ]
+      },
+      {
+        "path": "packages/frontend/admin",
+        "identifiers": [
+          "packages/frontend/admin",
+          "@flama/frontend-admin"
+        ],
+        "neededBy": [
+          "admin-web"
+        ]
+      },
+      {
+        "path": "packages/frontend/web",
+        "identifiers": [
+          "packages/frontend/web",
+          "@flama/frontend-web"
+        ],
+        "neededBy": [
+          "web",
+          "admin-web"
+        ]
+      },
+      {
+        "path": "packages/frontend/api-client",
+        "identifiers": [
+          "packages/frontend/api-client",
+          "@flama/api-client"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "admin-web"
+        ]
+      },
+      {
+        "path": "scripts/check-bundle-size.mjs",
+        "identifiers": [
+          "check-bundle-size",
+          "check:bundle"
+        ],
+        "neededBy": [
+          "web",
+          "admin-web"
+        ]
+      },
+      {
+        "path": "scripts/check-frontend-structure.mjs",
+        "identifiers": [
+          "check-frontend-structure",
+          "check:structure"
+        ],
+        "neededBy": [
+          "web",
+          "admin-web",
+          "mobile"
+        ]
+      },
+      {
+        "path": "scripts/scaffold-feature.mjs",
+        "identifiers": [
+          "scaffold-feature.mjs"
+        ],
+        "neededBy": [
+          "web",
+          "admin-web",
+          "mobile"
+        ]
+      },
+      {
+        "path": ".agents/skills/scaffold-feature",
+        "identifiers": [
+          ".agents/skills/scaffold-feature",
+          "/scaffold-feature"
+        ],
+        "neededBy": [
+          "web",
+          "admin-web",
+          "mobile"
+        ]
+      },
+      {
+        "path": "packages/tsconfig/depcruise/frontend-app.cjs",
+        "identifiers": [
+          "depcruise/frontend-app"
+        ],
+        "neededBy": [
+          "web",
+          "admin-web",
+          "mobile"
+        ]
+      },
+      {
+        "path": "packages/tsconfig/depcruise/frontend-kit.cjs",
+        "identifiers": [
+          "depcruise/frontend-kit"
+        ],
+        "neededBy": [
+          "web",
+          "admin-web",
+          "mobile"
+        ]
+      }
+    ]
+  },
+  "files": {
+    "apps/admin-web": "files/apps/admin-web",
+    "helm/flama/templates/admin-web-deployment.yaml": "files/helm/flama/templates/admin-web-deployment.yaml"
+  },
+  "sharedFiles": {
+    "packages/frontend/admin": "shared/packages/frontend/admin"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "admin-web",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "anchor": "admin-web",
+      "source": "blocks/_github_workflows_ci_yml.txt"
+    },
+    {
+      "file": "docker/docker-compose.prod.yml",
+      "anchor": "admin-web",
+      "source": "blocks/docker_docker-compose_prod_yml.txt"
+    },
+    {
+      "file": "docker/docker-compose.prod.yml",
+      "anchor": "admin-web-2",
+      "source": "blocks/docker_docker-compose_prod_yml_1.txt"
+    },
+    {
+      "file": "helm/flama/templates/ingress.yaml",
+      "anchor": "admin-web",
+      "source": "blocks/helm_flama_templates_ingress_yaml.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "helm/flama/templates/ingress.yaml",
+      "anchor": "admin-web-2",
+      "source": "blocks/helm_flama_templates_ingress_yaml_1.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "helm/flama/values.yaml",
+      "anchor": "admin-web",
+      "source": "blocks/helm_flama_values_yaml.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "helm/flama/values.yaml",
+      "anchor": "admin-web-2",
+      "source": "blocks/helm_flama_values_yaml_1.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "helm/flama/values.yaml",
+      "anchor": "admin-web-3",
+      "source": "blocks/helm_flama_values_yaml_2.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "scripts/check-bundle-size.mjs",
+      "anchor": "admin-web",
+      "source": "blocks/scripts_check-bundle-size_mjs.txt"
+    },
+    {
+      "file": "scripts/check-frontend-structure.mjs",
+      "anchor": "admin-web",
+      "source": "blocks/scripts_check-frontend-structure_mjs.txt"
+    },
+    {
+      "file": "scripts/ci/affected.mjs",
+      "anchor": "admin-web",
+      "source": "blocks/scripts_ci_affected_mjs.txt"
+    },
+    {
+      "file": "scripts/scaffold-feature.mjs",
+      "anchor": "admin-web",
+      "source": "blocks/scripts_scaffold-feature_mjs.txt"
+    }
+  ],
+  "coOwned": [
+    {
+      "file": ".agents/hooks/arch-check.sh",
+      "source": "blocks/co-owned/_agents_hooks_arch-check_sh.txt"
+    },
+    {
+      "file": ".env.example",
+      "source": "blocks/co-owned/_env_example.txt"
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "source": "blocks/co-owned/_github_workflows_ci_yml.txt"
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "source": "blocks/co-owned/_github_workflows_ci_yml_1.txt"
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "source": "blocks/co-owned/_github_workflows_ci_yml_2.txt"
+    },
+    {
+      "file": "scripts/check-frontend-structure.mjs",
+      "source": "blocks/co-owned/scripts_check-frontend-structure_mjs.txt"
+    },
+    {
+      "file": "scripts/scaffold-feature.mjs",
+      "source": "blocks/co-owned/scripts_scaffold-feature_mjs.txt"
+    }
+  ]
+}
