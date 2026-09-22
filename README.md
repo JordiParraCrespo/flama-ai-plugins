@@ -5,8 +5,8 @@ the starter deliberately does not ship, packaged so a project can add them back.
 
 ```bash
 # in your Flama project
-pnpm plugin:list   --from ../flama-ai-plugins
-pnpm plugin:add    cli --from ../flama-ai-plugins
+pnpm plugin:list
+pnpm plugin:add    cli
 pnpm plugin:remove cli
 ```
 
@@ -33,6 +33,19 @@ reverse, and the two halves are deliberately the same machine:
 Installed source becomes your code. There is no npm package, no version range
 and no upgrade command — Flama's own packages are all `private: true`, and a
 plugin is the same deal as the starter itself.
+
+`list` and `add` fetch this repository themselves — a depth-1 clone into a
+temporary directory, discarded when the command ends — so a project needs no
+checkout of it sitting alongside:
+
+```bash
+pnpm plugin:add cli --ref v0.3.0              # a branch, a tag or a commit
+pnpm plugin:add cli --repo <url>              # a fork
+pnpm plugin:add cli --from ../flama-ai-plugins # a checkout you already have
+```
+
+`--from` is what this repo's own harnesses use, and the offline route.
+`plugin:remove` fetches nothing: it is the pruner, running against the project.
 
 ## What a plugin holds
 

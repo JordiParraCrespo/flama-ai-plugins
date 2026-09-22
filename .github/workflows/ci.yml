@@ -66,8 +66,11 @@ jobs:
       # installs compiles. Nothing else does either, now that `apps/cli` has
       # left the starter — so its build, tests and lint run here, against the
       # workspace it lands in.
+      # An absolute path: `--from` resolves against the starter's root, not the
+      # working directory, so that the same argument means the same thing from
+      # anywhere in a project. `.` would name the starter checkout itself.
       - name: Install the plugin
-        run: node .flama-ai/scripts/plugins/plugin.mjs add cli --from .
+        run: node .flama-ai/scripts/plugins/plugin.mjs add cli --from "$GITHUB_WORKSPACE"
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
         working-directory: .flama-ai
