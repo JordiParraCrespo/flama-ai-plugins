@@ -1,0 +1,13 @@
+# flama:begin mcp|cli
+# ------------------------------------------------------------------------------
+# MCP server (apps/mcp) and CLI (apps/cli)
+# ------------------------------------------------------------------------------
+
+# Base URL of the Flama API the MCP server (and, as a profile override, the
+# CLI) talks to
+FLAMA_API_URL=http://localhost:3001
+# API token for the stdio entrypoint (`flama tokens create`); the HTTP
+# entrypoint takes a credential per request instead. Also read by the CLI as an
+# override for the active profile's token.
+FLAMA_API_TOKEN=
+# flama:end mcp|cli

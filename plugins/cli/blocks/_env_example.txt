@@ -1,0 +1,10 @@
+# flama:begin cli
+# ------------------------------------------------------------------------------
+# CLI (apps/cli) — normally configured via profiles (`flama config`), not env.
+# These are per-invocation overrides read from the real environment:
+#   FLAMA_CONFIG   — path to the config file (default: XDG config dir)
+#   FLAMA_PROFILE  — profile to use for this invocation
+#   FLAMA_API_URL / FLAMA_API_TOKEN — override the profile's URL/token
+# ------------------------------------------------------------------------------
+# flama:end cli
+
