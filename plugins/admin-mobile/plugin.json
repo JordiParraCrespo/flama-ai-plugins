@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Admin control plane (mobile)",
-    "summary": "apps/admin-mobile — Expo control plane for users and roles",
+    "summary": "apps/admin-mobile \u2014 Expo control plane for users and roles",
     "identifiers": [
       "apps/admin-mobile",
       "@flama/admin-mobile"
@@ -45,17 +45,6 @@
         ],
         "neededBy": [
           "admin-web",
-          "admin-mobile"
-        ]
-      },
-      {
-        "path": "packages/frontend/nitro-app-info",
-        "identifiers": [
-          "packages/frontend/nitro-app-info",
-          "@flama/nitro-app-info"
-        ],
-        "neededBy": [
-          "mobile",
           "admin-mobile"
         ]
       },
