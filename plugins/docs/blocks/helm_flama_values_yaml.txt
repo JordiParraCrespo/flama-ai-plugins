@@ -1,0 +1,13 @@
+# flama:begin docs
+docs:
+  image: ghcr.io/your-org/flama-docs:latest
+  replicas: 1
+  port: 80
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+# flama:end docs

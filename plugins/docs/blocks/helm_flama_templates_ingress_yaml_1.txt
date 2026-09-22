@@ -1,0 +1,12 @@
+    # flama:begin docs
+    - host: {{ .Values.ingress.hosts.docs }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-docs
+                port:
+                  number: 80
+    # flama:end docs

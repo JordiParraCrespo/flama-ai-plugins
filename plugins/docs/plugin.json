@@ -1,0 +1,64 @@
+{
+  "id": "docs",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Documentation site",
+    "summary": "apps/docs — Docusaurus site (architecture, deployment, error catalog)",
+    "identifiers": [
+      "apps/docs",
+      "@flama/docs",
+      "flama-docs"
+    ],
+    "paths": [
+      "apps/docs",
+      "helm/flama/templates/docs-deployment.yaml",
+      "apps/api/src/__tests__/error-catalog-coverage.spec.ts"
+    ]
+  },
+  "files": {
+    "apps/docs": "files/apps/docs",
+    "helm/flama/templates/docs-deployment.yaml": "files/helm/flama/templates/docs-deployment.yaml",
+    "apps/api/src/__tests__/error-catalog-coverage.spec.ts": "files/apps/api/src/__tests__/error-catalog-coverage.spec.ts"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "docs",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "docker/docker-compose.prod.yml",
+      "anchor": "docs",
+      "source": "blocks/docker_docker-compose_prod_yml.txt"
+    },
+    {
+      "file": "helm/flama/templates/ingress.yaml",
+      "anchor": "docs",
+      "source": "blocks/helm_flama_templates_ingress_yaml.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "helm/flama/templates/ingress.yaml",
+      "anchor": "docs-2",
+      "source": "blocks/helm_flama_templates_ingress_yaml_1.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "helm/flama/values.yaml",
+      "anchor": "docs",
+      "source": "blocks/helm_flama_values_yaml.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "helm/flama/values.yaml",
+      "anchor": "docs-2",
+      "source": "blocks/helm_flama_values_yaml_1.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "scripts/ci/affected.mjs",
+      "anchor": "docs",
+      "source": "blocks/scripts_ci_affected_mjs.txt"
+    }
+  ]
+}

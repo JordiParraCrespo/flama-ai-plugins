@@ -171,6 +171,25 @@ export function anchorAt(afterContent, at) {
   return null;
 }
 
+/**
+ * The feature that owns a file, if it is not this one.
+ *
+ * A block can land in a file another optional feature brings — the CLI's
+ * sidebar entry lives in `apps/docs/sidebars.ts`, which belongs to `docs`.
+ * In a project without that feature the file is simply absent, and the block
+ * has nowhere to go and nothing to say. Recording the owner lets the
+ * installer skip it there instead of refusing to install at all, while a
+ * missing file that *no* feature explains stays a loud failure, because then
+ * it means an anchor moved.
+ */
+export function ownerOf(features, file, self) {
+  for (const [id, feature] of Object.entries(features)) {
+    if (id === self) continue;
+    if ((feature.paths ?? []).some((p) => file === p || file.startsWith(`${p}/`))) return id;
+  }
+  return null;
+}
+
 function main() {
   const argv = process.argv.slice(2);
   const id = argv.find((arg) => !arg.startsWith('--'));
@@ -229,20 +248,23 @@ function main() {
     const blocks = [];
     for (const file of modified) {
       const after = readFileSync(join(scratch, file), 'utf8');
+      // A feature can own several blocks in one file — `helm/values.yaml`
+      // carries one per app it deploys, `ingress.yaml` one per host. Each is
+      // restored at an anchor of its own, so each becomes its own entry.
       const found = removalHunks(git(scratch, 'diff', '-U0', '--', file));
-      if (found.length > 1) fail(`${file}: ${found.length} separate removals; expected one block`);
-      const [block] = found;
-      if (!block) continue;
-      const anchor = anchorAt(after, block.at);
-      if (!anchor) {
-        fail(
-          `${file}: no "flama:plugins <slot>" anchor after the removed block — add one where the block sits, or the installer has nowhere to put it back`,
-        );
-      }
-      const source = `blocks/${file.replace(/[/.]/g, '_')}.txt`;
-      writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
-      blocks.push({ file, anchor, source });
-      console.log(`  block  ${file} → ${anchor}`);
+      found.forEach((block, n) => {
+        const anchor = anchorAt(after, block.at);
+        if (!anchor) {
+          fail(
+            `${file}: no "flama:plugins <slot>" anchor after the block removed at line ${block.at} — add one where the block sits, or the installer has nowhere to put it back`,
+          );
+        }
+        const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
+        writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
+        const needs = ownerOf(manifest.features, file, id);
+        blocks.push({ file, anchor, source, ...(needs ? { needs } : {}) });
+        console.log(`  block  ${file} → ${anchor}${needs ? ` (only with ${needs})` : ''}`);
+      });
     }
 
     // Co-owned blocks live in files the prune only narrowed, so they do not
@@ -265,8 +287,11 @@ function main() {
         const source = `blocks/co-owned/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
         mkdirSync(join(out, 'blocks', 'co-owned'), { recursive: true });
         writeFileSync(join(out, source), `${block.installed}\n`);
-        coOwned.push({ file, source });
-        console.log(`  shared block ${file} (${block.ids.join('|')})`);
+        const needs = ownerOf(manifest.features, file, id);
+        coOwned.push({ file, source, ...(needs ? { needs } : {}) });
+        console.log(
+          `  shared block ${file} (${block.ids.join('|')})${needs ? ` (only with ${needs})` : ''}`,
+        );
       });
     }
 
