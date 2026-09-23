@@ -269,7 +269,18 @@ function main() {
     // Marked blocks in files that survive.
     mkdirSync(join(out, 'blocks'), { recursive: true });
     const blocks = [];
+    // A JSON file is never a block source: it cannot hold a comment, so it
+    // cannot hold an anchor, so there is nowhere to put a block back. What a
+    // feature owns in one is declared instead — a `json` edit in its
+    // features.json entry, or a script in `scripts` — and a declaration is
+    // what the installer reads backwards.
+    const declared = new Set((feature.json ?? []).map((edit) => edit.file));
     for (const file of modified) {
+      if (file.endsWith('.json')) {
+        const how = declared.has(file) ? 'declared' : 'scripts and package names';
+        console.log(`  json   ${file} (${how})`);
+        continue;
+      }
       const after = readFileSync(join(scratch, file), 'utf8');
       // A feature can own several blocks in one file — `helm/values.yaml`
       // carries one per app it deploys, `ingress.yaml` one per host. Each is
@@ -279,7 +290,7 @@ function main() {
         const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
         writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
         const needs = ownerOf(manifest.features, file, id);
-        const anchor = anchorAt(after, block.at);
+        const anchor = anchorBeside(after, block.at - 1);
         if (anchor) {
           blocks.push({ file, anchor, source, ...(needs ? { needs } : {}) });
           console.log(`  block  ${file} → ${anchor}${needs ? ` (only with ${needs})` : ''}`);
