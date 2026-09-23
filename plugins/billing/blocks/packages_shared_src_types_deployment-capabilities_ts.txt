@@ -1,0 +1,3 @@
+  // flama:begin billing
+  'stripe_billing',
+  // flama:end billing

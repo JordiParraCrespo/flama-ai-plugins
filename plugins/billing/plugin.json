@@ -1,0 +1,261 @@
+{
+  "id": "billing",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Stripe billing",
+    "summary": "apps/api/src/billing — Stripe subscriptions: checkout, customer portal, webhooks and revenue metrics",
+    "identifiers": [
+      "apps/api/src/billing",
+      "BillingModule",
+      "stripeConfig",
+      "stripe_billing",
+      "STRIPE_SECRET_KEY",
+      "billing.schema",
+      "BILLING_001"
+    ],
+    "paths": [
+      "apps/api/src/billing",
+      "apps/api/src/config/stripe.config.ts",
+      "apps/api/src/migrations/1781000000000-AddBilling.ts",
+      "apps/api/src/migrations/1781200000000-AddSubscriptionLastEventAt.ts",
+      "packages/shared/src/schemas/billing.schema.ts"
+    ],
+    "json": [
+      {
+        "file": "apps/api/package.json",
+        "path": [
+          "dependencies"
+        ],
+        "set": {
+          "stripe": "^22.0.0"
+        },
+        "setAt": [
+          38
+        ]
+      },
+      {
+        "file": "packages/translations/en/errors.json",
+        "path": [
+          "byCode"
+        ],
+        "set": {
+          "BILLING_001": "Billing is not available on this server.",
+          "BILLING_002": "No billing account exists for you yet.",
+          "BILLING_003": "No subscription was found.",
+          "BILLING_004": "The billing request could not be verified.",
+          "BILLING_005": "Checkout could not be started. Please try again.",
+          "BILLING_006": "You already have an active subscription.",
+          "BILLING_007": "The billing portal could not be opened. Please try again.",
+          "BILLING_008": "Your billing account could not be created. Please try again.",
+          "BILLING_009": "That plan is not available."
+        },
+        "setAt": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "file": "packages/translations/en/index.json",
+        "path": [
+          "errors",
+          "byCode"
+        ],
+        "set": {
+          "BILLING_001": "Billing is not available on this server.",
+          "BILLING_002": "No billing account exists for you yet.",
+          "BILLING_003": "No subscription was found.",
+          "BILLING_004": "The billing request could not be verified.",
+          "BILLING_005": "Checkout could not be started. Please try again.",
+          "BILLING_006": "You already have an active subscription.",
+          "BILLING_007": "The billing portal could not be opened. Please try again.",
+          "BILLING_008": "Your billing account could not be created. Please try again.",
+          "BILLING_009": "That plan is not available."
+        },
+        "setAt": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "file": "packages/translations/es/errors.json",
+        "path": [
+          "byCode"
+        ],
+        "set": {
+          "BILLING_001": "La facturación no está disponible en este servidor.",
+          "BILLING_002": "Todavía no existe una cuenta de facturación para ti.",
+          "BILLING_003": "No se ha encontrado ninguna suscripción.",
+          "BILLING_004": "No se ha podido verificar la solicitud de facturación.",
+          "BILLING_005": "No se ha podido iniciar el pago. Inténtalo de nuevo.",
+          "BILLING_006": "Ya tienes una suscripción activa.",
+          "BILLING_007": "No se ha podido abrir el portal de facturación. Inténtalo de nuevo.",
+          "BILLING_008": "No se ha podido crear tu cuenta de facturación. Inténtalo de nuevo.",
+          "BILLING_009": "Ese plan no está disponible."
+        },
+        "setAt": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "file": "packages/translations/es/index.json",
+        "path": [
+          "errors",
+          "byCode"
+        ],
+        "set": {
+          "BILLING_001": "La facturación no está disponible en este servidor.",
+          "BILLING_002": "Todavía no existe una cuenta de facturación para ti.",
+          "BILLING_003": "No se ha encontrado ninguna suscripción.",
+          "BILLING_004": "No se ha podido verificar la solicitud de facturación.",
+          "BILLING_005": "No se ha podido iniciar el pago. Inténtalo de nuevo.",
+          "BILLING_006": "Ya tienes una suscripción activa.",
+          "BILLING_007": "No se ha podido abrir el portal de facturación. Inténtalo de nuevo.",
+          "BILLING_008": "No se ha podido crear tu cuenta de facturación. Inténtalo de nuevo.",
+          "BILLING_009": "Ese plan no está disponible."
+        },
+        "setAt": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      }
+    ],
+    "regenerate": [
+      "generate:api-client",
+      "generate:openapi"
+    ]
+  },
+  "files": {
+    "apps/api/src/billing": "files/apps/api/src/billing",
+    "apps/api/src/config/stripe.config.ts": "files/apps/api/src/config/stripe.config.ts",
+    "apps/api/src/migrations/1781000000000-AddBilling.ts": "files/apps/api/src/migrations/1781000000000-AddBilling.ts",
+    "apps/api/src/migrations/1781200000000-AddSubscriptionLastEventAt.ts": "files/apps/api/src/migrations/1781200000000-AddSubscriptionLastEventAt.ts",
+    "packages/shared/src/schemas/billing.schema.ts": "files/packages/shared/src/schemas/billing.schema.ts"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "api-integrations-env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "api-module-imports",
+      "source": "blocks/apps_api_src_app_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "api-config-imports",
+      "source": "blocks/apps_api_src_app_module_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "api-config",
+      "source": "blocks/apps_api_src_app_module_ts_2.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "api-modules",
+      "source": "blocks/apps_api_src_app_module_ts_3.txt"
+    },
+    {
+      "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
+      "anchor": "handler-imports",
+      "source": "blocks/apps_api_src_auth___tests___endpoint-policies_spec_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
+      "anchor": "guarded-handlers",
+      "source": "blocks/apps_api_src_auth___tests___endpoint-policies_spec_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/capabilities/__tests__/capabilities.module.spec.ts",
+      "anchor": "bare-capabilities",
+      "source": "blocks/apps_api_src_capabilities___tests___capabilities_module_spec_ts.txt"
+    },
+    {
+      "file": "apps/api/src/capabilities/__tests__/capabilities.module.spec.ts",
+      "anchor": "capability-tests",
+      "source": "blocks/apps_api_src_capabilities___tests___capabilities_module_spec_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/capabilities/capabilities.module.ts",
+      "anchor": "capabilities",
+      "source": "blocks/apps_api_src_capabilities_capabilities_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/health/dtos/capabilities.response.dto.ts",
+      "anchor": "client-capabilities",
+      "source": "blocks/apps_api_src_health_dtos_capabilities_response_dto_ts.txt"
+    },
+    {
+      "file": "apps/docs/docs/errors.md",
+      "anchor": "integration-errors",
+      "source": "blocks/apps_docs_docs_errors_md.txt",
+      "needs": "docs"
+    },
+    {
+      "file": "packages/shared/src/permissions/abilities.ts",
+      "anchor": "known-subjects",
+      "source": "blocks/packages_shared_src_permissions_abilities_ts.txt"
+    },
+    {
+      "file": "packages/shared/src/permissions/endpoint-policies.ts",
+      "anchor": "endpoint-policies",
+      "source": "blocks/packages_shared_src_permissions_endpoint-policies_ts.txt"
+    },
+    {
+      "file": "packages/shared/src/schemas/index.ts",
+      "anchor": "schema-exports",
+      "source": "blocks/packages_shared_src_schemas_index_ts.txt"
+    },
+    {
+      "file": "packages/shared/src/scopes/catalog.ts",
+      "anchor": "scope-resources",
+      "source": "blocks/packages_shared_src_scopes_catalog_ts.txt"
+    },
+    {
+      "file": "packages/shared/src/scopes/catalog.ts",
+      "anchor": "permission-groups",
+      "source": "blocks/packages_shared_src_scopes_catalog_ts_1.txt"
+    },
+    {
+      "file": "packages/shared/src/types/deployment-capabilities.ts",
+      "anchor": "deployment-capabilities",
+      "source": "blocks/packages_shared_src_types_deployment-capabilities_ts.txt"
+    },
+    {
+      "file": "packages/shared/src/types/deployment-capabilities.ts",
+      "anchor": "client-capabilities",
+      "source": "blocks/packages_shared_src_types_deployment-capabilities_ts_1.txt"
+    }
+  ]
+}

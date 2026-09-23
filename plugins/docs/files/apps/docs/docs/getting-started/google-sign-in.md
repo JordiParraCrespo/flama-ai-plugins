@@ -142,7 +142,7 @@ Two ways to confirm it took:
 
 ```bash
 curl http://localhost:3001/api/v1/health/capabilities
-# {"google_oauth":true,"github_oauth":false,"stripe_billing":false}
+# {"google_oauth":true,"github_oauth":false}
 ```
 
 If `google_oauth` is `off`/`false`, the API did not see both variables — the

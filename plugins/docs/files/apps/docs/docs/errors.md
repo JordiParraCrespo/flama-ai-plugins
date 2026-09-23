@@ -44,8 +44,8 @@ An unexpected `5xx` never carries an internal message — the status is preserve
 (a readiness failure still answers `503`) but the `detail` always reads
 `"An unexpected error occurred. Quote the correlation id when reporting it."`
 The specifics are in the server log, keyed by `correlationId`. Catalog errors
-that are themselves `5xx` (e.g. `BILLING_001`) keep their curated title, since
-that text was written to be shown.
+that are themselves `5xx` (an integration that is not configured, say) keep
+their curated title, since that text was written to be shown.
 
 The `type` base is configurable with `ERROR_TYPE_BASE_URL` so a deployment can
 point at its own documentation.
@@ -160,16 +160,7 @@ wrong place.
 | `GRANT_003` <a id="grant_003" /> | The named principal does not belong to this organization  | 400  |
 | `GRANT_004` <a id="grant_004" /> | Access grants are written inside an organization          | 400  |
 
-## Leads
-
-| Code                           | Title          | HTTP |
-| ------------------------------ | -------------- | ---- |
-| `LEAD_001` <a id="lead_001" /> | Lead not found                          | 404  |
-| `LEAD_002` <a id="lead_002" /> | Leads are created inside an organization | 400  |
-
-Also returned for a lead that exists but sits outside the caller's access
-scope. Distinguishing the two would confirm the id.
-
+<!-- flama:begin billing -->
 ## Billing
 
 | Code                                 | Title                                        | HTTP |
@@ -182,6 +173,10 @@ scope. Distinguishing the two would confirm the id.
 | `BILLING_006` <a id="billing_006" /> | This user already has an active subscription | 409  |
 | `BILLING_007` <a id="billing_007" /> | Failed to open the Stripe Customer Portal    | 502  |
 | `BILLING_008` <a id="billing_008" /> | Failed to create a Stripe customer           | 502  |
+| `BILLING_009` <a id="billing_009" /> | That price is not offered here               | 400  |
+
+<!-- flama:end billing -->
+<!-- flama:plugins integration-errors -->
 
 ## Organizations, teams & invitations
 
