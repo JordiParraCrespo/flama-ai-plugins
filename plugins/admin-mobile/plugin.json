@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Admin control plane (mobile)",
-    "summary": "apps/admin-mobile \u2014 Expo control plane for users and roles",
+    "summary": "apps/admin-mobile — Expo control plane for users and roles",
     "identifiers": [
       "apps/admin-mobile",
       "@flama/admin-mobile"
@@ -164,32 +164,32 @@
     },
     {
       "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
-      "anchor": "admin-mobile",
+      "anchor": "auth-consts",
       "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
     },
     {
       "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
-      "anchor": "admin-mobile-2",
+      "anchor": "trusted-origins",
       "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
     },
     {
       "file": "apps/api/src/config/app.config.ts",
-      "anchor": "admin-mobile",
+      "anchor": "config-schema",
       "source": "blocks/apps_api_src_config_app_config_ts.txt"
     },
     {
       "file": "apps/api/src/config/app.config.ts",
-      "anchor": "admin-mobile-2",
+      "anchor": "config-env",
       "source": "blocks/apps_api_src_config_app_config_ts_1.txt"
     },
     {
       "file": "docker/docker-compose.prod.yml",
-      "anchor": "admin-mobile",
+      "anchor": "api-env",
       "source": "blocks/docker_docker-compose_prod_yml.txt"
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "admin-mobile",
+      "anchor": "api-env",
       "source": "blocks/helm_flama_values_yaml.txt",
       "needs": "helm"
     },
@@ -217,35 +217,74 @@
   "coOwned": [
     {
       "file": ".env.example",
-      "source": "blocks/co-owned/_env_example.txt"
+      "anchor": "mobile-env",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": ".github/workflows/ci.yml",
-      "source": "blocks/co-owned/_github_workflows_ci_yml.txt"
+      "anchor": "design-lint",
+      "order": [
+        "web",
+        "admin-web",
+        "web-showcase",
+        "mobile",
+        "admin-mobile",
+        "mobile-showcase"
+      ]
     },
     {
       "file": ".github/workflows/ci.yml",
-      "source": "blocks/co-owned/_github_workflows_ci_yml_1.txt"
+      "anchor": "frontend-structure",
+      "order": [
+        "web",
+        "admin-web",
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
-      "source": "blocks/co-owned/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
+      "anchor": "auth-imports",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
-      "source": "blocks/co-owned/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
+      "anchor": "auth-plugins",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": "packages/tsconfig/depcruise/frontend-domain.cjs",
-      "source": "blocks/co-owned/packages_tsconfig_depcruise_frontend-domain_cjs.txt"
+      "anchor": "native-modules",
+      "order": [
+        "mobile",
+        "admin-mobile",
+        "mobile-showcase"
+      ]
     },
     {
       "file": "scripts/check-frontend-structure.mjs",
-      "source": "blocks/co-owned/scripts_check-frontend-structure_mjs.txt"
+      "anchor": "mobile-kits",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": "scripts/scaffold-feature.mjs",
-      "source": "blocks/co-owned/scripts_scaffold-feature_mjs.txt"
+      "anchor": "mobile-templates",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     }
   ]
 }

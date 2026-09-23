@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Admin control plane (web)",
-    "summary": "apps/admin-web \u2014 Vite control plane for users, roles and permissions",
+    "summary": "apps/admin-web — Vite control plane for users, roles and permissions",
     "identifiers": [
       "apps/admin-web",
       "@flama/admin-web",
@@ -161,41 +161,41 @@
     },
     {
       "file": "docker/docker-compose.prod.yml",
-      "anchor": "admin-web",
+      "anchor": "services",
       "source": "blocks/docker_docker-compose_prod_yml.txt"
     },
     {
       "file": "docker/docker-compose.prod.yml",
-      "anchor": "admin-web-2",
+      "anchor": "services",
       "source": "blocks/docker_docker-compose_prod_yml_1.txt"
     },
     {
       "file": "helm/flama/templates/ingress.yaml",
-      "anchor": "admin-web",
+      "anchor": "ingress-tls",
       "source": "blocks/helm_flama_templates_ingress_yaml.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/templates/ingress.yaml",
-      "anchor": "admin-web-2",
+      "anchor": "ingress-rules",
       "source": "blocks/helm_flama_templates_ingress_yaml_1.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "admin-web",
+      "anchor": "services",
       "source": "blocks/helm_flama_values_yaml.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "admin-web-2",
+      "anchor": "services",
       "source": "blocks/helm_flama_values_yaml_1.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "admin-web-3",
+      "anchor": "ingress-hosts",
       "source": "blocks/helm_flama_values_yaml_2.txt",
       "needs": "helm"
     },
@@ -223,32 +223,90 @@
       "file": ".agents/hooks/arch-check.sh",
       "anchor": "admin-web",
       "source": "blocks/_agents_hooks_arch-check_sh.txt"
+    },
+    {
+      "file": "apps/api/src/config/app.config.ts",
+      "anchor": "config-schema",
+      "source": "blocks/apps_api_src_config_app_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/app.config.ts",
+      "anchor": "config-env",
+      "source": "blocks/apps_api_src_config_app_config_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "auth-consts",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "trusted-origins",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/main.ts",
+      "anchor": "cors-origins",
+      "source": "blocks/apps_api_src_main_ts.txt"
+    },
+    {
+      "file": ".env.example",
+      "anchor": "api-urls",
+      "source": "blocks/_env_example_1.txt"
     }
   ],
   "coOwned": [
     {
       "file": ".env.example",
-      "source": "blocks/co-owned/_env_example.txt"
+      "anchor": "web-env",
+      "order": [
+        "web",
+        "admin-web"
+      ]
     },
     {
       "file": ".github/workflows/ci.yml",
-      "source": "blocks/co-owned/_github_workflows_ci_yml.txt"
+      "anchor": "design-lint",
+      "order": [
+        "web",
+        "admin-web",
+        "web-showcase",
+        "mobile",
+        "mobile-showcase"
+      ]
     },
     {
       "file": ".github/workflows/ci.yml",
-      "source": "blocks/co-owned/_github_workflows_ci_yml_1.txt"
+      "anchor": "frontend-structure",
+      "order": [
+        "web",
+        "admin-web",
+        "mobile"
+      ]
     },
     {
       "file": ".github/workflows/ci.yml",
-      "source": "blocks/co-owned/_github_workflows_ci_yml_2.txt"
+      "anchor": "bundle-budgets",
+      "order": [
+        "web",
+        "admin-web"
+      ]
     },
     {
       "file": "scripts/check-frontend-structure.mjs",
-      "source": "blocks/co-owned/scripts_check-frontend-structure_mjs.txt"
+      "anchor": "web-kits",
+      "order": [
+        "web",
+        "admin-web"
+      ]
     },
     {
       "file": "scripts/scaffold-feature.mjs",
-      "source": "blocks/co-owned/scripts_scaffold-feature_mjs.txt"
+      "anchor": "web-templates",
+      "order": [
+        "web",
+        "admin-web"
+      ]
     }
   ]
 }

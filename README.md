@@ -24,9 +24,10 @@ Flama prunes. `scripts/starter/prune.mjs` ships every app the starter knows how
 to build and takes out what a project does not want. A plugin is that in
 reverse, and the two halves are deliberately the same machine:
 
-- A plugin **is** a feature entry. Installing writes it to `.flama-plugins.json`,
-  which the pruner merges into its manifest at load. From that moment the
-  honesty check covers the plugin and `starter:prune --without <id>` removes it.
+- A plugin **is** a feature entry. Installing writes it into `features.json`,
+  the starter's own manifest, marked `"plugin": true`. There is one catalog, so
+  from that moment the honesty check covers the plugin and
+  `starter:prune --without <id>` removes it.
 - **Removal is the pruner.** `plugin:remove` shells out to `prune.mjs`. There is
   no second implementation of "take this feature out" to keep in step, so the
   uninstall path is as tested as the prune path has always been.

@@ -1,3 +1,0 @@
-  // flama:begin mobile|admin-mobile
-  'packages/frontend/mobile',
-  // flama:end mobile|admin-mobile

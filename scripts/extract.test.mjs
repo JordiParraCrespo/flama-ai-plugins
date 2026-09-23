@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { anchorAt, coOwnedBlocks, removalHunks } from './extract.mjs';
+import { anchorAt, anchorBeside, coOwnedBlocks, removalHunks } from './extract.mjs';
 
 test('removalHunks reads the deleted runs out of a -U0 diff', () => {
   const diff = [
@@ -68,4 +68,38 @@ test('coOwnedBlocks sees an outer block that encloses an inner one', () => {
 test('coOwnedBlocks ignores blocks this feature has no part in', () => {
   const content = '# flama:begin gadget|doodad\nX=\n# flama:end gadget|doodad';
   assert.deepEqual(coOwnedBlocks(content, 'widget'), []);
+});
+
+test('anchorBeside names the block it sits with, and nothing further down', () => {
+  const content = [
+    '# flama:begin web|admin-web',
+    'VITE_API_URL=',
+    '# flama:end web|admin-web',
+    '# flama:plugins web-env',
+    '',
+    'PORT=3001',
+    '# flama:plugins something-else',
+  ].join('\n');
+  assert.equal(anchorBeside(content, 2), 'web-env');
+
+  // A block with no anchor beside it gets none, even though the file has one
+  // further down — that slot belongs to something else.
+  const orphan = ['# flama:begin web', 'A=', '# flama:end web', 'B=', '# flama:plugins later'].join('\n');
+  assert.equal(anchorBeside(orphan, 2), null);
+
+  // Anchors stack: several plugins can name the same block.
+  const stacked = ['# flama:end web', '# flama:plugins one', '# flama:plugins two'].join('\n');
+  assert.equal(anchorBeside(stacked, 0), 'one');
+});
+
+test('coOwnedBlocks reports where each block closes', () => {
+  const content = [
+    'x',
+    '// flama:begin web|admin-web',
+    'const a = 1;',
+    '// flama:end web|admin-web',
+  ].join('\n');
+  const [block] = coOwnedBlocks(content, 'admin-web');
+  assert.equal(block.endLine, 3);
+  assert.deepEqual(block.ids, ['web', 'admin-web']);
 });

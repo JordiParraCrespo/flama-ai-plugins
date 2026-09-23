@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Command-line interface",
-    "summary": "apps/cli \u2014 `flama` CLI driven by scoped API tokens",
+    "summary": "apps/cli — `flama` CLI driven by scoped API tokens",
     "identifiers": [
       "apps/cli",
       "@flama/cli"
@@ -33,11 +33,19 @@
   "coOwned": [
     {
       "file": ".env.example",
-      "source": "blocks/co-owned/_env_example.txt"
+      "anchor": "agent-env",
+      "order": [
+        "mcp",
+        "cli"
+      ]
     },
     {
       "file": "AUTHORIZATION.md",
-      "source": "blocks/co-owned/AUTHORIZATION_md.txt"
+      "anchor": "agent-docs",
+      "order": [
+        "cli",
+        "mcp"
+      ]
     }
   ],
   "filesNeed": {

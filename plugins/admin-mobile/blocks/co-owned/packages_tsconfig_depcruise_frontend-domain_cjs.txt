@@ -1,3 +1,0 @@
-            // flama:begin mobile|admin-mobile|mobile-showcase
-            'node_modules/(react-native|expo-[a-z-]+)/',
-            // flama:end mobile|admin-mobile|mobile-showcase

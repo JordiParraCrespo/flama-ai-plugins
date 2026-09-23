@@ -22,6 +22,37 @@
       "qa",
       "qa:suite",
       "qa:coverage"
+    ],
+    "json": [
+      {
+        "file": "biome.json",
+        "path": [
+          "files",
+          "includes"
+        ],
+        "remove": [
+          "!**/qa/artifacts"
+        ],
+        "at": [
+          12
+        ]
+      },
+      {
+        "file": "package.json",
+        "path": [
+          "scripts"
+        ],
+        "set": {
+          "qa": "pnpm --filter @flama/qa qa",
+          "qa:suite": "pnpm --filter @flama/qa suite",
+          "qa:coverage": "pnpm --filter @flama/qa coverage"
+        },
+        "setAt": [
+          19,
+          20,
+          21
+        ]
+      }
     ]
   },
   "files": {
@@ -39,18 +70,6 @@
       "file": "pnpm-workspace.yaml",
       "anchor": "qa",
       "source": "blocks/pnpm-workspace_yaml.txt"
-    }
-  ],
-  "jsonBlocks": [
-    {
-      "file": "biome.json",
-      "after": "      \"!**/test-results\",",
-      "source": "blocks/biome_json.txt"
-    },
-    {
-      "file": "package.json",
-      "after": "    \"test:e2e\": \"pnpm --filter @flama/e2e e2e\",",
-      "source": "blocks/package_json.txt"
     }
   ]
 }

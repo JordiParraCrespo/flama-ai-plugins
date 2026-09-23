@@ -156,12 +156,33 @@ export function coOwnedBlocks(content, id) {
       installed: installed.join('\n'),
       pruned: pruned.join('\n'),
       ids: block.ids,
+      // Where the block closes, so the caller can look for the anchor that
+      // names it on the next line.
+      endLine: index,
     });
   });
   return found;
 }
 
 /** The first `flama:plugins <slot>` anchor at or after a line of the pruned file. */
+/**
+ * The anchor immediately beside the block closing on `endLine`, or null.
+ *
+ * Immediately: only other anchors and blank lines may sit between, so this
+ * names *this* block rather than whatever slot happens to appear next in the
+ * file. That distinction matters for a co-owned block, which is not removed
+ * and so has no gap to mark its place — only the anchor that sits with it.
+ */
+export function anchorBeside(content, endLine) {
+  const lines = content.split('\n');
+  for (let i = endLine + 1; i < lines.length; i += 1) {
+    const match = /flama:plugins\s+([\w-]+)\b/.exec(lines[i]);
+    if (match) return match[1];
+    if (lines[i].trim()) return null;
+  }
+  return null;
+}
+
 export function anchorAt(afterContent, at) {
   const lines = afterContent.split('\n');
   for (let i = Math.max(0, at); i < lines.length; i += 1) {
@@ -210,7 +231,7 @@ function main() {
   try {
     execFileSync(
       'node',
-      ['scripts/starter/prune.mjs', '--without', id, '--keep-tooling', '--no-install'],
+      ['scripts/starter/prune.mjs', '--without', id, '--no-install'],
       { cwd: scratch, stdio: 'pipe' },
     );
 
@@ -248,8 +269,18 @@ function main() {
     // Marked blocks in files that survive.
     mkdirSync(join(out, 'blocks'), { recursive: true });
     const blocks = [];
-    const jsonBlocks = [];
+    // A JSON file is never a block source: it cannot hold a comment, so it
+    // cannot hold an anchor, so there is nowhere to put a block back. What a
+    // feature owns in one is declared instead — a `json` edit in its
+    // features.json entry, or a script in `scripts` — and a declaration is
+    // what the installer reads backwards.
+    const declared = new Set((feature.json ?? []).map((edit) => edit.file));
     for (const file of modified) {
+      if (file.endsWith('.json')) {
+        const how = declared.has(file) ? 'declared' : 'scripts and package names';
+        console.log(`  json   ${file} (${how})`);
+        continue;
+      }
       const after = readFileSync(join(scratch, file), 'utf8');
       // A feature can own several blocks in one file — `helm/values.yaml`
       // carries one per app it deploys, `ingress.yaml` one per host. Each is
@@ -259,31 +290,23 @@ function main() {
         const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
         writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
         const needs = ownerOf(manifest.features, file, id);
-        const anchor = anchorAt(after, block.at);
+        const anchor = anchorBeside(after, block.at - 1);
         if (anchor) {
           blocks.push({ file, anchor, source, ...(needs ? { needs } : {}) });
           console.log(`  block  ${file} → ${anchor}${needs ? ` (only with ${needs})` : ''}`);
           return;
         }
-        // JSON holds no comments, so it can hold no anchor. The line the run
-        // followed is the anchor instead: content rather than a marker, which
-        // is why it has to be unique in the file — otherwise the installer
-        // would be choosing between identical places to put it back.
-        if (!file.endsWith('.json')) {
-          fail(
-            `${file}: no "flama:plugins <slot>" anchor after the block removed at line ${block.at} — add one where the block sits, or the installer has nowhere to put it back`,
-          );
-        }
-        const lines = after.split('\n');
-        const preceding = lines[block.at - 1];
-        const occurrences = lines.filter((line) => line === preceding).length;
-        if (preceding === undefined || occurrences !== 1) {
-          fail(
-            `${file}: the line above the removed run appears ${occurrences} times, so it cannot say where the run goes back`,
-          );
-        }
-        jsonBlocks.push({ file, after: preceding, source, ...(needs ? { needs } : {}) });
-        console.log(`  json   ${file} (after ${preceding.trim()})`);
+        // JSON holds no comments, so it can hold no anchor — and needs none.
+        // What a feature owns in a JSON file is declared in its features.json
+        // entry, and a declaration reads backwards: see the `json` edits
+        // carried in `feature`, which say what to remove and at what index it
+        // goes back.
+        fail(
+          `${file}: no "flama:plugins <slot>" anchor after the block removed at line ${block.at}` +
+            (file.endsWith('.json')
+              ? ` — declare this edit in the feature's "json" list in features.json instead of removing lines`
+              : ` — add one where the block sits, or the installer has nowhere to put it back`),
+        );
       });
     }
 
@@ -302,15 +325,24 @@ function main() {
         continue;
       const buffer = readFileSync(full);
       if (buffer.includes(0)) continue;
-      const blocks = coOwnedBlocks(buffer.toString('utf8'), id);
-      blocks.forEach((block, n) => {
-        const source = `blocks/co-owned/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
-        mkdirSync(join(out, 'blocks', 'co-owned'), { recursive: true });
-        writeFileSync(join(out, source), `${block.installed}\n`);
+      const content = buffer.toString('utf8');
+      const blocks = coOwnedBlocks(content, id);
+      blocks.forEach((block) => {
+        // The block is named by the anchor beside it, never by its contents:
+        // a plugin that stored the body would break the moment the starter
+        // reworded a line it does not own.
+        const anchor = anchorBeside(content, block.endLine);
+        if (!anchor) {
+          fail(
+            `${file}: the shared block "${block.ids.join('|')}" has no "flama:plugins <slot>" ` +
+              `anchor beside it — add one after its flama:end, or nothing can say which block ` +
+              `"${id}" joins`,
+          );
+        }
         const needs = ownerOf(manifest.features, file, id);
-        coOwned.push({ file, source, ...(needs ? { needs } : {}) });
+        coOwned.push({ file, anchor, order: block.ids, ...(needs ? { needs } : {}) });
         console.log(
-          `  shared block ${file} (${block.ids.join('|')})${needs ? ` (only with ${needs})` : ''}`,
+          `  shared block ${file} → ${anchor} (${block.ids.join('|')})${needs ? ` (only with ${needs})` : ''}`,
         );
       });
     }
@@ -368,7 +400,6 @@ function main() {
       files,
       ...(Object.keys(sharedFiles).length ? { sharedFiles } : {}),
       ...(blocks.length ? { blocks } : {}),
-      ...(jsonBlocks.length ? { jsonBlocks } : {}),
       ...(coOwned.length ? { coOwned } : {}),
     };
     writeFileSync(join(out, 'plugin.json'), `${JSON.stringify(plugin, null, 2)}\n`);
