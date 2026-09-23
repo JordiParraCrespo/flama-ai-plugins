@@ -37,7 +37,7 @@ pnpm check:structure
   passes `requestSignUp: false`: accounts are provisioned by an administrator,
   and that refusal is the feature.
 - Naming a feature after the page (`team`, `settings`). Only kernel modules and
-  `admin-users` / `roles` are allowed; this app has no allowlist entry.
+  `admin-users` / `roles` / `feature-flags` are allowed; this app has no allowlist entry.
 - Writing a role's permission list into a component. It belongs in
   `src/features/roles/lib/permission-areas.ts`, which carries no JSX.
 - Growing a section until it holds the table, its columns, its bulk action and

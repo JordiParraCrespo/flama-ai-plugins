@@ -2,7 +2,7 @@
 
 > Read the root [`CLAUDE.md`](../../../CLAUDE.md) first.
 
-The control plane's domain (`admin-users`, `roles`) on top of
+The control plane's domain (`admin-users`, `roles`, `feature-flags`) on top of
 `@flama/frontend-core`. Platform-free logic only; the UI lives in
 `apps/admin-web`, `apps/admin-mobile` or the platform kits. The layer model
 and the full "add a module" cookbook are

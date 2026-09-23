@@ -1,12 +1,14 @@
 import type { FlamaApp } from '@flama/frontend-core';
 import type { AdminUsersService } from '../modules/admin-users';
 import { AdminUsersModule } from '../modules/admin-users';
+import type { FeatureFlagsAdminService } from '../modules/feature-flags';
+import { FeatureFlagsAdminModule } from '../modules/feature-flags';
 import type { RolesService } from '../modules/roles';
 import { RolesModule } from '../modules/roles';
 import { TOKENS } from './tokens';
 
 /** What a control-plane app loads into `FlamaApp.create({ modules })`. */
-export const adminModules = [AdminUsersModule, RolesModule];
+export const adminModules = [AdminUsersModule, RolesModule, FeatureFlagsAdminModule];
 
 /** The admin product's services, resolved from the kernel container. */
 export class AdminApp {
@@ -37,5 +39,9 @@ export class AdminApp {
 
   get roles(): RolesService {
     return this.kernel.container.get(TOKENS.RolesService);
+  }
+
+  get featureFlags(): FeatureFlagsAdminService {
+    return this.kernel.container.get(TOKENS.FeatureFlagsAdminService);
   }
 }

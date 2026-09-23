@@ -22,6 +22,7 @@ const sidebars: SidebarsConfig = {
         'architecture/frontend-architecture',
         'architecture/query-keys',
         'architecture/analytics',
+        'architecture/feature-flags',
       ],
     },
     'errors',

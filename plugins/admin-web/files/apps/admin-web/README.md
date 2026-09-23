@@ -2,7 +2,9 @@
 
 The browser control plane. It manages platform users — creating them, banning
 and unbanning, setting passwords, revoking sessions, assigning application
-roles — and the roles themselves with their permission grants. Consumer
+roles — the roles themselves with their permission grants, and feature flags:
+targeting, kill switches, segments, an "explain" for any caller and the audit
+trail (`/flags`). Consumer
 features belong in [`apps/web`](../web); this app has no registration route and
 no workspace of its own.
 
@@ -43,7 +45,7 @@ pnpm --filter @flama/admin-web arch      # dependency-cruiser
 src/
 ├── main.tsx, app.tsx     # bootstrap, router, the single <Toaster />
 ├── routes/               # Route + a mount, under 120 lines each
-├── features/             # admin-users/, roles/, auth/ — kind directories only
+├── features/             # admin-users/, roles/, feature-flags/, auth/ — kind directories only
 ├── providers/            # flama-provider.tsx, query-provider.tsx
 ├── lib/                  # configuration only: flama.ts, auth-client.ts, nav.ts
 ├── styles/
@@ -60,7 +62,7 @@ public/
   `@flama/frontend-web` (`packages/frontend/web`), the same kit `apps/web` uses.
 - Primitives are in `@flama/design-system-web`.
 - Domain logic is in `@flama/frontend-core` (session, users, user settings,
-  capabilities, analytics) and `@flama/frontend-admin` (admin-users, roles).
+  capabilities, analytics) and `@flama/frontend-admin` (admin-users, roles, feature-flags).
   This app loads the admin product and never the consumer one.
 
 ## More

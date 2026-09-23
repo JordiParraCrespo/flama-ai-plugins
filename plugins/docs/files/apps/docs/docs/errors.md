@@ -160,6 +160,25 @@ wrong place.
 | `GRANT_003` <a id="grant_003" /> | The named principal does not belong to this organization  | 400  |
 | `GRANT_004` <a id="grant_004" /> | Access grants are written inside an organization          | 400  |
 
+## Feature flags
+
+| Code                           | Title                                    | HTTP |
+| ------------------------------ | ---------------------------------------- | ---- |
+| `FLAG_001` <a id="flag_001" /> | Feature flag not found                   | 404  |
+| `FLAG_002` <a id="flag_002" /> | The targeting is not valid for this flag | 422  |
+| `FLAG_003` <a id="flag_003" /> | This feature is not available            | 403  |
+| `FLAG_004` <a id="flag_004" /> | Segment not found                        | 404  |
+| `FLAG_005` <a id="flag_005" /> | A segment with this key already exists   | 409  |
+| `FLAG_006` <a id="flag_006" /> | The segment is still targeted by a flag  | 409  |
+| `FLAG_007` <a id="flag_007" /> | The segment conditions are not valid     | 422  |
+
+`FLAG_001` means the key is not in the code's catalog — the database cannot
+invent a flag. `FLAG_002` and `FLAG_007` list every problem in the `problems`
+extension, not just the first. `FLAG_003` is what a route behind
+`@RequireFlag` answers while its flag is off for the caller; the `flag`
+extension names which one. `FLAG_006` carries the flags still targeting the
+segment in `usedBy`.
+
 <!-- flama:begin billing -->
 ## Billing
 

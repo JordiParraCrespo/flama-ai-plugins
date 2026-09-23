@@ -15,6 +15,18 @@ export {
 } from './admin-users.queries';
 export { useAdminApp } from './context';
 export {
+  flagAdminKeys,
+  useCreateFlagSegment,
+  useDeleteFlagSegment,
+  useExplainFeatureFlag,
+  useFlagChanges,
+  useFlagSegments,
+  useManagedFeatureFlags,
+  useToggleFeatureFlag,
+  useUpdateFeatureFlag,
+  useUpdateFlagSegment,
+} from './feature-flags.queries';
+export {
   rolesKeys,
   useAssignUserRoles,
   useAuthorizationCatalog,
