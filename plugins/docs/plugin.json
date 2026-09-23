@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Documentation site",
-    "summary": "apps/docs \u2014 Docusaurus site (architecture, deployment, error catalog)",
+    "summary": "apps/docs — Docusaurus site (architecture, deployment, error catalog)",
     "identifiers": [
       "apps/docs",
       "@flama/docs",
@@ -28,30 +28,30 @@
     },
     {
       "file": "docker/docker-compose.prod.yml",
-      "anchor": "docs",
+      "anchor": "services",
       "source": "blocks/docker_docker-compose_prod_yml.txt"
     },
     {
       "file": "helm/flama/templates/ingress.yaml",
-      "anchor": "docs",
+      "anchor": "ingress-tls",
       "source": "blocks/helm_flama_templates_ingress_yaml.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/templates/ingress.yaml",
-      "anchor": "docs-2",
+      "anchor": "ingress-rules",
       "source": "blocks/helm_flama_templates_ingress_yaml_1.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "docs",
+      "anchor": "services",
       "source": "blocks/helm_flama_values_yaml.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "docs-2",
+      "anchor": "ingress-hosts",
       "source": "blocks/helm_flama_values_yaml_1.txt",
       "needs": "helm"
     },

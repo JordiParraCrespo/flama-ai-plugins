@@ -161,41 +161,41 @@
     },
     {
       "file": "docker/docker-compose.prod.yml",
-      "anchor": "admin-web",
+      "anchor": "services",
       "source": "blocks/docker_docker-compose_prod_yml.txt"
     },
     {
       "file": "docker/docker-compose.prod.yml",
-      "anchor": "admin-web-2",
+      "anchor": "services",
       "source": "blocks/docker_docker-compose_prod_yml_1.txt"
     },
     {
       "file": "helm/flama/templates/ingress.yaml",
-      "anchor": "admin-web",
+      "anchor": "ingress-tls",
       "source": "blocks/helm_flama_templates_ingress_yaml.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/templates/ingress.yaml",
-      "anchor": "admin-web-2",
+      "anchor": "ingress-rules",
       "source": "blocks/helm_flama_templates_ingress_yaml_1.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "admin-web",
+      "anchor": "services",
       "source": "blocks/helm_flama_values_yaml.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "admin-web-2",
+      "anchor": "services",
       "source": "blocks/helm_flama_values_yaml_1.txt",
       "needs": "helm"
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "admin-web-3",
+      "anchor": "ingress-hosts",
       "source": "blocks/helm_flama_values_yaml_2.txt",
       "needs": "helm"
     },
