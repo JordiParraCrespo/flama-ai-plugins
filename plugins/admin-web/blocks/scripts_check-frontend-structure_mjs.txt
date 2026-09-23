@@ -1,0 +1,10 @@
+  // flama:begin admin-web
+  {
+    app: 'apps/admin-web',
+    routes: 'src/routes',
+    features: 'src/features',
+    product: 'admin',
+    allow: [],
+    kit: 'web',
+  },
+  // flama:end admin-web

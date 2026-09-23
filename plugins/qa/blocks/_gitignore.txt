@@ -1,0 +1,4 @@
+# flama:begin qa
+# QA pack run output. The curated copy under docs/screenshots/ is committed.
+qa/artifacts/
+# flama:end qa

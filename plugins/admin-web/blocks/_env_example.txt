@@ -1,0 +1,3 @@
+# flama:begin admin-web
+ADMIN_WEB_IMAGE=
+# flama:end admin-web

@@ -1,0 +1,56 @@
+{
+  "id": "qa",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "QA scenario pack",
+    "summary": "qa/ — scenario-driven Playwright QA pack with maturity tracking and screenshots",
+    "identifiers": [
+      "@flama/qa",
+      "qa/"
+    ],
+    "paths": [
+      "qa",
+      "plans",
+      "docs/screenshots"
+    ],
+    "requires": [
+      "web",
+      "admin-web",
+      "e2e"
+    ],
+    "scripts": [
+      "qa",
+      "qa:suite",
+      "qa:coverage"
+    ]
+  },
+  "files": {
+    "qa": "files/qa",
+    "plans": "files/plans",
+    "docs/screenshots": "files/docs/screenshots"
+  },
+  "blocks": [
+    {
+      "file": ".gitignore",
+      "anchor": "qa",
+      "source": "blocks/_gitignore.txt"
+    },
+    {
+      "file": "pnpm-workspace.yaml",
+      "anchor": "qa",
+      "source": "blocks/pnpm-workspace_yaml.txt"
+    }
+  ],
+  "jsonBlocks": [
+    {
+      "file": "biome.json",
+      "after": "      \"!**/test-results\",",
+      "source": "blocks/biome_json.txt"
+    },
+    {
+      "file": "package.json",
+      "after": "    \"test:e2e\": \"pnpm --filter @flama/e2e e2e\",",
+      "source": "blocks/package_json.txt"
+    }
+  ]
+}

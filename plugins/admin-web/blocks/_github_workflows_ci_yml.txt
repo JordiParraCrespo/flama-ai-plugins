@@ -1,0 +1,3 @@
+          # flama:begin admin-web
+          if changed @flama/admin-web; then filters+=(--filter=@flama/admin-web); fi
+          # flama:end admin-web

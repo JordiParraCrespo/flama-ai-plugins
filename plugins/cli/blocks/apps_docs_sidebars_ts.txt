@@ -1,3 +1,7 @@
-        // flama:begin cli
-        'tooling/cli',
-        // flama:end cli
+    // flama:begin cli
+    {
+      type: 'category',
+      label: 'CLI',
+      items: ['tooling/cli'],
+    },
+    // flama:end cli

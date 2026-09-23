@@ -1,0 +1,3 @@
+    "qa": "pnpm --filter @flama/qa qa",
+    "qa:suite": "pnpm --filter @flama/qa suite",
+    "qa:coverage": "pnpm --filter @flama/qa coverage",

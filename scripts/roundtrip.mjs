@@ -18,7 +18,7 @@
  * so this runs anywhere. A full `pnpm build` belongs in the host repo's CI.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -103,6 +103,20 @@ function roundtrip(repo, id, keep) {
     // The starter as it ships, without the plugin.
     if (!checkAll(dir, 'before')) return;
 
+    // A plugin can need another: the QA pack drives the web control plane, so
+    // it cannot install into a project without it. Bring those in first and
+    // take them out last, so what is proven is this plugin against a project
+    // that can actually hold it.
+    const manifest = JSON.parse(readFileSync(join(plugin, 'plugin.json'), 'utf8'));
+    const needed = (manifest.feature?.requires ?? []).filter((dep) =>
+      existsSync(join(ROOT, 'plugins', dep, 'plugin.json')),
+    );
+    for (const dep of needed) {
+      if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', dep, '--from', ROOT], `add ${dep}`))
+        return;
+      console.log(`    ✓ installed ${dep} (required)`);
+    }
+
     if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', id, '--from', ROOT], 'add')) return;
     console.log('    ✓ installed');
     // With the plugin in, the honesty check now covers it: every mention of
@@ -111,6 +125,10 @@ function roundtrip(repo, id, keep) {
 
     if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', id], 'remove')) return;
     console.log('    ✓ removed');
+    for (const dep of [...needed].reverse()) {
+      if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', dep], `remove ${dep}`)) return;
+      console.log(`    ✓ removed ${dep}`);
+    }
 
     const diff = git(dir, 'diff', '--stat', 'HEAD', '--', '.', ...NOT_RESTORED).trim();
     const untracked = git(dir, 'status', '--porcelain', '--untracked-files=all')

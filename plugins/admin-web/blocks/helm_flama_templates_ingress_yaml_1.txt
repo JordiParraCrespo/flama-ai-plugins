@@ -1,0 +1,12 @@
+    # flama:begin admin-web
+    - host: {{ .Values.ingress.hosts.adminWeb }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-admin-web
+                port:
+                  number: {{ .Values.adminWeb.port }}
+    # flama:end admin-web

@@ -1,0 +1,10 @@
+  // flama:begin admin-mobile
+  {
+    app: 'apps/admin-mobile',
+    routes: 'app',
+    features: 'features',
+    product: 'admin',
+    allow: [],
+    kit: 'mobile',
+  },
+  // flama:end admin-mobile

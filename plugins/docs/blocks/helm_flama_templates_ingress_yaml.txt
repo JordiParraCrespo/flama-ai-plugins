@@ -1,0 +1,3 @@
+        # flama:begin docs
+        - {{ .Values.ingress.hosts.docs }}
+        # flama:end docs

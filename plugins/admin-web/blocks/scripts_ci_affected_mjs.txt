@@ -1,0 +1,3 @@
+  // flama:begin admin-web
+  'admin-web': '@flama/admin-web',
+  // flama:end admin-web

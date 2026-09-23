@@ -1,0 +1,3 @@
+    # flama:begin docs
+    docs: docs.flama.dev
+    # flama:end docs

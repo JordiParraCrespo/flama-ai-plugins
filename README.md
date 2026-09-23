@@ -13,6 +13,10 @@ pnpm plugin:remove cli
 | Plugin | What it adds |
 |---|---|
 | `cli` | `apps/cli` — the `flama` command-line interface, driven by scoped API tokens |
+| `docs` | `apps/docs` — the Docusaurus site |
+| `admin-web` | `apps/admin-web` — the Vite control plane for users, roles and permissions |
+| `admin-mobile` | `apps/admin-mobile` — the Expo control plane |
+| `qa` | `qa/` — the scenario-driven Playwright QA pack (requires `admin-web`) |
 
 ## The idea
 
@@ -116,12 +120,16 @@ would otherwise have nowhere to put the block back.
 
 ## Known limits
 
-- **A feature cannot be extracted while another optional feature co-owns a
-  block with it and is itself extracted.** `cli` and `mcp` share three blocks;
-  `cli` is a plugin because `mcp` stayed behind to hold them. Making both
-  plugins needs install to *create* a co-owned block when no owner is present
-  and *widen* it when one is — order-independently. That is a design decision
-  about how shared configuration should be modelled, not a missing function.
+- **A block every owner has left cannot be recreated.** Widening a co-owned
+  block composes now — two plugins that share one both install, in either
+  order — but only while some owner remains to hold the block. `cli` and `mcp`
+  share three blocks and `mcp` stays behind to hold them; if it left too, the
+  block would go with it and installing `cli` would have nowhere to widen.
+  Creating one from nothing is still a design decision about how shared
+  configuration should be modelled, not a missing function.
+- **A failed install is not undone.** Installing copies files, inserts blocks
+  and then widens; a failure at the last step leaves the earlier ones in
+  place. `plugin:remove` cleans up, but nothing rolls back on its own.
 - **Prose is not restored.** The pruner rewrites config, not sentences; a
   README table or an architecture paragraph naming a plugin is edited by hand
   in the starter, as it always was.

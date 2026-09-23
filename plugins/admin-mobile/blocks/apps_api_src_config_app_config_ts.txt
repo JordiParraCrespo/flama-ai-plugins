@@ -1,0 +1,3 @@
+  // flama:begin admin-mobile
+  adminMobileScheme: z.string().default('flama-admin'),
+  // flama:end admin-mobile

@@ -1,0 +1,9 @@
+  # flama:begin admin-web
+  admin-web:
+    image: ${ADMIN_WEB_IMAGE:-ghcr.io/your-org/flama-admin-web:latest}
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "3003:3000"
+  # flama:end admin-web

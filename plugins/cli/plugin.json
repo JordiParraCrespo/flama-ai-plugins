@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Command-line interface",
-    "summary": "apps/cli — `flama` CLI driven by scoped API tokens",
+    "summary": "apps/cli \u2014 `flama` CLI driven by scoped API tokens",
     "identifiers": [
       "apps/cli",
       "@flama/cli"
@@ -11,16 +11,6 @@
     "paths": [
       "apps/cli",
       "apps/docs/docs/tooling/cli.md"
-    ],
-    "shared": [
-      {
-        "path": "apps/docs/docs/tooling/permissions.md",
-        "identifiers": [],
-        "neededBy": [
-          "cli",
-          "mcp"
-        ]
-      }
     ]
   },
   "files": {
@@ -36,7 +26,8 @@
     {
       "file": "apps/docs/sidebars.ts",
       "anchor": "docs-tooling",
-      "source": "blocks/apps_docs_sidebars_ts.txt"
+      "source": "blocks/apps_docs_sidebars_ts.txt",
+      "needs": "docs"
     }
   ],
   "coOwned": [
@@ -47,10 +38,9 @@
     {
       "file": "AUTHORIZATION.md",
       "source": "blocks/co-owned/AUTHORIZATION_md.txt"
-    },
-    {
-      "file": "apps/docs/sidebars.ts",
-      "source": "blocks/co-owned/apps_docs_sidebars_ts.txt"
     }
-  ]
+  ],
+  "filesNeed": {
+    "apps/docs/docs/tooling/cli.md": "docs"
+  }
 }
