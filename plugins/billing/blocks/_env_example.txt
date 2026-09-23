@@ -8,5 +8,8 @@ STRIPE_WEBHOOK_SECRET=
 STRIPE_SUCCESS_URL=
 STRIPE_CANCEL_URL=
 STRIPE_PORTAL_RETURN_URL=
+# Comma-separated Stripe Price ids checkout may sell (price_…). Checkout
+# refuses any other price with BILLING_009, and every price while this is unset
+STRIPE_PRICE_IDS=
 
 # flama:end billing

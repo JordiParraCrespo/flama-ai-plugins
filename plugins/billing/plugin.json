@@ -46,7 +46,8 @@
           "BILLING_005": "Checkout could not be started. Please try again.",
           "BILLING_006": "You already have an active subscription.",
           "BILLING_007": "The billing portal could not be opened. Please try again.",
-          "BILLING_008": "Your billing account could not be created. Please try again."
+          "BILLING_008": "Your billing account could not be created. Please try again.",
+          "BILLING_009": "That plan is not available."
         },
         "setAt": [
           17,
@@ -56,7 +57,8 @@
           21,
           22,
           23,
-          24
+          24,
+          25
         ]
       },
       {
@@ -73,7 +75,8 @@
           "BILLING_005": "Checkout could not be started. Please try again.",
           "BILLING_006": "You already have an active subscription.",
           "BILLING_007": "The billing portal could not be opened. Please try again.",
-          "BILLING_008": "Your billing account could not be created. Please try again."
+          "BILLING_008": "Your billing account could not be created. Please try again.",
+          "BILLING_009": "That plan is not available."
         },
         "setAt": [
           17,
@@ -83,7 +86,8 @@
           21,
           22,
           23,
-          24
+          24,
+          25
         ]
       },
       {
@@ -99,7 +103,8 @@
           "BILLING_005": "No se ha podido iniciar el pago. Inténtalo de nuevo.",
           "BILLING_006": "Ya tienes una suscripción activa.",
           "BILLING_007": "No se ha podido abrir el portal de facturación. Inténtalo de nuevo.",
-          "BILLING_008": "No se ha podido crear tu cuenta de facturación. Inténtalo de nuevo."
+          "BILLING_008": "No se ha podido crear tu cuenta de facturación. Inténtalo de nuevo.",
+          "BILLING_009": "Ese plan no está disponible."
         },
         "setAt": [
           17,
@@ -109,7 +114,8 @@
           21,
           22,
           23,
-          24
+          24,
+          25
         ]
       },
       {
@@ -126,7 +132,8 @@
           "BILLING_005": "No se ha podido iniciar el pago. Inténtalo de nuevo.",
           "BILLING_006": "Ya tienes una suscripción activa.",
           "BILLING_007": "No se ha podido abrir el portal de facturación. Inténtalo de nuevo.",
-          "BILLING_008": "No se ha podido crear tu cuenta de facturación. Inténtalo de nuevo."
+          "BILLING_008": "No se ha podido crear tu cuenta de facturación. Inténtalo de nuevo.",
+          "BILLING_009": "Ese plan no está disponible."
         },
         "setAt": [
           17,
@@ -136,7 +143,8 @@
           21,
           22,
           23,
-          24
+          24,
+          25
         ]
       }
     ],

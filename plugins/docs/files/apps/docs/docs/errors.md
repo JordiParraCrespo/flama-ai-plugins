@@ -173,6 +173,7 @@ wrong place.
 | `BILLING_006` <a id="billing_006" /> | This user already has an active subscription | 409  |
 | `BILLING_007` <a id="billing_007" /> | Failed to open the Stripe Customer Portal    | 502  |
 | `BILLING_008` <a id="billing_008" /> | Failed to create a Stripe customer           | 502  |
+| `BILLING_009` <a id="billing_009" /> | That price is not offered here               | 400  |
 
 <!-- flama:end billing -->
 <!-- flama:plugins integration-errors -->

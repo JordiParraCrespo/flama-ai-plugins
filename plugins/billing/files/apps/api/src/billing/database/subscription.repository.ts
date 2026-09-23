@@ -12,6 +12,9 @@ import type {
   SubscriptionRepositoryPort,
 } from './subscription.repository.port';
 
+/** A newer webhook already wrote this subscription; see `saveIfNewer`. */
+class StaleWrite extends Error {}
+
 /**
  * TypeORM-backed adapter for the subscription aggregate. Translates between the
  * domain `SubscriptionEntity` and its ORM persistence model via
@@ -41,6 +44,30 @@ export class SubscriptionRepository implements SubscriptionRepositoryPort {
       manager.getRepository(SubscriptionOrmEntity).save(this.mapper.toPersistence(entity)),
     );
     return this.mapper.toDomain(record);
+  }
+
+  async saveIfNewer(entity: SubscriptionEntity): Promise<boolean> {
+    const { id, ...values } = this.mapper.toPersistence(entity);
+    try {
+      await this.outbox.writeWithEvents([entity], async (manager) => {
+        // One statement: Postgres re-checks the WHERE against the row a
+        // concurrent writer just committed, so the newest event always wins.
+        const result = await manager
+          .createQueryBuilder()
+          .update(SubscriptionOrmEntity)
+          .set(values)
+          .where('id = :id', { id })
+          .andWhere('("lastEventAt" IS NULL OR "lastEventAt" <= :at)', { at: values.lastEventAt })
+          .execute();
+        // Thrown, not returned, so the events staged with it roll back too.
+        if (!result.affected) throw new StaleWrite();
+      });
+      return true;
+    } catch (error) {
+      if (!(error instanceof StaleWrite)) throw error;
+      entity.clearEvents();
+      return false;
+    }
   }
 
   async findOneById(id: string): Promise<Option<SubscriptionEntity>> {

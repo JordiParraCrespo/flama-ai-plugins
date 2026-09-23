@@ -45,4 +45,9 @@ export const BillingErrors = {
     message: 'Failed to create a Stripe customer',
     httpStatus: 502,
   },
+  PRICE_NOT_OFFERED: {
+    code: 'BILLING_009',
+    message: 'That price is not offered here',
+    httpStatus: 400,
+  },
 } as const satisfies Record<string, ErrorDefinition>;

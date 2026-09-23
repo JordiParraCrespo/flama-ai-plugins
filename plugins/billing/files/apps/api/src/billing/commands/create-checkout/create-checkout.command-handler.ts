@@ -37,6 +37,12 @@ export class CreateCheckoutCommandHandler
   ) {}
 
   async execute(command: CreateCheckoutCommand): Promise<string> {
+    // The caller names a price; the server decides whether it is for sale.
+    // Stripe itself would take any active Price in the account.
+    if (!this.offeredPriceIds.includes(command.priceId)) {
+      throw new AppError(BillingErrors.PRICE_NOT_OFFERED);
+    }
+
     // Guard against double-subscribing: if the user already has a live
     // subscription, opening another subscription-mode Checkout would create a
     // second Stripe subscription and double-bill them. Send them to the portal.
@@ -67,6 +73,10 @@ export class CreateCheckoutCommandHandler
     });
     await this.customers.insert(BillingCustomerEntity.createNew({ userId, stripeCustomerId }));
     return stripeCustomerId;
+  }
+
+  private get offeredPriceIds(): readonly string[] {
+    return this.configService.get<string[]>('stripe.priceIds') ?? [];
   }
 
   private get frontendUrl(): string {

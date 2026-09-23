@@ -26,6 +26,11 @@ export class CreateCheckoutHttpController {
   })
   @ApiResponse({ status: 201, type: BillingSessionResponseDto })
   @ApiProblemResponse({
+    status: 400,
+    description: 'That price is not offered here',
+    code: 'BILLING_009',
+  })
+  @ApiProblemResponse({
     status: 409,
     description: 'This user already has an active subscription',
     code: 'BILLING_006',

@@ -75,15 +75,17 @@ export class HandleStripeWebhookCommandHandler
   }
 
   /**
-   * Apply the webhook state to an existing subscription, persisting only when
-   * `sync()` actually changed something (it discards out-of-order/stale events).
+   * Apply the webhook state to an existing subscription. `sync()` drops an event
+   * older than the one this read saw; `saveIfNewer` drops one that a delivery
+   * racing this one overtook between the read and the write.
    */
   private async applySync(
     subscription: SubscriptionEntity,
     data: NormalizedSubscription,
   ): Promise<void> {
-    if (subscription.sync(this.mapper.toSyncProps(data))) {
-      await this.subscriptions.save(subscription);
+    if (!subscription.sync(this.mapper.toSyncProps(data))) return;
+    if (!(await this.subscriptions.saveIfNewer(subscription))) {
+      this.logger.debug(`Dropped a stale event for subscription ${data.stripeSubscriptionId}`);
     }
   }
 

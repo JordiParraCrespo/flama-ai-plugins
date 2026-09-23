@@ -15,6 +15,12 @@ export interface FindSubscriptionsParams {
  */
 export interface SubscriptionRepositoryPort extends RepositoryPort<SubscriptionEntity> {
   findOneByStripeId(stripeSubscriptionId: string): Promise<Option<SubscriptionEntity>>;
+  /**
+   * Write a webhook-synced subscription unless a newer event already landed.
+   * The check is part of the write, not a read before it, so two deliveries
+   * racing on one row cannot let the older one win. False when it was stale.
+   */
+  saveIfNewer(entity: SubscriptionEntity): Promise<boolean>;
   /** The user's most recently created subscription, if any. */
   findOneByUserId(userId: string): Promise<Option<SubscriptionEntity>>;
   findSubscriptions(params: FindSubscriptionsParams): Promise<Paginated<SubscriptionEntity>>;

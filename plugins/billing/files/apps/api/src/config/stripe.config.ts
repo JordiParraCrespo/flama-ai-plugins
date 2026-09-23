@@ -16,6 +16,20 @@ const schema = z.object({
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
   portalReturnUrl: z.string().url().optional(),
+  /**
+   * The Stripe Price ids checkout may sell, comma-separated. Stripe accepts any
+   * active Price in the account — a legacy plan, a test price — so the server
+   * decides what is on offer, not the caller. Unset offers nothing.
+   */
+  priceIds: z
+    .string()
+    .optional()
+    .transform((value) =>
+      (value ?? '')
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean),
+    ),
 });
 
 export const stripeConfig = registerAs('stripe', () =>
@@ -25,5 +39,6 @@ export const stripeConfig = registerAs('stripe', () =>
     successUrl: 'STRIPE_SUCCESS_URL',
     cancelUrl: 'STRIPE_CANCEL_URL',
     portalReturnUrl: 'STRIPE_PORTAL_RETURN_URL',
+    priceIds: 'STRIPE_PRICE_IDS',
   }),
 );
