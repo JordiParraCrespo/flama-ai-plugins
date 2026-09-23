@@ -217,35 +217,74 @@
   "coOwned": [
     {
       "file": ".env.example",
-      "source": "blocks/co-owned/_env_example.txt"
+      "anchor": "mobile-env",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": ".github/workflows/ci.yml",
-      "source": "blocks/co-owned/_github_workflows_ci_yml.txt"
+      "anchor": "design-lint",
+      "order": [
+        "web",
+        "admin-web",
+        "web-showcase",
+        "mobile",
+        "admin-mobile",
+        "mobile-showcase"
+      ]
     },
     {
       "file": ".github/workflows/ci.yml",
-      "source": "blocks/co-owned/_github_workflows_ci_yml_1.txt"
+      "anchor": "frontend-structure",
+      "order": [
+        "web",
+        "admin-web",
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
-      "source": "blocks/co-owned/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
+      "anchor": "auth-imports",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
-      "source": "blocks/co-owned/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
+      "anchor": "auth-plugins",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": "packages/tsconfig/depcruise/frontend-domain.cjs",
-      "source": "blocks/co-owned/packages_tsconfig_depcruise_frontend-domain_cjs.txt"
+      "anchor": "native-modules",
+      "order": [
+        "mobile",
+        "admin-mobile",
+        "mobile-showcase"
+      ]
     },
     {
       "file": "scripts/check-frontend-structure.mjs",
-      "source": "blocks/co-owned/scripts_check-frontend-structure_mjs.txt"
+      "anchor": "mobile-kits",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     },
     {
       "file": "scripts/scaffold-feature.mjs",
-      "source": "blocks/co-owned/scripts_scaffold-feature_mjs.txt"
+      "anchor": "mobile-templates",
+      "order": [
+        "mobile",
+        "admin-mobile"
+      ]
     }
   ]
 }

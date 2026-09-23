@@ -1,3 +1,0 @@
-    // flama:begin mobile|admin-mobile
-    expo(),
-    // flama:end mobile|admin-mobile
