@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "QA scenario pack",
-    "summary": "qa/ \u2014 scenario-driven Playwright QA pack with maturity tracking and screenshots",
+    "summary": "qa/ — scenario-driven Playwright QA pack with maturity tracking and screenshots",
     "identifiers": [
       "@flama/qa",
       "qa/"
@@ -47,7 +47,7 @@
           "qa:suite": "pnpm --filter @flama/qa suite",
           "qa:coverage": "pnpm --filter @flama/qa coverage"
         },
-        "at": [
+        "setAt": [
           19,
           20,
           21

@@ -223,6 +223,36 @@
       "file": ".agents/hooks/arch-check.sh",
       "anchor": "admin-web",
       "source": "blocks/_agents_hooks_arch-check_sh.txt"
+    },
+    {
+      "file": "apps/api/src/config/app.config.ts",
+      "anchor": "config-schema",
+      "source": "blocks/apps_api_src_config_app_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/app.config.ts",
+      "anchor": "config-env",
+      "source": "blocks/apps_api_src_config_app_config_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "auth-consts",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "trusted-origins",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/main.ts",
+      "anchor": "cors-origins",
+      "source": "blocks/apps_api_src_main_ts.txt"
+    },
+    {
+      "file": ".env.example",
+      "anchor": "api-urls",
+      "source": "blocks/_env_example_1.txt"
     }
   ],
   "coOwned": [

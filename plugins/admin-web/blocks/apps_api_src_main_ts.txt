@@ -1,0 +1,3 @@
+      // flama:begin admin-web
+      configService.getOrThrow<string>('app.adminFrontendUrl'),
+      // flama:end admin-web
