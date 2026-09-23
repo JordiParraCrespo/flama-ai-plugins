@@ -68,8 +68,15 @@ jobs:
           node-version: 22
       - name: Unit tests
         run: node --test scripts/*.test.mjs
+      # A shared block's body is carried for projects that pruned its other
+      # owners, and read out of the starter rather than written by hand. This
+      # is what keeps the copy from drifting: it fails when the starter
+      # rewords its block and the plugin still carries the old words.
+      - name: Shared block bodies match the starter
+        run: node scripts/shared-bodies.mjs --repo .flama-ai --check
       # Install each plugin, run the host repo's own checks with it in, remove
-      # it, and require the tree to come back byte-identical.
+      # it, and require the tree to come back byte-identical — into the full
+      # starter and into the pruned projects plugins actually land in.
       - name: Round trip
         run: node scripts/roundtrip.mjs --repo .flama-ai
 

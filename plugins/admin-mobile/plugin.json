@@ -221,7 +221,8 @@
       "order": [
         "mobile",
         "admin-mobile"
-      ]
+      ],
+      "source": "blocks/shared/env_example__mobile-env.txt"
     },
     {
       "file": ".github/workflows/ci.yml",
@@ -233,7 +234,8 @@
         "mobile",
         "admin-mobile",
         "mobile-showcase"
-      ]
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__design-lint.txt"
     },
     {
       "file": ".github/workflows/ci.yml",
@@ -243,7 +245,8 @@
         "admin-web",
         "mobile",
         "admin-mobile"
-      ]
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__frontend-structure.txt"
     },
     {
       "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
@@ -251,7 +254,8 @@
       "order": [
         "mobile",
         "admin-mobile"
-      ]
+      ],
+      "source": "blocks/shared/apps_api_src_auth_infrastructure_better_auth_config_ts__auth-imports.txt"
     },
     {
       "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
@@ -259,7 +263,8 @@
       "order": [
         "mobile",
         "admin-mobile"
-      ]
+      ],
+      "source": "blocks/shared/apps_api_src_auth_infrastructure_better_auth_config_ts__auth-plugins.txt"
     },
     {
       "file": "packages/tsconfig/depcruise/frontend-domain.cjs",
@@ -268,7 +273,8 @@
         "mobile",
         "admin-mobile",
         "mobile-showcase"
-      ]
+      ],
+      "source": "blocks/shared/packages_tsconfig_depcruise_frontend_domain_cjs__native-modules.txt"
     },
     {
       "file": "scripts/check-frontend-structure.mjs",
@@ -276,7 +282,8 @@
       "order": [
         "mobile",
         "admin-mobile"
-      ]
+      ],
+      "source": "blocks/shared/scripts_check_frontend_structure_mjs__mobile-kits.txt"
     },
     {
       "file": "scripts/scaffold-feature.mjs",
@@ -284,7 +291,8 @@
       "order": [
         "mobile",
         "admin-mobile"
-      ]
+      ],
+      "source": "blocks/shared/scripts_scaffold_feature_mjs__mobile-templates.txt"
     }
   ]
 }

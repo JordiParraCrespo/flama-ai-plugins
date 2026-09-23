@@ -1,0 +1,3 @@
+            // flama:begin admin-mobile
+            'node_modules/(react-native|expo-[a-z-]+)/',
+            // flama:end admin-mobile
