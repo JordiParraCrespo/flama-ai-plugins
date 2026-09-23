@@ -38,27 +38,22 @@ export function bodyPath(block) {
  * The grammar comes from the starter itself, so there is one parser.
  */
 export function sharedBody(markers, content, file, block, id) {
-  const found = markers.findAnchor(file, content, block.anchor);
-  if (!found) return { error: `${file}: no "flama:plugins ${block.anchor}" anchor` };
-  const lines = markers.annotate(file, content);
-  let closing = null;
-  for (let i = found.index - 1; i >= 0; i--) {
-    if (markers.ANCHOR_RE.test(lines[i].line) || !lines[i].line.trim()) continue;
-    if (lines[i].marker && markers.MARKER_RE.exec(lines[i].line)?.[1] === 'end') closing = i;
-    break;
+  if (!markers.findAnchor(file, content, block.anchor)) {
+    return { error: `${file}: no "flama:plugins ${block.anchor}" anchor` };
   }
-  const nearest = closing === null ? null : lines[closing].stack.at(-1);
-  if (!nearest?.ids.some((owner) => owner !== id && block.order?.includes(owner))) {
+  const marked = markers.blockAbove(file, content, block.anchor);
+  if (!marked?.ids.some((owner) => owner !== id && block.order?.includes(owner))) {
     return { error: `${file}: the block above "${block.anchor}" is not one ${id} shares` };
   }
-  const refence = (line) => {
-    const spec = markers.MARKER_RE.exec(line)[2];
-    return line.replace(spec, id);
-  };
+  // Fenced for `id` alone, through the grammar's own edits: add it, then
+  // take every other owner out.
+  const others = new Set(marked.ids);
+  const refence = (line) => markers.narrowMarker(markers.widenMarker(line, id, 0), others);
+  const lines = content.split('\n');
   const body = [
-    refence(lines[nearest.begin - 1].line),
-    ...lines.slice(nearest.begin, closing).map((entry) => entry.line),
-    refence(lines[closing].line),
+    refence(lines[marked.begin]),
+    ...lines.slice(marked.begin + 1, marked.end),
+    refence(lines[marked.end]),
   ];
   return { body: `${body.join('\n')}\n` };
 }
