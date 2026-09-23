@@ -210,7 +210,7 @@ function main() {
   try {
     execFileSync(
       'node',
-      ['scripts/starter/prune.mjs', '--without', id, '--keep-tooling', '--no-install'],
+      ['scripts/starter/prune.mjs', '--without', id, '--no-install'],
       { cwd: scratch, stdio: 'pipe' },
     );
 
