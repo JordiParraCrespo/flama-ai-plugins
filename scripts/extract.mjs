@@ -34,6 +34,7 @@ import {
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { syncSharedBodies } from './shared-bodies.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
@@ -211,7 +212,7 @@ export function ownerOf(features, file, self) {
   return null;
 }
 
-function main() {
+async function main() {
   const argv = process.argv.slice(2);
   const id = argv.find(
     (arg, i) => !arg.startsWith('--') && !['--repo', '--also'].includes(argv[i - 1]),
@@ -408,6 +409,11 @@ function main() {
   } finally {
     rmSync(scratch, { recursive: true, force: true });
   }
+  // The directory was rebuilt from scratch, so the bodies its shared blocks
+  // carry — for projects that pruned the blocks' other owners — go back in
+  // now, read from the same starter, rather than waiting for `--check` to
+  // notice they are missing.
+  if (await syncSharedBodies({ repo, ids: [id] })) process.exit(1);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) await main();

@@ -46,8 +46,10 @@ export function sharedBody(markers, content, file, block, id) {
     return { error: `${file}: the block above "${block.anchor}" is not one ${id} shares` };
   }
   // Fenced for `id` alone, through the grammar's own edits: add it, then
-  // take every other owner out.
-  const others = new Set(marked.ids);
+  // take every other owner out. Never `id` itself — in a starter that already
+  // has the plugin it is one of the owners, and narrowing a spec to nothing
+  // leaves it as it was.
+  const others = new Set(marked.ids.filter((owner) => owner !== id));
   const refence = (line) => markers.narrowMarker(markers.widenMarker(line, id, 0), others);
   const lines = content.split('\n');
   const body = [
@@ -58,17 +60,20 @@ export function sharedBody(markers, content, file, block, id) {
   return { body: `${body.join('\n')}\n` };
 }
 
-async function main() {
-  const argv = process.argv.slice(2);
-  const check = argv.includes('--check');
-  const repoFlag = argv.indexOf('--repo');
-  const repo = resolve(repoFlag === -1 ? '../flama-ai' : argv[repoFlag + 1]);
+/**
+ * Write (or with `check`, compare) the shared bodies of `ids`, every plugin
+ * when omitted, against the starter at `repo`. Returns the number of
+ * problems. `extract.mjs` calls it for the plugin it just regenerated: the
+ * extraction rebuilds the plugin directory from scratch, and without this it
+ * would drop every body and `source` it had.
+ */
+export async function syncSharedBodies({ repo, check = false, ids = null }) {
   const markersPath = join(repo, 'scripts/lib/markers.mjs');
   if (!existsSync(markersPath)) fail(`${repo} has no scripts/lib/markers.mjs`);
   const markers = await import(pathToFileURL(markersPath).href);
 
   let problems = 0;
-  for (const id of readdirSync(join(ROOT, 'plugins')).sort()) {
+  for (const id of ids ?? readdirSync(join(ROOT, 'plugins')).sort()) {
     const manifestPath = join(ROOT, 'plugins', id, 'plugin.json');
     if (!existsSync(manifestPath)) continue;
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
@@ -113,6 +118,15 @@ async function main() {
     }
     if (changed) writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
   }
+  return problems;
+}
+
+async function main() {
+  const argv = process.argv.slice(2);
+  const check = argv.includes('--check');
+  const repoFlag = argv.indexOf('--repo');
+  const repo = resolve(repoFlag === -1 ? '../flama-ai' : argv[repoFlag + 1]);
+  const problems = await syncSharedBodies({ repo, check });
   if (check) {
     console.log(
       problems
