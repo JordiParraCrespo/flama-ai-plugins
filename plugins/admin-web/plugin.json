@@ -262,7 +262,8 @@
       "order": [
         "web",
         "admin-web"
-      ]
+      ],
+      "source": "blocks/shared/env_example__web-env.txt"
     },
     {
       "file": ".github/workflows/ci.yml",
@@ -273,7 +274,8 @@
         "web-showcase",
         "mobile",
         "mobile-showcase"
-      ]
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__design-lint.txt"
     },
     {
       "file": ".github/workflows/ci.yml",
@@ -282,7 +284,8 @@
         "web",
         "admin-web",
         "mobile"
-      ]
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__frontend-structure.txt"
     },
     {
       "file": ".github/workflows/ci.yml",
@@ -290,7 +293,8 @@
       "order": [
         "web",
         "admin-web"
-      ]
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__bundle-budgets.txt"
     },
     {
       "file": "scripts/check-frontend-structure.mjs",
@@ -298,7 +302,8 @@
       "order": [
         "web",
         "admin-web"
-      ]
+      ],
+      "source": "blocks/shared/scripts_check_frontend_structure_mjs__web-kits.txt"
     },
     {
       "file": "scripts/scaffold-feature.mjs",
@@ -306,7 +311,11 @@
       "order": [
         "web",
         "admin-web"
-      ]
+      ],
+      "source": "blocks/shared/scripts_scaffold_feature_mjs__web-templates.txt"
     }
-  ]
+  ],
+  "filesNeed": {
+    "helm/flama/templates/admin-web-deployment.yaml": "helm"
+  }
 }

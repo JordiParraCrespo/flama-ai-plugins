@@ -1,0 +1,7 @@
+      # flama:begin admin-web
+      # The frontend layout contract: feature names, kind directories, the
+      # route line cap, no copies of what a kit ships, and the docs every
+      # package carries. Import rules are dependency-cruiser's, above.
+      - name: Frontend structure
+        run: pnpm check:structure
+      # flama:end admin-web

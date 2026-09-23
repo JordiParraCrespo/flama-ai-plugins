@@ -41,6 +41,23 @@ const CHECKS = [
   ['node', ['scripts/check-api-structure.mjs']],
 ];
 
+/**
+ * The projects a plugin has to install into, as the features each keeps.
+ *
+ * Not only the starter as it ships. A plugin is added to a project, and a
+ * project has been pruned — usually hard: most keep the web app and little
+ * else. Installing into the full starter alone never met a pruned feature's
+ * shared block, a copied file carrying a block for a feature that is gone, or
+ * a Helm template with no `helm/` to land in, and every one of those broke a
+ * real install. `null` is the starter untouched.
+ */
+const SHAPES = [
+  { name: 'the full starter', keep: null },
+  { name: 'web + e2e', keep: ['web', 'e2e'] },
+  { name: 'mobile only', keep: ['mobile'] },
+  { name: 'the API alone', keep: [] },
+];
+
 let failures = 0;
 
 function git(cwd, ...args) {
@@ -89,9 +106,40 @@ function scratchCopy(repo) {
   return dir;
 }
 
-function roundtrip(repo, id, keep) {
-  console.log(`\n${id}`);
+/**
+ * A scratch copy of the starter pruned to `shape`, committed as its baseline,
+ * and the paths the prune took out.
+ *
+ * Those paths are the other thing an install into a pruned project can get
+ * wrong. A plugin file that belongs to a pruned feature — a Helm template in a
+ * project without Helm — has to be skipped (`filesNeed`), and copying it
+ * anyway brings back a lone fragment of that feature that no check notices,
+ * because the feature and its identifiers are gone from the manifest. Only
+ * here is the full starter's manifest still at hand to say what was pruned.
+ */
+function shapedCopy(repo, shape) {
   const dir = scratchCopy(repo);
+  if (shape.keep === null) return { dir, pruned: [] };
+  const manifest = JSON.parse(readFileSync(join(dir, 'scripts/starter/features.json'), 'utf8'));
+  const without = Object.keys(manifest.features).filter((id) => !shape.keep.includes(id));
+  if (!without.length) return { dir, pruned: [] };
+  const pruned = without.flatMap((id) => manifest.features[id].paths ?? []);
+  execFileSync(
+    'node',
+    ['scripts/starter/prune.mjs', '--without', without.join(','), '--no-install'],
+    {
+      cwd: dir,
+      stdio: 'pipe',
+    },
+  );
+  git(dir, 'add', '-A');
+  git(dir, '-c', 'user.email=rt@flama', '-c', 'user.name=roundtrip', 'commit', '-qm', 'pruned');
+  return { dir, pruned };
+}
+
+function roundtrip(base, pruned, id, keep) {
+  console.log(`\n${id}`);
+  const dir = scratchCopy(base);
   try {
     const plugin = join(ROOT, 'plugins', id);
     if (!existsSync(join(plugin, 'plugin.json'))) {
@@ -111,14 +159,51 @@ function roundtrip(repo, id, keep) {
     const needed = (manifest.feature?.requires ?? []).filter((dep) =>
       existsSync(join(ROOT, 'plugins', dep, 'plugin.json')),
     );
+    // A requirement that is a shipped feature, pruned from this shape, makes
+    // the plugin uninstallable here by design; the installer says so.
+    const features = JSON.parse(
+      readFileSync(join(dir, 'scripts/starter/features.json'), 'utf8'),
+    ).features;
+    const missing = [manifest, ...needed.map((dep) => readManifest(dep))]
+      .flatMap((m) => m.feature?.requires ?? [])
+      .filter((dep) => !features[dep] && !existsSync(join(ROOT, 'plugins', dep, 'plugin.json')));
+    if (missing.length) {
+      console.log(`    – not installable here: requires ${[...new Set(missing)].join(', ')}`);
+      return;
+    }
+    // A control plane builds on its platform's kits, and a project that
+    // pruned every app of that platform pruned the kits with them.
+    const noKit = (manifest.feature?.shared ?? [])
+      .map(({ path }) => path)
+      .filter((path) => !(path in (manifest.sharedFiles ?? {})) && !existsSync(join(dir, path)));
+    if (noKit.length) {
+      console.log(
+        `    – not installable here: builds on ${noKit.join(', ')}, pruned with its apps`,
+      );
+      return;
+    }
     for (const dep of needed) {
-      if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', dep, '--from', ROOT], `add ${dep}`))
+      if (
+        !run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', dep, '--from', ROOT], `add ${dep}`)
+      )
         return;
       console.log(`    ✓ installed ${dep} (required)`);
     }
 
     if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', id, '--from', ROOT], 'add')) return;
     console.log('    ✓ installed');
+    const revived = git(dir, 'status', '--porcelain', '--untracked-files=all')
+      .split('\n')
+      .filter((line) => line.startsWith('??'))
+      .map((line) => line.slice(3))
+      .filter((file) => pruned.some((path) => file === path || file.startsWith(`${path}/`)));
+    if (revived.length) {
+      console.log('    ✗ the install brought back part of a feature this project pruned:');
+      for (const file of revived) console.log(`      ${file}`);
+      console.log('      Name the feature it belongs to in the plugin\'s "filesNeed".');
+      failures += 1;
+      return;
+    }
     // With the plugin in, the honesty check now covers it: every mention of
     // the feature has to sit inside a path or a block the plugin owns.
     checkAll(dir, 'with');
@@ -155,6 +240,10 @@ function roundtrip(repo, id, keep) {
   }
 }
 
+function readManifest(id) {
+  return JSON.parse(readFileSync(join(ROOT, 'plugins', id, 'plugin.json'), 'utf8'));
+}
+
 function main() {
   const argv = process.argv.slice(2);
   const keep = argv.includes('--keep');
@@ -173,8 +262,15 @@ function main() {
         .map((entry) => entry.name)
         .sort();
 
-  console.log(`Round-tripping ${ids.length} plugin(s) against ${repo}`);
-  for (const id of ids) roundtrip(repo, id, keep);
+  for (const shape of SHAPES) {
+    console.log(`\n━━ ${ids.length} plugin(s) into ${shape.name} (${repo})`);
+    const { dir: base, pruned } = shapedCopy(repo, shape);
+    try {
+      for (const id of ids) roundtrip(base, pruned, id, keep);
+    } finally {
+      if (!keep) rmSync(base, { recursive: true, force: true });
+    }
+  }
 
   console.log(failures ? `\n${failures} failure(s).` : '\nAll plugins round-trip cleanly.');
   process.exit(failures ? 1 : 0);

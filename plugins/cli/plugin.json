@@ -37,7 +37,8 @@
       "order": [
         "mcp",
         "cli"
-      ]
+      ],
+      "source": "blocks/shared/env_example__agent-env.txt"
     },
     {
       "file": "AUTHORIZATION.md",
@@ -45,7 +46,8 @@
       "order": [
         "cli",
         "mcp"
-      ]
+      ],
+      "source": "blocks/shared/AUTHORIZATION_md__agent-docs.txt"
     }
   ],
   "filesNeed": {

@@ -65,5 +65,8 @@
       "anchor": "docs",
       "source": "blocks/_gitignore.txt"
     }
-  ]
+  ],
+  "filesNeed": {
+    "helm/flama/templates/docs-deployment.yaml": "helm"
+  }
 }

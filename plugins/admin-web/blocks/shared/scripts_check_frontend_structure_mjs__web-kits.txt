@@ -1,0 +1,3 @@
+  // flama:begin admin-web
+  'packages/frontend/web',
+  // flama:end admin-web

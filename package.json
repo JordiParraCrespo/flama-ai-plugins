@@ -8,6 +8,6 @@
   "scripts": {
     "extract": "node scripts/extract.mjs",
     "roundtrip": "node scripts/roundtrip.mjs",
-    "test": "node --test scripts/*.test.mjs && node scripts/roundtrip.mjs"
+    "test": "node --test scripts/*.test.mjs && node scripts/shared-bodies.mjs --check && node scripts/roundtrip.mjs"
   }
 }
