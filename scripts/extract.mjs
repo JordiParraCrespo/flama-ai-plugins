@@ -392,6 +392,7 @@ async function main() {
         ...(feature.requires ? { requires: feature.requires } : {}),
         ...(feature.scripts ? { scripts: feature.scripts } : {}),
         ...(feature.json ? { json: feature.json } : {}),
+        ...(feature.regenerate ? { regenerate: feature.regenerate } : {}),
         // Shared paths this feature is a dependant of. It does not own them —
         // they outlive it while another dependant remains — but its name is
         // in their `neededBy`, and an install or removal that leaves that

@@ -1,0 +1,3 @@
+  // flama:begin billing
+  '/billing/subscriptions': { controller: FindSubscriptionsHttpController, handler: 'findAll' },
+  // flama:end billing

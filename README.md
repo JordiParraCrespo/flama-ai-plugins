@@ -17,6 +17,7 @@ pnpm plugin:remove cli
 | `admin-web` | `apps/admin-web` — the Vite control plane for users, roles and permissions |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane |
 | `qa` | `qa/` — the scenario-driven Playwright QA pack (requires `admin-web`) |
+| `billing` | `apps/api/src/billing` — Stripe subscriptions: checkout, customer portal, webhooks, revenue metrics |
 
 ## The idea
 

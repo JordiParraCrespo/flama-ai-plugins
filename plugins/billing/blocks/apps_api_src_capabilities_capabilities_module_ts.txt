@@ -1,0 +1,3 @@
+    // flama:begin billing
+    stripe_billing: Boolean(configService.get('stripe.secretKey')),
+    // flama:end billing

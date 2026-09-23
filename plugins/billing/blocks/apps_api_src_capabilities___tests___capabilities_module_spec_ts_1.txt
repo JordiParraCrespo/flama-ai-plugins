@@ -1,0 +1,8 @@
+  // flama:begin billing
+  it('enables stripe_billing on the secret key alone', () => {
+    expect(resolveCapabilities(configWith({ 'stripe.secretKey': 'sk_test' })).stripe_billing).toBe(
+      true,
+    );
+  });
+
+  // flama:end billing
