@@ -14,7 +14,7 @@ pnpm plugin:remove cli
 |---|---|
 | `cli` | `apps/cli` — the `flama` command-line interface, driven by scoped API tokens |
 | `docs` | `apps/docs` — the Docusaurus site |
-| `admin-web` | `apps/admin-web` — the Vite control plane for users, roles and permissions |
+| `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane |
 | `qa` | `qa/` — the scenario-driven Playwright QA pack (requires `admin-web`) |
 | `billing` | `apps/api/src/billing` — Stripe subscriptions: checkout, customer portal, webhooks, revenue metrics |

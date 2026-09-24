@@ -160,7 +160,7 @@ consumer app (`apps/web`) on purpose:
   `signInSocial` passes `requestSignUp: false` unconditionally, so a provider
   identity with no account is rejected by the API instead of silently creating
   an administrator. Its `callbackURL` lands on `/users`, not `/dashboard`.
-- **`nav.ts`** — two rows, `/users` and `/roles`, with a local `NavItem` type
+- **`nav.ts`** — three rows, `/users`, `/roles` and `/flags`, with a local `NavItem` type
   whose `to` is that union. It carries no `policies`: the whole app is already
   behind the `canAccessControlPlane` gate in `_authenticated.tsx`. A row that
   did need one would take it from `ENDPOINT_POLICIES` in
