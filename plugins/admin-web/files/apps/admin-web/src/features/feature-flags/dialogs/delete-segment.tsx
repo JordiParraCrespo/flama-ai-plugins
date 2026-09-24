@@ -17,16 +17,19 @@ export function DeleteSegmentDialog({
 }) {
   const { t } = useTranslation();
   const remove = useDeleteFlagSegment();
+  const inUse = segment.usedBy.length > 0;
 
   return (
     <ConfirmDialog
       title={t('control.flags.segments.deleteTitle')}
       description={
-        segment.usedBy.length > 0
+        inUse
           ? t('control.flags.segments.inUse', { flags: segment.usedBy.join(', ') })
           : t('control.flags.segments.deleteDescription')
       }
-      pending={remove.isPending}
+      // The confirm button stays disabled while a flag still targets it: the
+      // request could only come back FLAG_006.
+      pending={remove.isPending || inUse}
       error={remove.error}
       onClose={onClose}
       onConfirm={() => remove.mutate(segment.key, { onSuccess: onClose })}

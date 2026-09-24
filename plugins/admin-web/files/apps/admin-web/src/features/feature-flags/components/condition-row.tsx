@@ -10,10 +10,14 @@ import {
   Textarea,
 } from '@flama/design-system-web';
 import { X } from '@flama/design-system-web/icons';
-import { FLAG_ATTRIBUTES, FLAG_OPERATORS, type FlagAttribute } from '@flama/shared/feature-flags';
+import {
+  FLAG_ATTRIBUTES,
+  type FlagAttribute,
+  type FlagOperator,
+} from '@flama/shared/feature-flags';
 import { type Control, type FieldValues, type Path, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { textToValues, valuesToText } from '@/features/feature-flags/lib/targeting';
+import { operatorsFor, textToValues, valuesToText } from '@/features/feature-flags/lib/targeting';
 
 /**
  * One `attribute operator values` line of a rule or a segment.
@@ -45,8 +49,9 @@ export function ConditionRow<TForm extends FieldValues>({
   const attributeLabels = Object.fromEntries(
     attributes.map((value) => [value, t(`control.flags.attributes.${value}`)]),
   );
+  const operators = operatorsFor(attribute.field.value as FlagAttribute);
   const operatorLabels = Object.fromEntries(
-    FLAG_OPERATORS.map((value) => [value, t(`control.flags.operators.${value}`)]),
+    operators.map((value) => [value, t(`control.flags.operators.${value}`)]),
   );
   const invalid = Boolean(values.fieldState.error ?? operator.fieldState.error);
 
@@ -57,7 +62,16 @@ export function ConditionRow<TForm extends FieldValues>({
           <Select
             items={attributeLabels}
             value={attribute.field.value as FlagAttribute}
-            onValueChange={(next) => attribute.field.onChange(next)}
+            onValueChange={(next) => {
+              attribute.field.onChange(next);
+              // An operator the new attribute has no meaning for goes back to
+              // membership rather than saving a condition that never matches.
+              if (
+                !operatorsFor(next as FlagAttribute).includes(operator.field.value as FlagOperator)
+              ) {
+                operator.field.onChange('in');
+              }
+            }}
             disabled={disabled}
           >
             <SelectTrigger aria-label={t('control.flags.targeting.attribute')} className="flex-1">
@@ -81,7 +95,7 @@ export function ConditionRow<TForm extends FieldValues>({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {FLAG_OPERATORS.map((value) => (
+              {operators.map((value) => (
                 <SelectItem key={value} value={value}>
                   {operatorLabels[value]}
                 </SelectItem>

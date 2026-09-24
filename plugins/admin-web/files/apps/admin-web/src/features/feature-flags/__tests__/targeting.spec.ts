@@ -5,6 +5,7 @@ import {
   evenSplit,
   newRuleId,
   offValueOf,
+  operatorsFor,
   parseValue,
   textToValues,
   valuesOf,
@@ -24,6 +25,13 @@ describe('targeting helpers', () => {
   });
 
   // Off means off: a kill switch whose default is true still serves false.
+  it('offers only the operators an attribute can match on', () => {
+    expect(operatorsFor('appVersion')).toContain('semver_gte');
+    expect(operatorsFor('organizationId')).toEqual(['in', 'not_in']);
+    expect(operatorsFor('segment')).not.toContain('ends_with');
+    expect(operatorsFor('email')).toContain('ends_with');
+  });
+
   it('knows what a switched-off flag serves', () => {
     expect(offValueOf(booleanFlag)).toBe(false);
     expect(offValueOf(variantFlag)).toBe('control');

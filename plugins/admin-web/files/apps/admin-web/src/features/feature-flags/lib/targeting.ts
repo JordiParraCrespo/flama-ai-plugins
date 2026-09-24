@@ -1,5 +1,12 @@
 import type { FeatureFlag } from '@flama/frontend-admin';
-import type { FlagCondition, FlagRule, FlagServe, FlagValue } from '@flama/shared';
+import type {
+  FlagAttribute,
+  FlagCondition,
+  FlagOperator,
+  FlagRule,
+  FlagServe,
+  FlagValue,
+} from '@flama/shared';
 
 /**
  * The values a flag may serve, as the targeting form offers them: `true` and
@@ -34,6 +41,17 @@ export function newRuleId(existing: readonly FlagRule[]): string {
   let index = existing.length + 1;
   while (taken.has(`rule-${index}`)) index += 1;
   return `rule-${index}`;
+}
+
+/**
+ * The operators that mean something for an attribute, as the evaluator reads
+ * them: a version compares, an email may match a domain, everything else is
+ * membership. Offering the rest would save a condition that never matches.
+ */
+export function operatorsFor(attribute: FlagAttribute): FlagOperator[] {
+  if (attribute === 'appVersion') return ['semver_gte', 'semver_lt', 'in', 'not_in'];
+  if (attribute === 'email') return ['in', 'not_in', 'ends_with'];
+  return ['in', 'not_in'];
 }
 
 export function emptyCondition(): FlagCondition {
