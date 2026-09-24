@@ -19,7 +19,7 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-const TEXT_FIELDS = ['userId', 'organizationId', 'email', 'role', 'appVersion'] as const;
+const TEXT_FIELDS = ['userId', 'organizationId', 'email', 'platformRole', 'appVersion'] as const;
 
 /**
  * Describe someone — as much of them as the operator knows — to ask what a

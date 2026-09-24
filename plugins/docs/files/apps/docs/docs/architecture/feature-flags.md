@@ -67,12 +67,19 @@ too), and refetched when the window regains focus or the app returns to the
 foreground. A failed refetch keeps the last good answer rather than reverting
 to defaults.
 
+`useFeatureFlag` takes boolean flags only; a variant flag has no "off" (its
+control arm is a variant like any other), so read it with `useFeatureFlagValue`
+and branch on the name.
+
 For a flow that must not change under the user's feet — a checkout, a transfer,
 a multi-step form — read it sticky:
 
 ```ts
 const newCheckout = useFeatureFlag('new_checkout', { sticky: true });
 ```
+
+A sticky read holds for as long as the component stays mounted and reads the
+same key as the same audience; signing in or out latches afresh.
 
 **Gate the capability on the server too.** Hiding a button is not a rollout:
 
@@ -81,6 +88,10 @@ const newCheckout = useFeatureFlag('new_checkout', { sticky: true });
 @RequireFlag('new_checkout')   // FLAG_003 while it is off for the caller
 create() {}
 ```
+
+`@RequireFlag` takes boolean flags only, and sees only who is calling — not
+the `platform` or `appVersion` a client reports — so gate on flags that
+target identity.
 
 Anywhere else in the API, inject the evaluator:
 
@@ -96,7 +107,7 @@ else. Each rule serves one value or a percentage split.
 
 | Condition | Operators |
 | --- | --- |
-| `userId`, `organizationId`, `role` | is one of / is not one of |
+| `userId`, `organizationId`, `platformRole` | is one of / is not one of |
 | `email` | … / ends with (`@acme.com` for staff) |
 | `platform` | `web`, `ios`, `android` |
 | `appVersion` | at least / below a semver — old app builds stay installed for years |
@@ -105,6 +116,9 @@ else. Each rule serves one value or a percentage split.
 - **Off means off.** A disabled flag serves `false` (or its default variant),
   whatever `defaultValue` says — which is what lets a kill switch whose default
   is `true` go dark.
+- **Split weights are percentages in 0.01 % steps** that must add up to
+  exactly 100 — the resolution of the 10 000 buckets a split is walked over,
+  so a saved split covers every caller.
 - **Splits are deterministic**: MurmurHash3 over the flag key, a per-flag salt
   and the unit, bucketed by **organization** so a whole workspace sees the same
   product (`bucketBy: 'user'` to change it). A caller the split cannot bucket —
