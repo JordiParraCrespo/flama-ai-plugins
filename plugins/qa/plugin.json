@@ -16,7 +16,8 @@
     "requires": [
       "web",
       "admin-web",
-      "e2e"
+      "e2e",
+      "organizations"
     ],
     "scripts": [
       "qa",
