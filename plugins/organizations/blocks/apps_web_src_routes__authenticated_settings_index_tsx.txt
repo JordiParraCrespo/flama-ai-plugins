@@ -1,4 +1,0 @@
-// flama:begin organizations
-import { generalSettingsPane } from '@/features/organizations/sections/general-settings';
-import { WorkspaceSettingsSubtitle } from '@/features/organizations/sections/settings-subtitle';
-// flama:end organizations

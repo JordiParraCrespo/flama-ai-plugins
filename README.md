@@ -118,10 +118,15 @@ node scripts/extract.mjs organizations --repo ../flama-ai
 
 Then the ordinary round trip runs from the pruned state, into every shape.
 
-Files the feature keeps inside another's tree — its screens in `apps/web`, its
-module in `packages/frontend/consumer` — are listed in `filesNeed` with that
-owner, a feature id or a shared path, and an install into a project without it
-skips them.
+Such a feature leaves no `flama:plugins` anchors in the starter: its fences
+are the only mark it makes. So the plugin carries the starter's copy of each
+file it has blocks in (`snapshots/`), and the installer merges the blocks onto
+the project's copy with `git merge-file` — a project that has edited the file
+since still takes them, and one that edited the same lines stops the install.
+
+Files the feature keeps inside another's tree are skipped by an install into a
+project without it: `filesNeed` names the feature (its screens in `apps/web`),
+`filesNeedPath` the shared path (its module in `packages/frontend/consumer`).
 
 Two things are excluded from the comparison, deliberately and visibly:
 `.changeset/` and `pnpm-lock.yaml`. The pruner rewrites a changeset's

@@ -1,3 +1,0 @@
-    // flama:begin organizations
-    AccessGrantOrmEntity,
-    // flama:end organizations

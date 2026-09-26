@@ -114,7 +114,7 @@ export function removalHunks(diff) {
   return hunks.filter((hunk) => hunk.lines.length > 0 && hunk.added === 0);
 }
 
-const FENCE_RE = /^(\s*(?:#|\/\/|<!--|\{\{-?\s*\/\*|\/\*)\s*flama:)(begin|end)(\s+)([\w|-]+)/;
+const FENCE_RE = /^(\s*(?:#|\/\/|<!--|\{\{-?\s*\/\*|\{\s*\/\*|\/\*)\s*flama:)(begin|end)(\s+)([\w|-]+)/;
 
 /**
  * Blocks whose marker names this feature *and* others — `flama:begin mcp|cli`.
@@ -284,6 +284,7 @@ async function main() {
     // Marked blocks in files that survive.
     mkdirSync(join(out, 'blocks'), { recursive: true });
     const blocks = [];
+    const snapshots = [];
     // A JSON file is never a block source: it cannot hold a comment, so it
     // cannot hold an anchor, so there is nowhere to put a block back. What a
     // feature owns in one is declared instead — a `json` edit in its
@@ -297,32 +298,30 @@ async function main() {
         continue;
       }
       const after = readFileSync(join(scratch, file), 'utf8');
+      const needs = ownerOf(manifest, file, id);
       // A feature can own several blocks in one file — `helm/values.yaml`
       // carries one per app it deploys, `ingress.yaml` one per host. Each is
       // restored at an anchor of its own, so each becomes its own entry.
       const found = removalHunks(git(scratch, 'diff', '-U0', '--', file));
-      found.forEach((block, n) => {
-        const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
-        writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
-        const needs = ownerOf(manifest, file, id);
-        const anchor = anchorBeside(after, block.at - 1);
-        if (anchor) {
-          blocks.push({ file, anchor, source, ...(needs ? { needs } : {}) });
-          console.log(`  block  ${file} → ${anchor}${needs ? ` (only with ${needs})` : ''}`);
-          return;
-        }
-        // JSON holds no comments, so it can hold no anchor — and needs none.
-        // What a feature owns in a JSON file is declared in its features.json
-        // entry, and a declaration reads backwards: see the `json` edits
-        // carried in `feature`, which say what to remove and at what index it
-        // goes back.
-        fail(
-          `${file}: no "flama:plugins <slot>" anchor after the block removed at line ${block.at}` +
-            (file.endsWith('.json')
-              ? ` — declare this edit in the feature's "json" list in features.json instead of removing lines`
-              : ` — add one where the block sits, or the installer has nowhere to put it back`),
-        );
-      });
+      const anchors = found.map((block) => anchorBeside(after, block.at - 1));
+      if (anchors.every(Boolean)) {
+        found.forEach((block, n) => {
+          const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
+          writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
+          blocks.push({ file, anchor: anchors[n], source, ...(needs ? { needs } : {}) });
+          console.log(`  block  ${file} → ${anchors[n]}${needs ? ` (only with ${needs})` : ''}`);
+        });
+        continue;
+      }
+      // A block with no anchor beside it is a feature the starter still ships:
+      // its fences are all the mark it leaves. The plugin carries the
+      // starter's copy of the file, and the installer merges the blocks back
+      // three-way, so every block in this file comes back that way.
+      const source = `snapshots/${file}`;
+      mkdirSync(dirname(join(out, source)), { recursive: true });
+      cpSync(join(repo, file), join(out, source));
+      snapshots.push({ file, source, ...(needs ? { needs } : {}) });
+      console.log(`  replay ${file} (${found.length} block(s))${needs ? ` (only with ${needs})` : ''}`);
     }
 
     // Co-owned blocks live in files the prune only narrowed, so they do not
@@ -389,12 +388,15 @@ async function main() {
       console.log(`  shared ${entry.path} (carried — every dependant is leaving)`);
     }
 
-    // A path, or a JSON file an edit touches, that lives inside something
-    // else optional is skipped by an install into a project without it.
+    // A path that lives inside another optional feature's tree, or inside a
+    // shared path, is skipped by an install into a project without it.
     const filesNeed = {};
-    for (const path of [...Object.keys(files), ...(feature.json ?? []).map((e) => e.file)]) {
+    const filesNeedPath = {};
+    for (const path of Object.keys(files)) {
       const owner = ownerOf(manifest, path, id);
-      if (owner) filesNeed[path] = owner;
+      if (!owner) continue;
+      if (manifest.features[owner]) filesNeed[path] = owner;
+      else filesNeedPath[path] = owner;
     }
 
     const covered = [...Object.keys(files), ...Object.keys(sharedFiles)];
@@ -411,6 +413,7 @@ async function main() {
         summary: feature.summary,
         identifiers: feature.identifiers,
         paths: feature.paths,
+        ...(feature.keeps ? { keeps: feature.keeps } : {}),
         ...(feature.requires ? { requires: feature.requires } : {}),
         ...(feature.scripts ? { scripts: feature.scripts } : {}),
         ...(feature.json ? { json: feature.json } : {}),
@@ -423,9 +426,11 @@ async function main() {
       },
       files,
       ...(Object.keys(filesNeed).length ? { filesNeed } : {}),
+      ...(Object.keys(filesNeedPath).length ? { filesNeedPath } : {}),
       ...(Object.keys(sharedFiles).length ? { sharedFiles } : {}),
       ...(blocks.length ? { blocks } : {}),
       ...(coOwned.length ? { coOwned } : {}),
+      ...(snapshots.length ? { snapshots } : {}),
     };
     writeFileSync(join(out, 'plugin.json'), `${JSON.stringify(plugin, null, 2)}\n`);
     for (const path of Object.keys(files)) console.log(`  copy   ${path}`);

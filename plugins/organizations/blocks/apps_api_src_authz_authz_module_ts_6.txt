@@ -1,3 +1,0 @@
-    // flama:begin organizations
-    ...tenancy.providers,
-    // flama:end organizations

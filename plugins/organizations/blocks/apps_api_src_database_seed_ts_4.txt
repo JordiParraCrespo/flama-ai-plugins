@@ -1,7 +1,0 @@
-    // flama:begin organizations
-    OrganizationOrmEntity,
-    MemberOrmEntity,
-    InvitationOrmEntity,
-    TeamOrmEntity,
-    TeamMemberOrmEntity,
-    // flama:end organizations

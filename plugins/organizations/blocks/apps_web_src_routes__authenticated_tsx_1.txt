@@ -1,3 +1,0 @@
-  // flama:begin organizations
-  WorkspaceGate,
-  // flama:end organizations

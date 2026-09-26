@@ -1,4 +1,0 @@
-// flama:begin organizations
-import { organizationPlugin, withActiveOrganization } from './organization-plugin.config';
-
-// flama:end organizations

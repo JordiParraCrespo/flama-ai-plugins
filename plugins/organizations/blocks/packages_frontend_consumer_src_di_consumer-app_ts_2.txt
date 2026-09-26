@@ -1,6 +1,0 @@
-  // flama:begin organizations
-  get organizations(): OrganizationsService {
-    return this.kernel.container.get(TOKENS.OrganizationsService);
-  }
-
-  // flama:end organizations

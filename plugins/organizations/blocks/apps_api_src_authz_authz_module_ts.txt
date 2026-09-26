@@ -1,6 +1,0 @@
-// flama:begin organizations
-import { MemberOrmEntity } from '../organizations/database/member.orm-entity';
-import { TeamOrmEntity } from '../organizations/database/team.orm-entity';
-import { TeamMemberOrmEntity } from '../organizations/database/team-member.orm-entity';
-import { ORGANIZATION_RESOURCES } from '../organizations/organizations.resource';
-// flama:end organizations

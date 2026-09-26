@@ -1,3 +1,0 @@
-    // flama:begin organizations
-    organizationPlugin(frontendUrl),
-    // flama:end organizations

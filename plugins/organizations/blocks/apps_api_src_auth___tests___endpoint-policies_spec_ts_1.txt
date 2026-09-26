@@ -1,3 +1,0 @@
-  // flama:begin organizations
-  '/organizations/:orgId/members': { controller: MembersController, handler: 'list' },
-  // flama:end organizations

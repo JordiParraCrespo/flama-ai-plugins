@@ -1,3 +1,0 @@
-// flama:begin organizations
-import { organizationTools } from './organizations.tools';
-// flama:end organizations

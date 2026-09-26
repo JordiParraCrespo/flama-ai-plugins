@@ -1,3 +1,0 @@
-  // flama:begin organizations
-  OrganizationsModule,
-  // flama:end organizations
