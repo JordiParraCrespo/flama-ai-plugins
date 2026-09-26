@@ -1,0 +1,4 @@
+# flama:begin mobile-showcase
+.expo/
+packages/frontend/design-system/mobile/assets/icons/nanoicons/
+# flama:end mobile-showcase

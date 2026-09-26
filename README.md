@@ -18,6 +18,8 @@ pnpm plugin:remove cli
 | `docs` | `apps/docs` — the Docusaurus site |
 | `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane |
+| `web-showcase` | `apps/web-showcase` — the Next.js gallery of the web design system, with the `/design-export-port` skill that rebuilds it from a design export |
+| `mobile-showcase` | `apps/mobile-showcase` — the Expo gallery of the mobile design system |
 | `qa` | `qa/` — the scenario-driven Playwright QA pack (requires `admin-web` and `organizations`) |
 | `billing` | `apps/api/src/billing` — Stripe subscriptions: checkout, customer portal, webhooks, revenue metrics |
 | `organizations` | Multi-tenancy — organizations, members, invitations, workspaces, access grants and onboarding. Ships in the starter; this is how a project that pruned it gets it back |
