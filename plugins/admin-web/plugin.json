@@ -210,11 +210,6 @@
       "source": "blocks/scripts_check-frontend-structure_mjs.txt"
     },
     {
-      "file": "scripts/ci/affected.mjs",
-      "anchor": "admin-web",
-      "source": "blocks/scripts_ci_affected_mjs.txt"
-    },
-    {
       "file": "scripts/scaffold-feature.mjs",
       "anchor": "admin-web",
       "source": "blocks/scripts_scaffold-feature_mjs.txt"

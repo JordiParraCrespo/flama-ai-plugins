@@ -1,3 +1,0 @@
-  // flama:begin docs
-  docs: '@flama/docs',
-  // flama:end docs
