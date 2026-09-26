@@ -14,6 +14,7 @@ pnpm plugin:remove cli
 |---|---|
 | `cli` | `apps/cli` — the `flama` command-line interface, driven by scoped API tokens |
 | `mcp` | `apps/mcp` — the MCP server (stdio + Streamable HTTP), and the API's OAuth provider for MCP clients with its consent screen |
+| `runner` | `apps/runner` + `packages/go/*` — the Go service template (REST + WS, API keys) the API delegates long-lived work to, with its own CI workflow, compose service and Helm deployment |
 | `docs` | `apps/docs` — the Docusaurus site |
 | `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane |
