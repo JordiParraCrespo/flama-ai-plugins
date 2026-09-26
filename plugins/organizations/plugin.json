@@ -71,6 +71,10 @@
           }
         }
       }
+    ],
+    "regenerate": [
+      "generate:api-client",
+      "generate:openapi"
     ]
   },
   "files": {
