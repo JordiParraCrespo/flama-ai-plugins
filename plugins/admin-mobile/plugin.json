@@ -204,11 +204,6 @@
       "source": "blocks/scripts_scaffold-feature_mjs.txt"
     },
     {
-      "file": ".gitignore",
-      "anchor": "admin-mobile",
-      "source": "blocks/_gitignore.txt"
-    },
-    {
       "file": ".agents/hooks/arch-check.sh",
       "anchor": "admin-mobile",
       "source": "blocks/_agents_hooks_arch-check_sh.txt"
