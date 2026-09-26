@@ -10,7 +10,6 @@
     ],
     "paths": [
       "apps/web-showcase",
-      ".agents/skills/design-export-port",
       ".agents/skills/next-best-practices",
       ".agents/skills/next-cache-components",
       ".agents/skills/next-upgrade",
@@ -18,33 +17,15 @@
     ],
     "json": [
       {
-        "file": "turbo.json",
-        "path": [
-          "tasks",
-          "build",
-          "outputs"
-        ],
-        "remove": [
-          ".next/**",
-          "!.next/cache/**"
-        ],
-        "at": [
-          1,
-          2
-        ]
-      },
-      {
         "file": "biome.json",
         "path": [
           "files",
           "includes"
         ],
         "remove": [
-          "!**/.next",
           "!**/apps/web-showcase"
         ],
         "at": [
-          4,
           20
         ]
       }
@@ -65,7 +46,6 @@
   },
   "files": {
     "apps/web-showcase": "files/apps/web-showcase",
-    ".agents/skills/design-export-port": "files/.agents/skills/design-export-port",
     ".agents/skills/next-best-practices": "files/.agents/skills/next-best-practices",
     ".agents/skills/next-cache-components": "files/.agents/skills/next-cache-components",
     ".agents/skills/next-upgrade": "files/.agents/skills/next-upgrade",
