@@ -1,0 +1,3 @@
+  // flama:begin organizations
+  await seedOrganization(dataSource, userRepo, roleRepo, userRoleRepo);
+  // flama:end organizations

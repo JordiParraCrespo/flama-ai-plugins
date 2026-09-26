@@ -1,0 +1,5 @@
+  // flama:begin organizations
+  FindAccessGrantsHttpController,
+  CreateAccessGrantHttpController,
+  RevokeAccessGrantHttpController,
+  // flama:end organizations

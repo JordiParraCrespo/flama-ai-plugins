@@ -1,0 +1,4 @@
+// flama:begin organizations
+import { seedOrganization } from './seed-organization';
+
+// flama:end organizations

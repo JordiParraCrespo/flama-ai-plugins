@@ -1,0 +1,3 @@
+// flama:begin organizations
+import { useOrganizations } from '@flama/frontend-consumer/organizations';
+// flama:end organizations

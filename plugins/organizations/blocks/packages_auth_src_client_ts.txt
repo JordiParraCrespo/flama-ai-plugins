@@ -1,0 +1,3 @@
+// flama:begin organizations
+import { organizationClientPlugin } from './organization-client';
+// flama:end organizations

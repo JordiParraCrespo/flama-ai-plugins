@@ -1,0 +1,25 @@
+// flama:begin organizations
+// Access grants are rows inside an organization, and the scope pieces resolve
+// one: none of it exists in a project without organizations.
+const tenancy = {
+  providers: [
+    CreateAccessGrantCommandHandler,
+    RevokeAccessGrantCommandHandler,
+    FindAccessGrantsQueryHandler,
+    AccessGrantMapper,
+    { provide: ACCESS_GRANT_REPOSITORY, useClass: AccessGrantRepository },
+    ActiveOrganizationResolver,
+    PrincipalResidencyChecker,
+    AccessScopeInterceptor,
+    SCOPE_RESOLVER_PROVIDER,
+  ] as Provider[],
+  exports: [
+    SCOPE_RESOLVER_PROVIDER,
+    ACCESS_GRANT_REPOSITORY,
+    AccessScopeInterceptor,
+    ActiveOrganizationResolver,
+  ],
+  entities: [AccessGrantOrmEntity, MemberOrmEntity, TeamOrmEntity, TeamMemberOrmEntity],
+  resources: ORGANIZATION_RESOURCES,
+};
+// flama:end organizations

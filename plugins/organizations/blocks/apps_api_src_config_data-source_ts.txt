@@ -1,0 +1,3 @@
+// flama:begin organizations
+import { AccessGrantOrmEntity } from '../authz/database/access-grant.orm-entity';
+// flama:end organizations

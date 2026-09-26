@@ -1,0 +1,3 @@
+  // flama:begin organizations
+  generalSettingsPane,
+  // flama:end organizations

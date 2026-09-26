@@ -1,0 +1,3 @@
+    // flama:begin organizations
+    ...tenancy.exports,
+    // flama:end organizations

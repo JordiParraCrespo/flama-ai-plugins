@@ -16,8 +16,9 @@ pnpm plugin:remove cli
 | `docs` | `apps/docs` — the Docusaurus site |
 | `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane |
-| `qa` | `qa/` — the scenario-driven Playwright QA pack (requires `admin-web`) |
+| `qa` | `qa/` — the scenario-driven Playwright QA pack (requires `admin-web` and `organizations`) |
 | `billing` | `apps/api/src/billing` — Stripe subscriptions: checkout, customer portal, webhooks, revenue metrics |
+| `organizations` | Multi-tenancy — organizations, members, invitations, workspaces, access grants and onboarding. Ships in the starter; this is how a project that pruned it gets it back |
 
 ## The idea
 
@@ -102,6 +103,25 @@ anchor that drifted, a manifest entry that reformatted the file it landed in —
 all of them show up as a diff, and none of them need a working `node_modules`
 to catch. The heavier checks (`tsc`, `vitest`, `pnpm build`) belong to the host
 repo's CI, which runs them on the plugin's files once installed.
+
+A plugin whose feature the starter still ships — `organizations` — runs one
+more step first. There the starter is the source and the plugin a copy of it,
+so the copy is held to it: prune the feature from the full starter, install the
+plugin, and the tree has to be the starter again, byte for byte, but for the
+`"plugin": true` flag on the installed entry. When the starter changes the
+feature, this fails until the plugin is extracted again — the same command that
+made it:
+
+```bash
+node scripts/extract.mjs organizations --repo ../flama-ai
+```
+
+Then the ordinary round trip runs from the pruned state, into every shape.
+
+Files the feature keeps inside another's tree — its screens in `apps/web`, its
+module in `packages/frontend/consumer` — are listed in `filesNeed` with that
+owner, a feature id or a shared path, and an install into a project without it
+skips them.
 
 Two things are excluded from the comparison, deliberately and visibly:
 `.changeset/` and `pnpm-lock.yaml`. The pruner rewrites a changeset's

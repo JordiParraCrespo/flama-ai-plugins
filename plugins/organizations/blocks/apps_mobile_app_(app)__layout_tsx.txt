@@ -1,0 +1,4 @@
+// flama:begin organizations
+import { WorkspaceGate } from '../../features/organizations/sections/workspace-gate';
+
+// flama:end organizations

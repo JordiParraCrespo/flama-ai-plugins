@@ -1,0 +1,3 @@
+  // flama:begin organizations
+  '/organizations/:orgId/members': [{ action: 'read', subject: 'Member' }],
+  // flama:end organizations

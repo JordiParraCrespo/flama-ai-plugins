@@ -1,0 +1,3 @@
+// flama:begin organizations
+import { OrganizationsModule } from './organizations/organizations.module';
+// flama:end organizations

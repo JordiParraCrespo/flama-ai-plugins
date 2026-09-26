@@ -1,0 +1,16 @@
+// flama:begin organizations
+import { AccessGrantMapper } from './access-grant.mapper';
+import { ActiveOrganizationResolver } from './application/active-organization.resolver';
+import { PrincipalResidencyChecker } from './application/principal-residency.policy';
+import { SCOPE_RESOLVER_PROVIDER } from './application/scope.resolver';
+import { ACCESS_GRANT_REPOSITORY } from './authz.di-tokens';
+import { CreateAccessGrantCommandHandler } from './commands/create-access-grant/create-access-grant.command-handler';
+import { CreateAccessGrantHttpController } from './commands/create-access-grant/create-access-grant.http.controller';
+import { RevokeAccessGrantCommandHandler } from './commands/revoke-access-grant/revoke-access-grant.command-handler';
+import { RevokeAccessGrantHttpController } from './commands/revoke-access-grant/revoke-access-grant.http.controller';
+import { AccessGrantOrmEntity } from './database/access-grant.orm-entity';
+import { AccessGrantRepository } from './database/access-grant.repository';
+import { AccessScopeInterceptor } from './interceptors/access-scope.interceptor';
+import { FindAccessGrantsHttpController } from './queries/find-access-grants/find-access-grants.http.controller';
+import { FindAccessGrantsQueryHandler } from './queries/find-access-grants/find-access-grants.query-handler';
+// flama:end organizations

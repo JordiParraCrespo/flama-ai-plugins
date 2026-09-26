@@ -1,0 +1,5 @@
+    // flama:begin organizations
+    // Organizations, members, invitations and workspaces (teams) under
+    // `authClient.organization.*`.
+    organizationClientPlugin(),
+    // flama:end organizations

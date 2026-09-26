@@ -1,0 +1,422 @@
+{
+  "id": "organizations",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Organizations (teams)",
+    "summary": "Multi-tenancy: organizations, members, invitations, workspaces and access grants, and the onboarding that creates the first organization",
+    "identifiers": [
+      "apps/api/src/organizations",
+      "OrganizationsModule",
+      "organizationPlugin",
+      "withActiveOrganization",
+      "ORGANIZATION_RESOURCES",
+      "AccessGrantOrmEntity",
+      "SCOPE_RESOLVER_PROVIDER",
+      "useOrganizations",
+      "WorkspaceGate",
+      "organizationClientPlugin",
+      "features/organizations",
+      "@flama/frontend-consumer/organizations",
+      "seedOrganization",
+      "AccessGrantMapper"
+    ],
+    "paths": [
+      "apps/api/src/organizations",
+      "apps/api/src/auth/infrastructure/organization-plugin.config.ts",
+      "apps/api/src/auth/infrastructure/invitation-url.util.ts",
+      "apps/api/src/auth/__tests__/invitation-url.util.spec.ts",
+      "apps/api/src/authz/application",
+      "apps/api/src/authz/commands",
+      "apps/api/src/authz/database",
+      "apps/api/src/authz/decorators",
+      "apps/api/src/authz/interceptors",
+      "apps/api/src/authz/queries/find-access-grants",
+      "apps/api/src/authz/domain/access-grant.entity.ts",
+      "apps/api/src/authz/domain/access-grant.errors.ts",
+      "apps/api/src/authz/dtos/access-grant.response.dto.ts",
+      "apps/api/src/authz/authz.di-tokens.ts",
+      "apps/api/src/authz/access-grant.mapper.ts",
+      "apps/api/src/database/seed-organization.ts",
+      "apps/mcp/src/tools/organizations.tools.ts",
+      "apps/mcp/src/tools/workspaces.tools.ts",
+      "apps/mobile/app/onboarding.tsx",
+      "apps/mobile/features/organizations",
+      "apps/web/src/features/organizations",
+      "apps/web/src/routes/_auth/accept-invitation.tsx",
+      "apps/web/src/routes/_auth/onboarding.tsx",
+      "e2e/support/organizations.ts",
+      "e2e/tests/api/organization-membership.spec.ts",
+      "e2e/tests/web/invitation-acceptance.spec.ts",
+      "e2e/tests/web/onboarding.spec.ts",
+      "e2e/tests/web/organization-settings.spec.ts",
+      "packages/auth/src/organization-client.ts",
+      "packages/auth/src/organization-options.ts",
+      "packages/frontend/consumer/src/modules/organizations",
+      "packages/frontend/consumer/src/react/organizations.queries.ts",
+      "packages/frontend/consumer/src/react/__tests__/organizations.create.spec.tsx",
+      "packages/frontend/consumer/src/react/__tests__/organizations.invitations.spec.tsx",
+      "packages/frontend/consumer/src/react/__tests__/organizations.queries.spec.ts",
+      "packages/frontend/consumer/src/react/__tests__/query-keys.spec.ts"
+    ],
+    "json": [
+      {
+        "file": "packages/frontend/consumer/package.json",
+        "path": [
+          "exports"
+        ],
+        "set": {
+          "./organizations": {
+            "types": "./dist/react/organizations.queries.d.ts",
+            "import": "./dist/react/organizations.queries.js"
+          }
+        }
+      }
+    ]
+  },
+  "files": {
+    "apps/api/src/organizations": "files/apps/api/src/organizations",
+    "apps/api/src/auth/infrastructure/organization-plugin.config.ts": "files/apps/api/src/auth/infrastructure/organization-plugin.config.ts",
+    "apps/api/src/auth/infrastructure/invitation-url.util.ts": "files/apps/api/src/auth/infrastructure/invitation-url.util.ts",
+    "apps/api/src/auth/__tests__/invitation-url.util.spec.ts": "files/apps/api/src/auth/__tests__/invitation-url.util.spec.ts",
+    "apps/api/src/authz/application": "files/apps/api/src/authz/application",
+    "apps/api/src/authz/commands": "files/apps/api/src/authz/commands",
+    "apps/api/src/authz/database": "files/apps/api/src/authz/database",
+    "apps/api/src/authz/decorators": "files/apps/api/src/authz/decorators",
+    "apps/api/src/authz/interceptors": "files/apps/api/src/authz/interceptors",
+    "apps/api/src/authz/queries/find-access-grants": "files/apps/api/src/authz/queries/find-access-grants",
+    "apps/api/src/authz/domain/access-grant.entity.ts": "files/apps/api/src/authz/domain/access-grant.entity.ts",
+    "apps/api/src/authz/domain/access-grant.errors.ts": "files/apps/api/src/authz/domain/access-grant.errors.ts",
+    "apps/api/src/authz/dtos/access-grant.response.dto.ts": "files/apps/api/src/authz/dtos/access-grant.response.dto.ts",
+    "apps/api/src/authz/authz.di-tokens.ts": "files/apps/api/src/authz/authz.di-tokens.ts",
+    "apps/api/src/authz/access-grant.mapper.ts": "files/apps/api/src/authz/access-grant.mapper.ts",
+    "apps/api/src/database/seed-organization.ts": "files/apps/api/src/database/seed-organization.ts",
+    "apps/mcp/src/tools/organizations.tools.ts": "files/apps/mcp/src/tools/organizations.tools.ts",
+    "apps/mcp/src/tools/workspaces.tools.ts": "files/apps/mcp/src/tools/workspaces.tools.ts",
+    "apps/mobile/app/onboarding.tsx": "files/apps/mobile/app/onboarding.tsx",
+    "apps/mobile/features/organizations": "files/apps/mobile/features/organizations",
+    "apps/web/src/features/organizations": "files/apps/web/src/features/organizations",
+    "apps/web/src/routes/_auth/accept-invitation.tsx": "files/apps/web/src/routes/_auth/accept-invitation.tsx",
+    "apps/web/src/routes/_auth/onboarding.tsx": "files/apps/web/src/routes/_auth/onboarding.tsx",
+    "e2e/support/organizations.ts": "files/e2e/support/organizations.ts",
+    "e2e/tests/api/organization-membership.spec.ts": "files/e2e/tests/api/organization-membership.spec.ts",
+    "e2e/tests/web/invitation-acceptance.spec.ts": "files/e2e/tests/web/invitation-acceptance.spec.ts",
+    "e2e/tests/web/onboarding.spec.ts": "files/e2e/tests/web/onboarding.spec.ts",
+    "e2e/tests/web/organization-settings.spec.ts": "files/e2e/tests/web/organization-settings.spec.ts",
+    "packages/auth/src/organization-client.ts": "files/packages/auth/src/organization-client.ts",
+    "packages/auth/src/organization-options.ts": "files/packages/auth/src/organization-options.ts",
+    "packages/frontend/consumer/src/modules/organizations": "files/packages/frontend/consumer/src/modules/organizations",
+    "packages/frontend/consumer/src/react/organizations.queries.ts": "files/packages/frontend/consumer/src/react/organizations.queries.ts",
+    "packages/frontend/consumer/src/react/__tests__/organizations.create.spec.tsx": "files/packages/frontend/consumer/src/react/__tests__/organizations.create.spec.tsx",
+    "packages/frontend/consumer/src/react/__tests__/organizations.invitations.spec.tsx": "files/packages/frontend/consumer/src/react/__tests__/organizations.invitations.spec.tsx",
+    "packages/frontend/consumer/src/react/__tests__/organizations.queries.spec.ts": "files/packages/frontend/consumer/src/react/__tests__/organizations.queries.spec.ts",
+    "packages/frontend/consumer/src/react/__tests__/query-keys.spec.ts": "files/packages/frontend/consumer/src/react/__tests__/query-keys.spec.ts"
+  },
+  "filesNeed": {
+    "apps/mcp/src/tools/organizations.tools.ts": "mcp",
+    "apps/mcp/src/tools/workspaces.tools.ts": "mcp",
+    "apps/mobile/app/onboarding.tsx": "mobile",
+    "apps/mobile/features/organizations": "mobile",
+    "apps/web/src/features/organizations": "web",
+    "apps/web/src/routes/_auth/accept-invitation.tsx": "web",
+    "apps/web/src/routes/_auth/onboarding.tsx": "web",
+    "e2e/support/organizations.ts": "e2e",
+    "e2e/tests/api/organization-membership.spec.ts": "e2e",
+    "e2e/tests/web/invitation-acceptance.spec.ts": "web",
+    "e2e/tests/web/onboarding.spec.ts": "web",
+    "e2e/tests/web/organization-settings.spec.ts": "web",
+    "packages/frontend/consumer/src/modules/organizations": "packages/frontend/consumer",
+    "packages/frontend/consumer/src/react/organizations.queries.ts": "packages/frontend/consumer",
+    "packages/frontend/consumer/src/react/__tests__/organizations.create.spec.tsx": "packages/frontend/consumer",
+    "packages/frontend/consumer/src/react/__tests__/organizations.invitations.spec.tsx": "packages/frontend/consumer",
+    "packages/frontend/consumer/src/react/__tests__/organizations.queries.spec.ts": "packages/frontend/consumer",
+    "packages/frontend/consumer/src/react/__tests__/query-keys.spec.ts": "packages/frontend/consumer",
+    "packages/frontend/consumer/package.json": "packages/frontend/consumer"
+  },
+  "blocks": [
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "tenancy-module-import",
+      "source": "blocks/apps_api_src_app_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "tenancy-module",
+      "source": "blocks/apps_api_src_app_module_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
+      "anchor": "tenancy-handler-imports",
+      "source": "blocks/apps_api_src_auth___tests___endpoint-policies_spec_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
+      "anchor": "tenancy-handlers",
+      "source": "blocks/apps_api_src_auth___tests___endpoint-policies_spec_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/auth/auth.module.ts",
+      "anchor": "tenancy-entity-imports",
+      "source": "blocks/apps_api_src_auth_auth_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/auth.module.ts",
+      "anchor": "tenancy-entities",
+      "source": "blocks/apps_api_src_auth_auth_module_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "tenancy-imports",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "session-hooks",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "tenancy-plugin",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts_2.txt"
+    },
+    {
+      "file": "apps/api/src/authz/authz.module.ts",
+      "anchor": "tenancy-imports",
+      "source": "blocks/apps_api_src_authz_authz_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/authz/authz.module.ts",
+      "anchor": "grant-imports",
+      "source": "blocks/apps_api_src_authz_authz_module_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/authz/authz.module.ts",
+      "anchor": "grant-controllers",
+      "source": "blocks/apps_api_src_authz_authz_module_ts_2.txt"
+    },
+    {
+      "file": "apps/api/src/authz/authz.module.ts",
+      "anchor": "tenancy",
+      "source": "blocks/apps_api_src_authz_authz_module_ts_3.txt"
+    },
+    {
+      "file": "apps/api/src/authz/authz.module.ts",
+      "anchor": "tenancy-entities",
+      "source": "blocks/apps_api_src_authz_authz_module_ts_4.txt"
+    },
+    {
+      "file": "apps/api/src/authz/authz.module.ts",
+      "anchor": "tenancy-resources",
+      "source": "blocks/apps_api_src_authz_authz_module_ts_5.txt"
+    },
+    {
+      "file": "apps/api/src/authz/authz.module.ts",
+      "anchor": "tenancy-providers",
+      "source": "blocks/apps_api_src_authz_authz_module_ts_6.txt"
+    },
+    {
+      "file": "apps/api/src/authz/authz.module.ts",
+      "anchor": "tenancy-exports",
+      "source": "blocks/apps_api_src_authz_authz_module_ts_7.txt"
+    },
+    {
+      "file": "apps/api/src/config/data-source.ts",
+      "anchor": "grant-entity-import",
+      "source": "blocks/apps_api_src_config_data-source_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/data-source.ts",
+      "anchor": "tenancy-entity-imports",
+      "source": "blocks/apps_api_src_config_data-source_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/config/data-source.ts",
+      "anchor": "grant-entity",
+      "source": "blocks/apps_api_src_config_data-source_ts_2.txt"
+    },
+    {
+      "file": "apps/api/src/config/data-source.ts",
+      "anchor": "tenancy-entities",
+      "source": "blocks/apps_api_src_config_data-source_ts_3.txt"
+    },
+    {
+      "file": "apps/api/src/database/seed.ts",
+      "anchor": "grant-entity-import",
+      "source": "blocks/apps_api_src_database_seed_ts.txt"
+    },
+    {
+      "file": "apps/api/src/database/seed.ts",
+      "anchor": "tenancy-entity-imports",
+      "source": "blocks/apps_api_src_database_seed_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/database/seed.ts",
+      "anchor": "seed-tenancy-imports",
+      "source": "blocks/apps_api_src_database_seed_ts_2.txt"
+    },
+    {
+      "file": "apps/api/src/database/seed.ts",
+      "anchor": "grant-entity",
+      "source": "blocks/apps_api_src_database_seed_ts_3.txt"
+    },
+    {
+      "file": "apps/api/src/database/seed.ts",
+      "anchor": "tenancy-entities",
+      "source": "blocks/apps_api_src_database_seed_ts_4.txt"
+    },
+    {
+      "file": "apps/api/src/database/seed.ts",
+      "anchor": "seed-tenancy",
+      "source": "blocks/apps_api_src_database_seed_ts_5.txt"
+    },
+    {
+      "file": "apps/mcp/src/tools/index.ts",
+      "anchor": "tenancy-tool-imports",
+      "source": "blocks/apps_mcp_src_tools_index_ts.txt",
+      "needs": "mcp"
+    },
+    {
+      "file": "apps/mcp/src/tools/index.ts",
+      "anchor": "workspace-tool-imports",
+      "source": "blocks/apps_mcp_src_tools_index_ts_1.txt",
+      "needs": "mcp"
+    },
+    {
+      "file": "apps/mcp/src/tools/index.ts",
+      "anchor": "tenancy-tools",
+      "source": "blocks/apps_mcp_src_tools_index_ts_2.txt",
+      "needs": "mcp"
+    },
+    {
+      "file": "apps/mobile/app/(app)/_layout.tsx",
+      "anchor": "app-gate-imports",
+      "source": "blocks/apps_mobile_app_(app)__layout_tsx.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/mobile/app/(app)/_layout.tsx",
+      "anchor": "app-gates",
+      "source": "blocks/apps_mobile_app_(app)__layout_tsx_1.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/mobile/features/auth/sections/auth-gate.tsx",
+      "anchor": "signed-in-routes",
+      "source": "blocks/apps_mobile_features_auth_sections_auth-gate_tsx.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/web/src/features/api-tokens/sections/create-token-card.tsx",
+      "anchor": "tenancy-imports",
+      "source": "blocks/apps_web_src_features_api-tokens_sections_create-token-card_tsx.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/features/api-tokens/sections/create-token-card.tsx",
+      "anchor": "token-organizations",
+      "source": "blocks/apps_web_src_features_api-tokens_sections_create-token-card_tsx_1.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/routes/_authenticated.tsx",
+      "anchor": "shell-imports",
+      "source": "blocks/apps_web_src_routes__authenticated_tsx.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/routes/_authenticated.tsx",
+      "anchor": "shell-gates",
+      "source": "blocks/apps_web_src_routes__authenticated_tsx_1.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/routes/_authenticated/settings/index.tsx",
+      "anchor": "settings-imports",
+      "source": "blocks/apps_web_src_routes__authenticated_settings_index_tsx.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/routes/_authenticated/settings/index.tsx",
+      "anchor": "settings-panes",
+      "source": "blocks/apps_web_src_routes__authenticated_settings_index_tsx_1.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/routes/_authenticated/settings/index.tsx",
+      "anchor": "settings-subtitles",
+      "source": "blocks/apps_web_src_routes__authenticated_settings_index_tsx_2.txt",
+      "needs": "web"
+    },
+    {
+      "file": "e2e/support/web.ts",
+      "anchor": "tenancy-imports",
+      "source": "blocks/e2e_support_web_ts.txt",
+      "needs": "e2e"
+    },
+    {
+      "file": "e2e/support/web.ts",
+      "anchor": "provision-workspace",
+      "source": "blocks/e2e_support_web_ts_1.txt",
+      "needs": "e2e"
+    },
+    {
+      "file": "packages/auth/src/client.ts",
+      "anchor": "client-plugin-imports",
+      "source": "blocks/packages_auth_src_client_ts.txt"
+    },
+    {
+      "file": "packages/auth/src/client.ts",
+      "anchor": "client-plugins",
+      "source": "blocks/packages_auth_src_client_ts_1.txt"
+    },
+    {
+      "file": "packages/auth/src/client.ts",
+      "anchor": "tenancy-exports",
+      "source": "blocks/packages_auth_src_client_ts_2.txt"
+    },
+    {
+      "file": "packages/auth/src/index.ts",
+      "anchor": "tenancy-exports",
+      "source": "blocks/packages_auth_src_index_ts.txt"
+    },
+    {
+      "file": "packages/frontend/consumer/src/di/consumer-app.ts",
+      "anchor": "tenancy-imports",
+      "source": "blocks/packages_frontend_consumer_src_di_consumer-app_ts.txt",
+      "needs": "packages/frontend/consumer"
+    },
+    {
+      "file": "packages/frontend/consumer/src/di/consumer-app.ts",
+      "anchor": "tenancy-module",
+      "source": "blocks/packages_frontend_consumer_src_di_consumer-app_ts_1.txt",
+      "needs": "packages/frontend/consumer"
+    },
+    {
+      "file": "packages/frontend/consumer/src/di/consumer-app.ts",
+      "anchor": "tenancy-service",
+      "source": "blocks/packages_frontend_consumer_src_di_consumer-app_ts_2.txt",
+      "needs": "packages/frontend/consumer"
+    },
+    {
+      "file": "packages/frontend/consumer/src/di/tokens.ts",
+      "anchor": "tenancy-tokens",
+      "source": "blocks/packages_frontend_consumer_src_di_tokens_ts.txt",
+      "needs": "packages/frontend/consumer"
+    },
+    {
+      "file": "packages/frontend/consumer/src/modules/index.ts",
+      "anchor": "tenancy-exports",
+      "source": "blocks/packages_frontend_consumer_src_modules_index_ts.txt",
+      "needs": "packages/frontend/consumer"
+    },
+    {
+      "file": "packages/shared/src/permissions/endpoint-policies.ts",
+      "anchor": "tenancy-endpoint-policies",
+      "source": "blocks/packages_shared_src_permissions_endpoint-policies_ts.txt"
+    },
+    {
+      "file": "scripts/check-api-structure.mjs",
+      "anchor": "api-structure-ledger",
+      "source": "blocks/scripts_check-api-structure_mjs.txt"
+    }
+  ]
+}

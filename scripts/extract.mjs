@@ -194,22 +194,37 @@ export function anchorAt(afterContent, at) {
 }
 
 /**
- * The feature that owns a file, if it is not this one.
+ * What a file lives inside, if it is not this feature: another optional
+ * feature, or a shared path.
  *
  * A block can land in a file another optional feature brings — the CLI's
- * sidebar entry lives in `apps/docs/sidebars.ts`, which belongs to `docs`.
- * In a project without that feature the file is simply absent, and the block
- * has nowhere to go and nothing to say. Recording the owner lets the
- * installer skip it there instead of refusing to install at all, while a
- * missing file that *no* feature explains stays a loud failure, because then
- * it means an anchor moved.
+ * sidebar entry lives in `apps/docs/sidebars.ts`, which belongs to `docs` —
+ * and a feature's own files can sit in another's tree, as the organizations
+ * screens do in `apps/web` and its module does in `packages/frontend/consumer`,
+ * a shared path that goes with the last app needing it. In a project without
+ * that owner the file is simply absent, and the block or file has nowhere to
+ * go and nothing to say. Recording the owner lets the installer skip it there
+ * instead of refusing to install at all, while a missing file that *nothing*
+ * explains stays a loud failure, because then it means an anchor moved.
+ *
+ * The innermost owner wins: it is the first to go. A feature is named by its
+ * id and a shared path by the path, which is how the installer tells them
+ * apart.
  */
-export function ownerOf(features, file, self) {
-  for (const [id, feature] of Object.entries(features)) {
+export function ownerOf(manifest, file, self) {
+  const inside = (path) => file === path || file.startsWith(`${path}/`);
+  let owner = null;
+  let depth = -1;
+  for (const [id, feature] of Object.entries(manifest.features ?? {})) {
     if (id === self) continue;
-    if ((feature.paths ?? []).some((p) => file === p || file.startsWith(`${p}/`))) return id;
+    for (const path of feature.paths ?? []) {
+      if (inside(path) && path.length > depth) [owner, depth] = [id, path.length];
+    }
   }
-  return null;
+  for (const path of Object.keys(manifest.shared ?? {})) {
+    if (inside(path) && path.length > depth) [owner, depth] = [path, path.length];
+  }
+  return owner;
 }
 
 async function main() {
@@ -230,11 +245,10 @@ async function main() {
 
   const scratch = scratchCopy(repo);
   try {
-    execFileSync(
-      'node',
-      ['scripts/starter/prune.mjs', '--without', id, '--no-install'],
-      { cwd: scratch, stdio: 'pipe' },
-    );
+    execFileSync('node', ['scripts/starter/prune.mjs', '--without', id, '--no-install'], {
+      cwd: scratch,
+      stdio: 'pipe',
+    });
 
     const out = join(ROOT, 'plugins', id);
     rmSync(out, { recursive: true, force: true });
@@ -290,7 +304,7 @@ async function main() {
       found.forEach((block, n) => {
         const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
         writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
-        const needs = ownerOf(manifest.features, file, id);
+        const needs = ownerOf(manifest, file, id);
         const anchor = anchorBeside(after, block.at - 1);
         if (anchor) {
           blocks.push({ file, anchor, source, ...(needs ? { needs } : {}) });
@@ -340,7 +354,7 @@ async function main() {
               `"${id}" joins`,
           );
         }
-        const needs = ownerOf(manifest.features, file, id);
+        const needs = ownerOf(manifest, file, id);
         coOwned.push({ file, anchor, order: block.ids, ...(needs ? { needs } : {}) });
         console.log(
           `  shared block ${file} → ${anchor} (${block.ids.join('|')})${needs ? ` (only with ${needs})` : ''}`,
@@ -375,6 +389,14 @@ async function main() {
       console.log(`  shared ${entry.path} (carried — every dependant is leaving)`);
     }
 
+    // A path, or a JSON file an edit touches, that lives inside something
+    // else optional is skipped by an install into a project without it.
+    const filesNeed = {};
+    for (const path of [...Object.keys(files), ...(feature.json ?? []).map((e) => e.file)]) {
+      const owner = ownerOf(manifest, path, id);
+      if (owner) filesNeed[path] = owner;
+    }
+
     const covered = [...Object.keys(files), ...Object.keys(sharedFiles)];
     const orphan = deleted.find((file) => !covered.some((p) => file.startsWith(p)));
     if (orphan) {
@@ -400,6 +422,7 @@ async function main() {
         ...(shared.length ? { shared } : {}),
       },
       files,
+      ...(Object.keys(filesNeed).length ? { filesNeed } : {}),
       ...(Object.keys(sharedFiles).length ? { sharedFiles } : {}),
       ...(blocks.length ? { blocks } : {}),
       ...(coOwned.length ? { coOwned } : {}),

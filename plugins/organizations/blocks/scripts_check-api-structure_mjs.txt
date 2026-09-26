@@ -1,0 +1,27 @@
+  // flama:begin organizations
+  {
+    path: 'apps/api/src/organizations/organizations.controller.ts',
+    kind: 'controller-at-module-root',
+  },
+  { path: 'apps/api/src/organizations/organizations.controller.ts', kind: 'route-outside-slice' },
+  { path: 'apps/api/src/organizations/members.controller.ts', kind: 'controller-at-module-root' },
+  { path: 'apps/api/src/organizations/members.controller.ts', kind: 'route-outside-slice' },
+  {
+    path: 'apps/api/src/organizations/invitations.controller.ts',
+    kind: 'controller-at-module-root',
+  },
+  { path: 'apps/api/src/organizations/invitations.controller.ts', kind: 'route-outside-slice' },
+  {
+    path: 'apps/api/src/organizations/workspaces.controller.ts',
+    kind: 'controller-at-module-root',
+  },
+  { path: 'apps/api/src/organizations/workspaces.controller.ts', kind: 'route-outside-slice' },
+  { path: 'apps/api/src/organizations/organizations.service.ts', kind: 'service-at-module-root' },
+  { path: 'apps/api/src/organizations/invitations.service.ts', kind: 'service-at-module-root' },
+  { path: 'apps/api/src/organizations/workspaces.service.ts', kind: 'service-at-module-root' },
+  { path: 'apps/api/src/organizations/organization.mappers.ts', kind: 'plural-mappers-file' },
+  {
+    path: 'apps/api/src/organizations/dtos/organization.request.dto.ts',
+    kind: 'file-name-not-admitted',
+  },
+  // flama:end organizations

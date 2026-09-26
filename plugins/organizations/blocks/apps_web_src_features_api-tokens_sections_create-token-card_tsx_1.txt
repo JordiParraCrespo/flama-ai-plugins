@@ -1,0 +1,3 @@
+    // flama:begin organizations
+    ...(useOrganizations().data ?? []),
+    // flama:end organizations

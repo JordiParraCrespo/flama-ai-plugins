@@ -1,0 +1,3 @@
+      // flama:begin organizations
+      ...tenancy.resources,
+      // flama:end organizations

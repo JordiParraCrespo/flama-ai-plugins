@@ -1,0 +1,4 @@
+  // flama:begin organizations
+  OrganizationsRepository: Symbol.for('OrganizationsRepository'),
+  OrganizationsService: Symbol.for('OrganizationsService'),
+  // flama:end organizations
