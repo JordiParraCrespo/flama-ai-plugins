@@ -1,0 +1,5 @@
+    // flama:begin mcp
+    OAuthApplicationOrmEntity,
+    OAuthAccessTokenOrmEntity,
+    OAuthConsentOrmEntity,
+    // flama:end mcp

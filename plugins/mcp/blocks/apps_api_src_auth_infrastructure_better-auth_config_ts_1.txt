@@ -1,0 +1,4 @@
+    // flama:begin mcp
+    // The API as an OAuth 2.1 provider for MCP clients (mcp-plugin.config.ts).
+    mcpPlugin(frontendUrl),
+    // flama:end mcp

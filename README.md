@@ -13,6 +13,7 @@ pnpm plugin:remove cli
 | Plugin | What it adds |
 |---|---|
 | `cli` | `apps/cli` — the `flama` command-line interface, driven by scoped API tokens |
+| `mcp` | `apps/mcp` — the MCP server (stdio + Streamable HTTP), and the API's OAuth provider for MCP clients with its consent screen |
 | `docs` | `apps/docs` — the Docusaurus site |
 | `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane |
@@ -81,8 +82,12 @@ plugin edited code it does not own.
 
 **Co-owned blocks** are the awkward ones. `flama:begin mcp|cli` belongs to both
 features: it survives while either remains, and the pruner narrows the spec to
-whoever is left. So the plugin cannot delete and restore it — it stores the
-widened form and swaps it for the narrowed one on install.
+whoever is left. So the plugin cannot delete and restore it — it widens the
+fence of the block already there, and where no owner is left it puts the body
+it carries back as its own. Those bodies are read from the starter by
+`scripts/shared-bodies.mjs`; for a block whose owners have all become plugins —
+`cli` and `mcp` share two — each plugin's copy is read from the other's, and
+`--check` fails when they disagree.
 
 ## Proving a plugin
 
@@ -123,10 +128,20 @@ are the only mark it makes. So the plugin carries the starter's copy of each
 file it has blocks in (`snapshots/`), and the installer merges the blocks onto
 the project's copy with `git merge-file` — a project that has edited the file
 since still takes them, and one that edited the same lines stops the install.
+A plugin whose feature the starter does not ship needs no snapshots: every
+block it has sits at a slot.
 
 Files the feature keeps inside another's tree are skipped by an install into a
 project without it: `filesNeed` names the feature (its screens in `apps/web`),
 `filesNeedPath` the shared path (its module in `packages/frontend/consumer`).
+The other way round — a path inside this plugin's tree that another feature
+owns, as the MCP server's organization tools belong to `organizations` — is the
+same two keys: the path is a `files` entry of its own with `filesNeed` naming
+its owner, and the feature's `json` edit puts it back on the owner's entry.
+The owner's plugin, extracted from a starter without that tree, carries the
+same files from the plugin that holds them (`filesNeed` naming the holder),
+and replays that plugin's files carrying its fences, so either can be added
+after the other.
 
 Two things are excluded from the comparison, deliberately and visibly:
 `.changeset/` and `pnpm-lock.yaml`. The pruner rewrites a changeset's
@@ -147,13 +162,6 @@ would otherwise have nowhere to put the block back.
 
 ## Known limits
 
-- **A block every owner has left cannot be recreated.** Widening a co-owned
-  block composes now — two plugins that share one both install, in either
-  order — but only while some owner remains to hold the block. `cli` and `mcp`
-  share three blocks and `mcp` stays behind to hold them; if it left too, the
-  block would go with it and installing `cli` would have nowhere to widen.
-  Creating one from nothing is still a design decision about how shared
-  configuration should be modelled, not a missing function.
 - **A failed install is not undone.** Installing copies files, inserts blocks
   and then widens; a failure at the last step leaves the earlier ones in
   place. `plugin:remove` cleans up, but nothing rolls back on its own.

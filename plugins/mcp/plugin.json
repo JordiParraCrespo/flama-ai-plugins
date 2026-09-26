@@ -1,0 +1,159 @@
+{
+  "id": "mcp",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "MCP server",
+    "summary": "apps/mcp — Model Context Protocol server (stdio + Streamable HTTP) over the API, and the API's OAuth provider for MCP clients with its consent screen",
+    "identifiers": [
+      "apps/mcp",
+      "@flama/mcp",
+      "flama-mcp"
+    ],
+    "paths": [
+      "apps/mcp",
+      "apps/api/src/auth/infrastructure/mcp-plugin.config.ts",
+      "apps/api/src/auth/infrastructure/mcp-credential-scope.adapter.ts",
+      "apps/api/src/auth/database/oauth-access-token.orm-entity.ts",
+      "apps/api/src/auth/database/oauth-application.orm-entity.ts",
+      "apps/api/src/auth/database/oauth-consent.orm-entity.ts",
+      "apps/api/test/mcp-oauth.integration.spec.ts",
+      "apps/web/src/routes/oauth",
+      "apps/web/src/features/auth/screens/oauth-consent.tsx",
+      "apps/web/src/features/auth/hooks/use-respond-to-consent.ts",
+      "apps/web/src/features/auth/lib/consent.ts",
+      "e2e/tests/api/mcp-oauth-provider.spec.ts",
+      "e2e/tests/web/oauth-consent.spec.ts"
+    ],
+    "keeps": {
+      "apps/api/src/migrations": "the OAuth tables arrive in the same migration as the API tokens, which stay, so a project without the MCP server keeps them, empty"
+    },
+    "json": [
+      {
+        "file": "scripts/starter/features.json",
+        "path": [
+          "features",
+          "organizations",
+          "paths"
+        ],
+        "remove": [
+          "apps/mcp/src/tools/organizations.tools.ts",
+          "apps/mcp/src/tools/workspaces.tools.ts"
+        ],
+        "at": [
+          16,
+          17
+        ],
+        "needs": "organizations"
+      }
+    ]
+  },
+  "files": {
+    "apps/mcp": "files/apps/mcp",
+    "apps/api/src/auth/infrastructure/mcp-plugin.config.ts": "files/apps/api/src/auth/infrastructure/mcp-plugin.config.ts",
+    "apps/api/src/auth/infrastructure/mcp-credential-scope.adapter.ts": "files/apps/api/src/auth/infrastructure/mcp-credential-scope.adapter.ts",
+    "apps/api/src/auth/database/oauth-access-token.orm-entity.ts": "files/apps/api/src/auth/database/oauth-access-token.orm-entity.ts",
+    "apps/api/src/auth/database/oauth-application.orm-entity.ts": "files/apps/api/src/auth/database/oauth-application.orm-entity.ts",
+    "apps/api/src/auth/database/oauth-consent.orm-entity.ts": "files/apps/api/src/auth/database/oauth-consent.orm-entity.ts",
+    "apps/api/test/mcp-oauth.integration.spec.ts": "files/apps/api/test/mcp-oauth.integration.spec.ts",
+    "apps/web/src/routes/oauth": "files/apps/web/src/routes/oauth",
+    "apps/web/src/features/auth/screens/oauth-consent.tsx": "files/apps/web/src/features/auth/screens/oauth-consent.tsx",
+    "apps/web/src/features/auth/hooks/use-respond-to-consent.ts": "files/apps/web/src/features/auth/hooks/use-respond-to-consent.ts",
+    "apps/web/src/features/auth/lib/consent.ts": "files/apps/web/src/features/auth/lib/consent.ts",
+    "e2e/tests/api/mcp-oauth-provider.spec.ts": "files/e2e/tests/api/mcp-oauth-provider.spec.ts",
+    "e2e/tests/web/oauth-consent.spec.ts": "files/e2e/tests/web/oauth-consent.spec.ts",
+    "apps/mcp/src/tools/organizations.tools.ts": "files/apps/mcp/src/tools/organizations.tools.ts",
+    "apps/mcp/src/tools/workspaces.tools.ts": "files/apps/mcp/src/tools/workspaces.tools.ts"
+  },
+  "filesNeed": {
+    "apps/web/src/routes/oauth": "web",
+    "apps/web/src/features/auth/screens/oauth-consent.tsx": "web",
+    "apps/web/src/features/auth/hooks/use-respond-to-consent.ts": "web",
+    "apps/web/src/features/auth/lib/consent.ts": "web",
+    "e2e/tests/api/mcp-oauth-provider.spec.ts": "e2e",
+    "e2e/tests/web/oauth-consent.spec.ts": "web",
+    "apps/mcp/src/tools/organizations.tools.ts": "organizations",
+    "apps/mcp/src/tools/workspaces.tools.ts": "organizations"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "apps/api/src/auth/auth.module.ts",
+      "anchor": "auth-entity-imports",
+      "source": "blocks/apps_api_src_auth_auth_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/auth.module.ts",
+      "anchor": "auth-provider-imports",
+      "source": "blocks/apps_api_src_auth_auth_module_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/auth/auth.module.ts",
+      "anchor": "auth-entities",
+      "source": "blocks/apps_api_src_auth_auth_module_ts_2.txt"
+    },
+    {
+      "file": "apps/api/src/auth/auth.module.ts",
+      "anchor": "auth-providers",
+      "source": "blocks/apps_api_src_auth_auth_module_ts_3.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "auth-plugin-imports",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "auth-plugins",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/config/data-source.ts",
+      "anchor": "entity-imports",
+      "source": "blocks/apps_api_src_config_data-source_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/data-source.ts",
+      "anchor": "entities",
+      "source": "blocks/apps_api_src_config_data-source_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/database/seed.ts",
+      "anchor": "entity-imports",
+      "source": "blocks/apps_api_src_database_seed_ts.txt"
+    },
+    {
+      "file": "apps/api/src/database/seed.ts",
+      "anchor": "entities",
+      "source": "blocks/apps_api_src_database_seed_ts_1.txt"
+    },
+    {
+      "file": "scripts/ci/affected.mjs",
+      "anchor": "images",
+      "source": "blocks/scripts_ci_affected_mjs.txt"
+    }
+  ],
+  "coOwned": [
+    {
+      "file": ".env.example",
+      "anchor": "agent-env",
+      "order": [
+        "mcp",
+        "cli"
+      ],
+      "source": "blocks/shared/env_example__agent-env.txt"
+    },
+    {
+      "file": "AUTHORIZATION.md",
+      "anchor": "agent-docs",
+      "order": [
+        "cli",
+        "mcp"
+      ],
+      "source": "blocks/shared/AUTHORIZATION_md__agent-docs.txt"
+    }
+  ]
+}

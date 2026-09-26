@@ -26,6 +26,7 @@ import {
   lstatSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   statSync,
@@ -114,7 +115,8 @@ export function removalHunks(diff) {
   return hunks.filter((hunk) => hunk.lines.length > 0 && hunk.added === 0);
 }
 
-const FENCE_RE = /^(\s*(?:#|\/\/|<!--|\{\{-?\s*\/\*|\{\s*\/\*|\/\*)\s*flama:)(begin|end)(\s+)([\w|-]+)/;
+const FENCE_RE =
+  /^(\s*(?:#|\/\/|<!--|\{\{-?\s*\/\*|\{\s*\/\*|\/\*)\s*flama:)(begin|end)(\s+)([\w|-]+)/;
 
 /**
  * Blocks whose marker names this feature *and* others — `flama:begin mcp|cli`.
@@ -227,6 +229,60 @@ export function ownerOf(manifest, file, self) {
   return owner;
 }
 
+/**
+ * The blocks other plugins here say they share with `id`: `file\0anchor` →
+ * the fence order they agreed.
+ */
+export function sharedWithPlugins(id) {
+  const found = new Map();
+  for (const other of readdirSync(join(ROOT, 'plugins')).sort()) {
+    const path = join(ROOT, 'plugins', other, 'plugin.json');
+    if (other === id || !existsSync(path)) continue;
+    for (const block of JSON.parse(readFileSync(path, 'utf8')).coOwned ?? []) {
+      if (block.order?.includes(id)) found.set(`${block.file}\0${block.anchor}`, block.order);
+    }
+  }
+  return found;
+}
+
+/**
+ * The plugins here holding files `id` owns: each plugin, and those files as
+ * `[destination, source]` — its `files` entries whose `filesNeed` is `id`.
+ */
+export function pluginsHolding(id) {
+  const found = [];
+  for (const other of readdirSync(join(ROOT, 'plugins')).sort()) {
+    const path = join(ROOT, 'plugins', other, 'plugin.json');
+    if (other === id || !existsSync(path)) continue;
+    const plugin = JSON.parse(readFileSync(path, 'utf8'));
+    const held = Object.entries(plugin.filesNeed ?? {})
+      .filter(([destination, owner]) => owner === id && plugin.files?.[destination])
+      .map(([destination]) => [destination, plugin.files[destination]]);
+    if (held.length) found.push([other, held]);
+  }
+  return found;
+}
+
+/** Files under `dir`, as paths relative to it, with a fence naming `id`. */
+function fencedFiles(dir, id) {
+  const found = [];
+  const walk = (at) => {
+    for (const entry of readdirSync(join(dir, at), { withFileTypes: true })) {
+      const rel = at ? `${at}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) walk(rel);
+      else if (
+        entry.isFile() &&
+        readFileSync(join(dir, rel), 'utf8')
+          .split('\n')
+          .some((line) => FENCE_RE.exec(line)?.[4].split('|').includes(id))
+      )
+        found.push(rel);
+    }
+  };
+  walk('');
+  return found;
+}
+
 async function main() {
   const argv = process.argv.slice(2);
   const id = argv.find(
@@ -285,6 +341,8 @@ async function main() {
     mkdirSync(join(out, 'blocks'), { recursive: true });
     const blocks = [];
     const snapshots = [];
+    const coOwned = [];
+    const joined = sharedWithPlugins(id);
     // A JSON file is never a block source: it cannot hold a comment, so it
     // cannot hold an anchor, so there is nowhere to put a block back. What a
     // feature owns in one is declared instead — a `json` edit in its
@@ -305,11 +363,25 @@ async function main() {
       const found = removalHunks(git(scratch, 'diff', '-U0', '--', file));
       const anchors = found.map((block) => anchorBeside(after, block.at - 1));
       if (anchors.every(Boolean)) {
-        found.forEach((block, n) => {
+        let n = 0;
+        found.forEach((block, i) => {
+          const anchor = anchors[i];
+          // A block this plugin shares with one that already left the
+          // starter — the CLI and the MCP server both document FLAMA_API_URL
+          // — is fenced with this id alone, because the other owner went
+          // first. That plugin recorded the sharing when it left, so this one
+          // joins it rather than carrying a second copy to sit beside it.
+          const order = joined.get(`${file}\0${anchor}`);
+          if (order) {
+            coOwned.push({ file, anchor, order, ...(needs ? { needs } : {}) });
+            console.log(`  shared block ${file} → ${anchor} (${order.join('|')}, with a plugin)`);
+            return;
+          }
           const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
+          n += 1;
           writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
-          blocks.push({ file, anchor: anchors[n], source, ...(needs ? { needs } : {}) });
-          console.log(`  block  ${file} → ${anchors[n]}${needs ? ` (only with ${needs})` : ''}`);
+          blocks.push({ file, anchor, source, ...(needs ? { needs } : {}) });
+          console.log(`  block  ${file} → ${anchor}${needs ? ` (only with ${needs})` : ''}`);
         });
         continue;
       }
@@ -321,12 +393,13 @@ async function main() {
       mkdirSync(dirname(join(out, source)), { recursive: true });
       cpSync(join(repo, file), join(out, source));
       snapshots.push({ file, source, ...(needs ? { needs } : {}) });
-      console.log(`  replay ${file} (${found.length} block(s))${needs ? ` (only with ${needs})` : ''}`);
+      console.log(
+        `  replay ${file} (${found.length} block(s))${needs ? ` (only with ${needs})` : ''}`,
+      );
     }
 
     // Co-owned blocks live in files the prune only narrowed, so they do not
     // all show up as removals; scan the tracked text files directly.
-    const coOwned = [];
     const tracked = git(repo, 'ls-files').split('\n').filter(Boolean);
     for (const file of tracked) {
       if (NOT_A_FEATURE.some((re) => re.test(file))) continue;
@@ -399,6 +472,48 @@ async function main() {
       else filesNeedPath[path] = owner;
     }
 
+    // A path inside this feature's tree that another feature owns — the MCP
+    // server's organization tools are organizations' — is its own entry, with
+    // its own `filesNeed`, so the tree is not what decides whether it lands.
+    // Which entry owns it once it has is the feature's `json` edit's business.
+    for (const [other, entry] of Object.entries(manifest.features)) {
+      if (other === id) continue;
+      for (const path of entry.paths ?? []) {
+        if (!feature.paths.some((own) => path.startsWith(`${own}/`))) continue;
+        files[path] = `files/${path}`;
+        filesNeed[path] = other;
+        console.log(`  owned  ${path} (by ${other})`);
+      }
+    }
+
+    // The other way round: files this feature owns inside a tree only a plugin
+    // here has — the MCP server's organization tools, once the server left
+    // the starter. The plugin's copy is the only one, so it is carried from
+    // there, installed only beside that plugin (`filesNeed`), and the plugin's
+    // files that carry this feature's fences come back as a shipped feature's
+    // blocks do (`snapshots`). Either can then be added after the other.
+    const paths = [...feature.paths];
+    for (const [holder, held] of pluginsHolding(id)) {
+      const holderDir = join(ROOT, 'plugins', holder);
+      for (const [path, source] of held) {
+        files[path] = `files/${path}`;
+        filesNeed[path] = holder;
+        mkdirSync(dirname(join(out, 'files', path)), { recursive: true });
+        cpSync(join(holderDir, source), join(out, 'files', path), { recursive: true });
+        const at = paths.findIndex((other) => other > path);
+        paths.splice(at === -1 ? paths.length : at, 0, path);
+        console.log(`  carry  ${path} (from ${holder})`);
+      }
+      for (const file of fencedFiles(join(holderDir, 'files'), id)) {
+        if (held.some(([path]) => file === path || file.startsWith(`${path}/`))) continue;
+        const source = `snapshots/${file}`;
+        mkdirSync(dirname(join(out, source)), { recursive: true });
+        cpSync(join(holderDir, 'files', file), join(out, source));
+        snapshots.push({ file, source, needs: holder });
+        console.log(`  replay ${file} (from ${holder}) (only with ${holder})`);
+      }
+    }
+
     const covered = [...Object.keys(files), ...Object.keys(sharedFiles)];
     const orphan = deleted.find((file) => !covered.some((p) => file.startsWith(p)));
     if (orphan) {
@@ -412,7 +527,7 @@ async function main() {
         title: feature.title,
         summary: feature.summary,
         identifiers: feature.identifiers,
-        paths: feature.paths,
+        paths,
         ...(feature.keeps ? { keeps: feature.keeps } : {}),
         ...(feature.requires ? { requires: feature.requires } : {}),
         ...(feature.scripts ? { scripts: feature.scripts } : {}),

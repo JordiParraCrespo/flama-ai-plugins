@@ -84,8 +84,6 @@
     "apps/api/src/authz/authz.di-tokens.ts": "files/apps/api/src/authz/authz.di-tokens.ts",
     "apps/api/src/authz/access-grant.mapper.ts": "files/apps/api/src/authz/access-grant.mapper.ts",
     "apps/api/src/database/seed-organization.ts": "files/apps/api/src/database/seed-organization.ts",
-    "apps/mcp/src/tools/organizations.tools.ts": "files/apps/mcp/src/tools/organizations.tools.ts",
-    "apps/mcp/src/tools/workspaces.tools.ts": "files/apps/mcp/src/tools/workspaces.tools.ts",
     "apps/mobile/app/onboarding.tsx": "files/apps/mobile/app/onboarding.tsx",
     "apps/mobile/features/organizations": "files/apps/mobile/features/organizations",
     "apps/web/src/features/organizations": "files/apps/web/src/features/organizations",
@@ -99,11 +97,11 @@
     "packages/auth/src/organization-client.ts": "files/packages/auth/src/organization-client.ts",
     "packages/auth/src/organization-options.ts": "files/packages/auth/src/organization-options.ts",
     "packages/frontend/consumer/src/modules/organizations": "files/packages/frontend/consumer/src/modules/organizations",
-    "packages/frontend/consumer/src/organizations": "files/packages/frontend/consumer/src/organizations"
+    "packages/frontend/consumer/src/organizations": "files/packages/frontend/consumer/src/organizations",
+    "apps/mcp/src/tools/organizations.tools.ts": "files/apps/mcp/src/tools/organizations.tools.ts",
+    "apps/mcp/src/tools/workspaces.tools.ts": "files/apps/mcp/src/tools/workspaces.tools.ts"
   },
   "filesNeed": {
-    "apps/mcp/src/tools/organizations.tools.ts": "mcp",
-    "apps/mcp/src/tools/workspaces.tools.ts": "mcp",
     "apps/mobile/app/onboarding.tsx": "mobile",
     "apps/mobile/features/organizations": "mobile",
     "apps/web/src/features/organizations": "web",
@@ -113,7 +111,9 @@
     "e2e/tests/api/organization-membership.spec.ts": "e2e",
     "e2e/tests/web/invitation-acceptance.spec.ts": "web",
     "e2e/tests/web/onboarding.spec.ts": "web",
-    "e2e/tests/web/organization-settings.spec.ts": "web"
+    "e2e/tests/web/organization-settings.spec.ts": "web",
+    "apps/mcp/src/tools/organizations.tools.ts": "mcp",
+    "apps/mcp/src/tools/workspaces.tools.ts": "mcp"
   },
   "filesNeedPath": {
     "packages/frontend/consumer/src/modules/organizations": "packages/frontend/consumer",
@@ -147,11 +147,6 @@
     {
       "file": "apps/api/src/database/seed.ts",
       "source": "snapshots/apps/api/src/database/seed.ts"
-    },
-    {
-      "file": "apps/mcp/src/tools/index.ts",
-      "source": "snapshots/apps/mcp/src/tools/index.ts",
-      "needs": "mcp"
     },
     {
       "file": "apps/mobile/app/(app)/_layout.tsx",
@@ -228,6 +223,11 @@
     {
       "file": "scripts/check-api-structure.mjs",
       "source": "snapshots/scripts/check-api-structure.mjs"
+    },
+    {
+      "file": "apps/mcp/src/tools/index.ts",
+      "source": "snapshots/apps/mcp/src/tools/index.ts",
+      "needs": "mcp"
     }
   ]
 }

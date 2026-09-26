@@ -7,10 +7,8 @@
       # Which SPAs those are is decided inside the block, next to the filter
       # that builds them, so a plugin that adds an SPA adds both in one place.
       - name: First-load budgets
-        env:
-          PACKAGES: ${{ needs.changes.outputs.packages }}
         run: |
-          changed() { [[ "$PACKAGES" == *"\"$1\""* ]]; }
+          changed() { [[ "$AFFECTED_PACKAGES" == *"\"$1\""* ]]; }
           filters=()
           # flama:begin web
           if changed @flama/web; then filters+=(--filter=@flama/web); fi

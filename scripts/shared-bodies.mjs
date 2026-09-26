@@ -12,6 +12,11 @@
  * copy here keeps the old words. So the body is never written by hand. This
  * script reads it out of the starter, and `--check` fails when the two differ.
  *
+ * A block can outlive every owner the starter ships: the CLI and the MCP
+ * server share one and both are plugins. Then the plugins' copies are the
+ * only ones, each reads its body from another's, and `--check` fails when
+ * they disagree.
+ *
  *   node scripts/shared-bodies.mjs --repo ../flama-ai           # write
  *   node scripts/shared-bodies.mjs --repo ../flama-ai --check   # compare
  */
@@ -61,6 +66,37 @@ export function sharedBody(markers, content, file, block, id) {
 }
 
 /**
+ * The body `id` carries for a block no owner in the starter still holds —
+ * every one of them left as a plugin — read from a plugin that shares it.
+ * The copies are the only ones left, so they must agree with each other.
+ */
+export function siblingBody(markers, block, id) {
+  for (const other of block.order ?? []) {
+    if (other === id) continue;
+    const path = join(ROOT, 'plugins', other, 'plugin.json');
+    if (!existsSync(path)) continue;
+    const theirs = (JSON.parse(readFileSync(path, 'utf8')).coOwned ?? []).find(
+      (entry) => entry.file === block.file && entry.anchor === block.anchor,
+    );
+    if (!theirs?.source || !existsSync(join(ROOT, 'plugins', other, theirs.source))) continue;
+    if (theirs.order.join('|') !== block.order.join('|')) {
+      return { error: `${block.file}: ${other} orders the "${block.anchor}" block differently` };
+    }
+    const lines = readFileSync(join(ROOT, 'plugins', other, theirs.source), 'utf8')
+      .replace(/\n$/, '')
+      .split('\n');
+    const refence = (line) =>
+      markers.narrowMarker(markers.widenMarker(line, id, 0), new Set([other]));
+    lines[0] = refence(lines[0]);
+    lines[lines.length - 1] = refence(lines[lines.length - 1]);
+    return { body: `${lines.join('\n')}\n` };
+  }
+  return {
+    error: `${block.file}: no plugin that shares the "${block.anchor}" block carries its body`,
+  };
+}
+
+/**
  * Write (or with `check`, compare) the shared bodies of `ids`, every plugin
  * when omitted, against the starter at `repo`. Returns the number of
  * problems. `extract.mjs` calls it for the plugin it just regenerated: the
@@ -72,6 +108,7 @@ export async function syncSharedBodies({ repo, check = false, ids = null }) {
   if (!existsSync(markersPath)) fail(`${repo} has no scripts/lib/markers.mjs`);
   const markers = await import(pathToFileURL(markersPath).href);
 
+  const starter = JSON.parse(readFileSync(join(repo, 'scripts/starter/features.json'), 'utf8'));
   let problems = 0;
   for (const id of ids ?? readdirSync(join(ROOT, 'plugins')).sort()) {
     const manifestPath = join(ROOT, 'plugins', id, 'plugin.json');
@@ -85,13 +122,10 @@ export async function syncSharedBodies({ repo, check = false, ids = null }) {
         problems += 1;
         continue;
       }
-      const { body, error } = sharedBody(
-        markers,
-        readFileSync(file, 'utf8'),
-        block.file,
-        block,
-        id,
-      );
+      const shipped = block.order.some((owner) => owner !== id && starter.features[owner]);
+      const { body, error } = shipped
+        ? sharedBody(markers, readFileSync(file, 'utf8'), block.file, block, id)
+        : siblingBody(markers, block, id);
       if (error) {
         console.log(`  ✗ ${id}: ${error}`);
         problems += 1;
@@ -101,7 +135,8 @@ export async function syncSharedBodies({ repo, check = false, ids = null }) {
       const current = existsSync(target) ? readFileSync(target, 'utf8') : null;
       if (check) {
         if (block.source !== bodyPath(block) || current !== body) {
-          console.log(`  ✗ ${id}: ${bodyPath(block)} does not match the starter's block`);
+          const against = shipped ? "the starter's block" : 'the other plugins’ copies';
+          console.log(`  ✗ ${id}: ${bodyPath(block)} does not match ${against}`);
           problems += 1;
         }
         continue;

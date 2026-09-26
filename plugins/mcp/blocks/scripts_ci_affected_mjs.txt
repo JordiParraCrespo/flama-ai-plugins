@@ -1,0 +1,3 @@
+  // flama:begin mcp
+  mcp: '@flama/mcp',
+  // flama:end mcp
