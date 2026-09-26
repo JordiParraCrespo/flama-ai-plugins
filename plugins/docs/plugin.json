@@ -56,11 +56,6 @@
       "needs": "helm"
     },
     {
-      "file": "scripts/ci/affected.mjs",
-      "anchor": "docs",
-      "source": "blocks/scripts_ci_affected_mjs.txt"
-    },
-    {
       "file": ".gitignore",
       "anchor": "docs",
       "source": "blocks/_gitignore.txt"

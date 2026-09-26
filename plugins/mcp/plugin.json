@@ -129,11 +129,6 @@
       "file": "apps/api/src/database/seed.ts",
       "anchor": "entities",
       "source": "blocks/apps_api_src_database_seed_ts_1.txt"
-    },
-    {
-      "file": "scripts/ci/affected.mjs",
-      "anchor": "images",
-      "source": "blocks/scripts_ci_affected_mjs.txt"
     }
   ],
   "coOwned": [

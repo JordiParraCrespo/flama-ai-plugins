@@ -1,0 +1,55 @@
+{
+  "id": "runner",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Go runner service",
+    "summary": "apps/runner + packages/go/* — Go service template (REST + WS, API keys) the API delegates long-lived work to",
+    "identifiers": [
+      "apps/runner",
+      "@flama/runner",
+      "@flama/go-",
+      "go.work",
+      "flama-runner",
+      "RUNNER_"
+    ],
+    "paths": [
+      "apps/runner",
+      "packages/go",
+      "go.work",
+      ".golangci.yml",
+      ".github/workflows/runner.yml",
+      ".agents/rules/go.md",
+      "helm/flama/templates/runner-deployment.yaml"
+    ]
+  },
+  "files": {
+    "apps/runner": "files/apps/runner",
+    "packages/go": "files/packages/go",
+    "go.work": "files/go.work",
+    ".golangci.yml": "files/.golangci.yml",
+    ".github/workflows/runner.yml": "files/.github/workflows/runner.yml",
+    ".agents/rules/go.md": "files/.agents/rules/go.md",
+    "helm/flama/templates/runner-deployment.yaml": "files/helm/flama/templates/runner-deployment.yaml"
+  },
+  "filesNeed": {
+    "helm/flama/templates/runner-deployment.yaml": "helm"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "docker/docker-compose.prod.yml",
+      "anchor": "services",
+      "source": "blocks/docker_docker-compose_prod_yml.txt"
+    },
+    {
+      "file": "helm/flama/values.yaml",
+      "anchor": "services",
+      "source": "blocks/helm_flama_values_yaml.txt",
+      "needs": "helm"
+    }
+  ]
+}
