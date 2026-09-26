@@ -23,12 +23,22 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 mcp
 
-COPY --from=builder --chown=mcp:nodejs /app/apps/mcp/dist ./dist
-COPY --from=builder --chown=mcp:nodejs /app/apps/mcp/node_modules ./node_modules
-COPY --from=builder --chown=mcp:nodejs /app/apps/mcp/package.json ./
+# pnpm links dependencies with **relative** symlinks whose depth encodes the
+# workspace layout: `apps/mcp/node_modules/@flama/env` points at
+# `../../../../packages/env`, and every third-party package points into
+# `../../node_modules/.pnpm/…`. Flattening `apps/mcp/node_modules` onto
+# `/app/node_modules` moves them two levels up, so those links dangle and
+# `@flama/env/load` fails at start. Keep the depth the links were written for,
+# with the built workspace packages beside it, and run from the app directory —
+# as the API's image does.
 COPY --from=builder --chown=mcp:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=mcp:nodejs /app/packages ./packages
+COPY --from=builder --chown=mcp:nodejs /app/apps/mcp/node_modules ./apps/mcp/node_modules
+COPY --from=builder --chown=mcp:nodejs /app/apps/mcp/dist ./apps/mcp/dist
+COPY --from=builder --chown=mcp:nodejs /app/apps/mcp/package.json ./apps/mcp/
 
 USER mcp
+WORKDIR /app/apps/mcp
 EXPOSE 3005
 
 # The remote (Streamable HTTP) entrypoint. Each request carries its own

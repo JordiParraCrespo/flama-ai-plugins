@@ -36,19 +36,15 @@ async function main(): Promise<void> {
   });
 
   // Ask the API what this token can actually do, rather than trusting the
-  // token's own claims or offering everything and failing later. Done once,
-  // before serving: the token is fixed for the life of the process, and a bad
-  // one should fail loudly at startup instead of on the first tool call.
+  // token's own claims or offering everything and failing later. Once before
+  // serving, so a bad token fails loudly at startup instead of on the first
+  // tool call.
   const credential = await client.currentCredential();
 
-  const build = () =>
-    createServer({
-      client,
-      scopes: credential.effectiveScopes,
-      toolsCacheTtlMs: config.toolsCacheTtlMs,
-    });
+  const build = (scopes: typeof credential.effectiveScopes) =>
+    createServer({ client, scopes, toolsCacheTtlMs: config.toolsCacheTtlMs });
 
-  const { tools, withheld } = build();
+  const { tools, withheld } = build(credential.effectiveScopes);
   console.error(
     `[flama-mcp] connected to ${config.apiUrl} as ${credential.email} (${credential.kind})`,
   );
@@ -56,7 +52,12 @@ async function main(): Promise<void> {
     `[flama-mcp] ${tools.length} tools available, ${withheld.length} withheld for lack of permissions`,
   );
 
-  serveStdio(() => build().server, {
+  // And again for every server built after that. The token is fixed for the
+  // life of the process, but what it amounts to is not: effective scopes are
+  // the token's grant intersected with its owner's roles *now*, so a role
+  // change would otherwise leave this process advertising tools the API then
+  // refuses, and hiding ones it would allow, until a restart.
+  serveStdio(async () => build((await client.currentCredential()).effectiveScopes).server, {
     onerror: (error) => console.error(`[flama-mcp] ${error.message}`),
   });
 }
