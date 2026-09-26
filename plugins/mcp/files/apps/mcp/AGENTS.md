@@ -62,6 +62,29 @@ src/
 - Adding an API endpoint you want reachable here means declaring its scope on
   the controller first — see `.agents/rules/scopes-and-credentials.md`.
 
+## Outside `apps/mcp`
+
+The `mcp` plugin installs more than this directory: the API becomes the OAuth
+2.1 provider MCP clients sign in through. Those files are the plugin's too,
+and `pnpm plugin:remove mcp` takes them with it.
+
+- `apps/api/src/auth/infrastructure/mcp-plugin.config.ts` — Better Auth's
+  `mcp()` plugin: discovery, dynamic client registration, the consent page,
+  the scope catalog advertised as `scopes_supported`.
+- `apps/api/src/auth/infrastructure/mcp-credential-scope.adapter.ts` —
+  `CREDENTIAL_SCOPE` with OAuth grants in front of the starter's resolver
+  (`getMcpSession`), bound after the starter's own binding in `AuthModule`.
+- `apps/api/src/auth/database/oauth-*.orm-entity.ts` — the three tables
+  Better Auth writes. The migration that creates them ships with the starter,
+  beside the API token table.
+- `apps/web/src/routes/oauth/consent.tsx` and the `auth` feature's consent
+  screen, hook and scope matcher — where the user approves or narrows a grant.
+- `apps/api/test/mcp-oauth.integration.spec.ts`, and the e2e specs for the
+  provider and the consent page.
+
+Both entrypoints load the root `.env` through `@flama/env` first; a no-op when
+the server is installed outside the repo.
+
 ## Commands
 
 ```bash

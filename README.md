@@ -128,18 +128,20 @@ are the only mark it makes. So the plugin carries the starter's copy of each
 file it has blocks in (`snapshots/`), and the installer merges the blocks onto
 the project's copy with `git merge-file` — a project that has edited the file
 since still takes them, and one that edited the same lines stops the install.
-Any block with no anchor beside it goes this way, so `mcp` carries snapshots
-too, for its lines in the API's auth wiring. Where another installed feature's
-block sits exactly where the starter's copy puts this one's, both stay.
+A plugin whose feature the starter does not ship needs no snapshots: every
+block it has sits at a slot.
 
 Files the feature keeps inside another's tree are skipped by an install into a
 project without it: `filesNeed` names the feature (its screens in `apps/web`),
 `filesNeedPath` the shared path (its module in `packages/frontend/consumer`).
-The other way round is `nested`: a path inside this plugin's tree that another
-feature owns — the MCP server's organization tools belong to `organizations`.
-It is copied only beside its owner, and handed back to the owner's entry. When
-the owner is a feature that ships, its own plugin carries the same files from
-the one that nests them, so the two install in either order.
+The other way round — a path inside this plugin's tree that another feature
+owns, as the MCP server's organization tools belong to `organizations` — is the
+same two keys: the path is a `files` entry of its own with `filesNeed` naming
+its owner, and the feature's `json` edit puts it back on the owner's entry.
+The owner's plugin, extracted from a starter without that tree, carries the
+same files from the plugin that holds them (`filesNeed` naming the holder),
+and replays that plugin's files carrying its fences, so either can be added
+after the other.
 
 Two things are excluded from the comparison, deliberately and visibly:
 `.changeset/` and `pnpm-lock.yaml`. The pruner rewrites a changeset's

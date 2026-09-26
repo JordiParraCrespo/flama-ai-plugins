@@ -1,0 +1,3 @@
+// flama:begin mcp
+import { mcpPlugin } from './mcp-plugin.config';
+// flama:end mcp

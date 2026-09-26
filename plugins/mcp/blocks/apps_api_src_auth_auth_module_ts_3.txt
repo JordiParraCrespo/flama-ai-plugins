@@ -1,0 +1,3 @@
+    // flama:begin mcp
+    ...MCP_CREDENTIAL_SCOPE_PROVIDERS,
+    // flama:end mcp

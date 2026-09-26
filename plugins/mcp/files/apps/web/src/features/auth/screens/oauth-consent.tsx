@@ -13,10 +13,11 @@ import {
   Skeleton,
 } from '@flama/design-system-web';
 import { usePermissionCatalog } from '@flama/frontend-consumer/react';
-import { useErrorMessage, useProfile, useRespondToConsent } from '@flama/frontend-core/react';
+import { useErrorMessage, useProfile } from '@flama/frontend-core/react';
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { CenteredCard } from '@/features/auth/components/centered-card';
+import { useRespondToConsent } from '@/features/auth/hooks/use-respond-to-consent';
 import { type ConsentSearch, describeScopes } from '@/features/auth/lib/consent';
 
 /**
@@ -24,7 +25,7 @@ import { type ConsentSearch, describeScopes } from '@/features/auth/lib/consent'
  *
  * Better Auth's MCP plugin sends the user here mid-authorization with the
  * client and the scopes it asked for; approving posts the consent code back and
- * follows the redirect it returns, through the core auth client so a separate
+ * follows the redirect it returns, through the Better Auth client so a separate
  * API origin works. Signing in first is required, so an
  * unauthenticated visitor is bounced to the login page and returned here.
  */

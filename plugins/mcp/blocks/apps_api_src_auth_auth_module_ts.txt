@@ -1,0 +1,5 @@
+// flama:begin mcp
+import { OAuthAccessTokenOrmEntity } from './database/oauth-access-token.orm-entity';
+import { OAuthApplicationOrmEntity } from './database/oauth-application.orm-entity';
+import { OAuthConsentOrmEntity } from './database/oauth-consent.orm-entity';
+// flama:end mcp

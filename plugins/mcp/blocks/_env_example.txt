@@ -1,4 +1,8 @@
 # flama:begin mcp
+# ------------------------------------------------------------------------------
+# MCP server (apps/mcp) — its own settings
+# ------------------------------------------------------------------------------
+
 # Port for the Streamable HTTP entrypoint. MCP_PORT wins over PORT so the MCP
 # server never collides with the API's PORT above (defaults to 3005).
 MCP_PORT=3005
@@ -10,3 +14,4 @@ FLAMA_TOOLS_CACHE_TTL_MS=
 # (empty disables cross-origin access)
 FLAMA_ALLOWED_ORIGINS=
 # flama:end mcp
+

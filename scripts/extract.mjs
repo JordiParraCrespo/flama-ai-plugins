@@ -245,34 +245,38 @@ export function sharedWithPlugins(id) {
   return found;
 }
 
-/** For each plugin here that nests paths `id` owns: the plugin, and those paths. */
-export function nestedFromPlugins(id) {
+/**
+ * The plugins here holding files `id` owns: each plugin, and those files as
+ * `[destination, source]` — its `files` entries whose `filesNeed` is `id`.
+ */
+export function pluginsHolding(id) {
   const found = [];
   for (const other of readdirSync(join(ROOT, 'plugins')).sort()) {
     const path = join(ROOT, 'plugins', other, 'plugin.json');
     if (other === id || !existsSync(path)) continue;
-    const held = Object.entries(JSON.parse(readFileSync(path, 'utf8')).nested ?? {})
-      .filter(([, owner]) => owner === id)
-      .map(([nestedPath]) => nestedPath);
+    const plugin = JSON.parse(readFileSync(path, 'utf8'));
+    const held = Object.entries(plugin.filesNeed ?? {})
+      .filter(([destination, owner]) => owner === id && plugin.files?.[destination])
+      .map(([destination]) => [destination, plugin.files[destination]]);
     if (held.length) found.push([other, held]);
   }
   return found;
 }
 
-/** Files under `dir` (as paths relative to it) with a fence naming `id`. */
+/** Files under `dir`, as paths relative to it, with a fence naming `id`. */
 function fencedFiles(dir, id) {
   const found = [];
   const walk = (at) => {
     for (const entry of readdirSync(join(dir, at), { withFileTypes: true })) {
       const rel = at ? `${at}/${entry.name}` : entry.name;
       if (entry.isDirectory()) walk(rel);
-      else if (entry.isFile()) {
-        const content = readFileSync(join(dir, rel), 'utf8');
-        const opens = content
+      else if (
+        entry.isFile() &&
+        readFileSync(join(dir, rel), 'utf8')
           .split('\n')
-          .some((line) => FENCE_RE.exec(line)?.[4].split('|').includes(id));
-        if (opens) found.push(rel);
-      }
+          .some((line) => FENCE_RE.exec(line)?.[4].split('|').includes(id))
+      )
+        found.push(rel);
     }
   };
   walk('');
@@ -468,37 +472,40 @@ async function main() {
       else filesNeedPath[path] = owner;
     }
 
-    // Paths inside this feature's tree that another feature owns — the MCP
-    // server's organization tools are organizations'. The prune took them
-    // with this tree, so the install copies them back only beside their
-    // owner, and hands them to its entry again.
-    const nested = {};
+    // A path inside this feature's tree that another feature owns — the MCP
+    // server's organization tools are organizations' — is its own entry, with
+    // its own `filesNeed`, so the tree is not what decides whether it lands.
+    // Which entry owns it once it has is the feature's `json` edit's business.
     for (const [other, entry] of Object.entries(manifest.features)) {
       if (other === id) continue;
       for (const path of entry.paths ?? []) {
-        if (feature.paths.some((own) => path.startsWith(`${own}/`))) nested[path] = other;
+        if (!feature.paths.some((own) => path.startsWith(`${own}/`))) continue;
+        files[path] = `files/${path}`;
+        filesNeed[path] = other;
+        console.log(`  owned  ${path} (by ${other})`);
       }
     }
 
-    // And the other way round: what a plugin here nests that this feature
-    // owns. The starter no longer has that tree, so the plugin's copy is the
-    // only one — carried from it, and installed only beside that plugin.
+    // The other way round: files this feature owns inside a tree only a plugin
+    // here has — the MCP server's organization tools, once the server left
+    // the starter. The plugin's copy is the only one, so it is carried from
+    // there, installed only beside that plugin (`filesNeed`), and the plugin's
+    // files that carry this feature's fences come back as a shipped feature's
+    // blocks do (`snapshots`). Either can then be added after the other.
     const paths = [...feature.paths];
-    for (const [holder, held] of nestedFromPlugins(id)) {
+    for (const [holder, held] of pluginsHolding(id)) {
       const holderDir = join(ROOT, 'plugins', holder);
-      for (const path of held) {
+      for (const [path, source] of held) {
         files[path] = `files/${path}`;
         filesNeed[path] = holder;
         mkdirSync(dirname(join(out, 'files', path)), { recursive: true });
-        cpSync(join(holderDir, 'files', path), join(out, 'files', path), { recursive: true });
+        cpSync(join(holderDir, source), join(out, 'files', path), { recursive: true });
         const at = paths.findIndex((other) => other > path);
         paths.splice(at === -1 ? paths.length : at, 0, path);
         console.log(`  carry  ${path} (from ${holder})`);
       }
-      // The holder's files that carry this feature's fences come back the
-      // way a shipped feature's blocks do, merged onto the holder's copy.
       for (const file of fencedFiles(join(holderDir, 'files'), id)) {
-        if (held.some((path) => file === path || file.startsWith(`${path}/`))) continue;
+        if (held.some(([path]) => file === path || file.startsWith(`${path}/`))) continue;
         const source = `snapshots/${file}`;
         mkdirSync(dirname(join(out, source)), { recursive: true });
         cpSync(join(holderDir, 'files', file), join(out, source));
@@ -535,7 +542,6 @@ async function main() {
       files,
       ...(Object.keys(filesNeed).length ? { filesNeed } : {}),
       ...(Object.keys(filesNeedPath).length ? { filesNeedPath } : {}),
-      ...(Object.keys(nested).length ? { nested } : {}),
       ...(Object.keys(sharedFiles).length ? { sharedFiles } : {}),
       ...(blocks.length ? { blocks } : {}),
       ...(coOwned.length ? { coOwned } : {}),

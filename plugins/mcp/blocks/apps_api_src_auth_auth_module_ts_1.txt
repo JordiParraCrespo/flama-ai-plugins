@@ -1,0 +1,3 @@
+// flama:begin mcp
+import { MCP_CREDENTIAL_SCOPE_PROVIDERS } from './infrastructure/mcp-credential-scope.adapter';
+// flama:end mcp
