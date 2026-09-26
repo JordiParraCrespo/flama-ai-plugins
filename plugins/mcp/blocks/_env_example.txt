@@ -1,0 +1,12 @@
+# flama:begin mcp
+# Port for the Streamable HTTP entrypoint. MCP_PORT wins over PORT so the MCP
+# server never collides with the API's PORT above (defaults to 3005).
+MCP_PORT=3005
+# Request timeout in milliseconds (default 30000)
+FLAMA_TIMEOUT_MS=
+# `ttlMs` advertised on tools/list (0 disables client caching of the list)
+FLAMA_TOOLS_CACHE_TTL_MS=
+# Comma-separated origins allowed to reach the HTTP entrypoint from a browser
+# (empty disables cross-origin access)
+FLAMA_ALLOWED_ORIGINS=
+# flama:end mcp
