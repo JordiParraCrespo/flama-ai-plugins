@@ -151,19 +151,37 @@ function roundtrip(base, pruned, id, keep) {
     // The starter as it ships, without the plugin.
     if (!checkAll(dir, 'before')) return;
 
-    // A plugin can need another: the QA pack drives the web control plane, so
-    // it cannot install into a project without it. Bring those in first and
-    // take them out last, so what is proven is this plugin against a project
-    // that can actually hold it.
     const manifest = JSON.parse(readFileSync(join(plugin, 'plugin.json'), 'utf8'));
-    const needed = (manifest.feature?.requires ?? []).filter((dep) =>
-      existsSync(join(ROOT, 'plugins', dep, 'plugin.json')),
-    );
-    // A requirement that is a shipped feature, pruned from this shape, makes
-    // the plugin uninstallable here by design; the installer says so.
     const features = JSON.parse(
       readFileSync(join(dir, 'scripts/starter/features.json'), 'utf8'),
     ).features;
+
+    // Some plugins are features the starter still ships — organizations is in
+    // the box, and the plugin is how a project that pruned it gets it back.
+    // The starter is the source there and the plugin a copy of it, so the
+    // copy is held to it: prune the feature, install the plugin, and the tree
+    // has to be the starter again, byte for byte, but for the flag that marks
+    // an installed feature. Then the usual round trip runs from the pruned
+    // state.
+    const ships = Boolean(features[id]);
+    if (ships) {
+      if (
+        !run(dir, 'node', ['scripts/starter/prune.mjs', '--without', id, '--no-install'], 'prune')
+      )
+        return;
+      git(dir, 'add', '-A');
+      git(dir, '-c', 'user.email=rt@flama', '-c', 'user.name=roundtrip', 'commit', '-qm', 'pruned');
+    }
+
+    // A plugin can need another: the QA pack drives the web control plane, so
+    // it cannot install into a project without it. Bring those in first and
+    // take them out last, so what is proven is this plugin against a project
+    // that can actually hold it. One the project already has is left alone.
+    const needed = (manifest.feature?.requires ?? []).filter(
+      (dep) => existsSync(join(ROOT, 'plugins', dep, 'plugin.json')) && !features[dep],
+    );
+    // A requirement that is a shipped feature, pruned from this shape, makes
+    // the plugin uninstallable here by design; the installer says so.
     const missing = [manifest, ...needed.map((dep) => readManifest(dep))]
       .flatMap((m) => m.feature?.requires ?? [])
       .filter((dep) => !features[dep] && !existsSync(join(ROOT, 'plugins', dep, 'plugin.json')));
@@ -196,7 +214,16 @@ function roundtrip(base, pruned, id, keep) {
       .split('\n')
       .filter((line) => line.startsWith('??'))
       .map((line) => line.slice(3))
-      .filter((file) => pruned.some((path) => file === path || file.startsWith(`${path}/`)));
+      .filter((file) => pruned.some((path) => file === path || file.startsWith(`${path}/`)))
+      // A shape can prune the feature this plugin is, or one it requires —
+      // organizations ships in the starter — and bringing that back is the
+      // whole point.
+      .filter(
+        (file) =>
+          ![manifest, ...needed.map((dep) => readManifest(dep))]
+            .flatMap((m) => m.feature?.paths ?? [])
+            .some((path) => file === path || file.startsWith(`${path}/`)),
+      );
     if (revived.length) {
       console.log('    ✗ the install brought back part of a feature this project pruned:');
       for (const file of revived) console.log(`      ${file}`);
@@ -207,6 +234,8 @@ function roundtrip(base, pruned, id, keep) {
     // With the plugin in, the honesty check now covers it: every mention of
     // the feature has to sit inside a path or a block the plugin owns.
     checkAll(dir, 'with');
+
+    if (ships && !reproducesStarter(dir, id)) return;
 
     if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', id], 'remove')) return;
     console.log('    ✓ removed');
@@ -238,6 +267,47 @@ function roundtrip(base, pruned, id, keep) {
     if (keep) console.log(`    (kept ${dir})`);
     else rmSync(dir, { recursive: true, force: true });
   }
+}
+
+/**
+ * Whether installing a shipped feature's plugin gave back the starter it was
+ * pruned from (the commit before HEAD). Everything must match byte for byte
+ * except `features.json`, where the installed entry carries `"plugin": true`
+ * and must match once that line is gone. A difference means the starter
+ * changed and the plugin was not extracted again.
+ */
+function reproducesStarter(dir, id) {
+  git(dir, 'add', '-A');
+  const manifestPath = 'scripts/starter/features.json';
+  const diff = git(
+    dir,
+    'diff',
+    '--cached',
+    '--stat',
+    'HEAD~1',
+    '--',
+    '.',
+    `:!${manifestPath}`,
+    ...NOT_RESTORED,
+  ).trim();
+  const starter = git(dir, 'show', `HEAD~1:${manifestPath}`);
+  const installed = readFileSync(join(dir, manifestPath), 'utf8');
+  const entry = installed.indexOf(`\n    "${id}": {`);
+  const unflagged =
+    entry === -1
+      ? installed
+      : installed.slice(0, entry) + installed.slice(entry).replace(/\n\s*"plugin": true,/, '');
+  git(dir, 'reset', '-q');
+  if (!diff && unflagged === starter) {
+    console.log('    ✓ reproduces the starter it was pruned from');
+    return true;
+  }
+  console.log('    ✗ the plugin no longer reproduces the starter — extract it again:');
+  console.log(`      node scripts/extract.mjs ${id} --repo <flama-ai>`);
+  for (const line of diff.split('\n').filter(Boolean)) console.log(`      ${line}`);
+  if (unflagged !== starter) console.log(`      ${manifestPath} differs beyond the plugin flag`);
+  failures += 1;
+  return false;
 }
 
 function readManifest(id) {

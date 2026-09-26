@@ -114,7 +114,7 @@ export function removalHunks(diff) {
   return hunks.filter((hunk) => hunk.lines.length > 0 && hunk.added === 0);
 }
 
-const FENCE_RE = /^(\s*(?:#|\/\/|<!--|\{\{-?\s*\/\*|\/\*)\s*flama:)(begin|end)(\s+)([\w|-]+)/;
+const FENCE_RE = /^(\s*(?:#|\/\/|<!--|\{\{-?\s*\/\*|\{\s*\/\*|\/\*)\s*flama:)(begin|end)(\s+)([\w|-]+)/;
 
 /**
  * Blocks whose marker names this feature *and* others — `flama:begin mcp|cli`.
@@ -194,22 +194,37 @@ export function anchorAt(afterContent, at) {
 }
 
 /**
- * The feature that owns a file, if it is not this one.
+ * What a file lives inside, if it is not this feature: another optional
+ * feature, or a shared path.
  *
  * A block can land in a file another optional feature brings — the CLI's
- * sidebar entry lives in `apps/docs/sidebars.ts`, which belongs to `docs`.
- * In a project without that feature the file is simply absent, and the block
- * has nowhere to go and nothing to say. Recording the owner lets the
- * installer skip it there instead of refusing to install at all, while a
- * missing file that *no* feature explains stays a loud failure, because then
- * it means an anchor moved.
+ * sidebar entry lives in `apps/docs/sidebars.ts`, which belongs to `docs` —
+ * and a feature's own files can sit in another's tree, as the organizations
+ * screens do in `apps/web` and its module does in `packages/frontend/consumer`,
+ * a shared path that goes with the last app needing it. In a project without
+ * that owner the file is simply absent, and the block or file has nowhere to
+ * go and nothing to say. Recording the owner lets the installer skip it there
+ * instead of refusing to install at all, while a missing file that *nothing*
+ * explains stays a loud failure, because then it means an anchor moved.
+ *
+ * The innermost owner wins: it is the first to go. A feature is named by its
+ * id and a shared path by the path, which is how the installer tells them
+ * apart.
  */
-export function ownerOf(features, file, self) {
-  for (const [id, feature] of Object.entries(features)) {
+export function ownerOf(manifest, file, self) {
+  const inside = (path) => file === path || file.startsWith(`${path}/`);
+  let owner = null;
+  let depth = -1;
+  for (const [id, feature] of Object.entries(manifest.features ?? {})) {
     if (id === self) continue;
-    if ((feature.paths ?? []).some((p) => file === p || file.startsWith(`${p}/`))) return id;
+    for (const path of feature.paths ?? []) {
+      if (inside(path) && path.length > depth) [owner, depth] = [id, path.length];
+    }
   }
-  return null;
+  for (const path of Object.keys(manifest.shared ?? {})) {
+    if (inside(path) && path.length > depth) [owner, depth] = [path, path.length];
+  }
+  return owner;
 }
 
 async function main() {
@@ -230,11 +245,10 @@ async function main() {
 
   const scratch = scratchCopy(repo);
   try {
-    execFileSync(
-      'node',
-      ['scripts/starter/prune.mjs', '--without', id, '--no-install'],
-      { cwd: scratch, stdio: 'pipe' },
-    );
+    execFileSync('node', ['scripts/starter/prune.mjs', '--without', id, '--no-install'], {
+      cwd: scratch,
+      stdio: 'pipe',
+    });
 
     const out = join(ROOT, 'plugins', id);
     rmSync(out, { recursive: true, force: true });
@@ -270,6 +284,7 @@ async function main() {
     // Marked blocks in files that survive.
     mkdirSync(join(out, 'blocks'), { recursive: true });
     const blocks = [];
+    const snapshots = [];
     // A JSON file is never a block source: it cannot hold a comment, so it
     // cannot hold an anchor, so there is nowhere to put a block back. What a
     // feature owns in one is declared instead — a `json` edit in its
@@ -283,32 +298,30 @@ async function main() {
         continue;
       }
       const after = readFileSync(join(scratch, file), 'utf8');
+      const needs = ownerOf(manifest, file, id);
       // A feature can own several blocks in one file — `helm/values.yaml`
       // carries one per app it deploys, `ingress.yaml` one per host. Each is
       // restored at an anchor of its own, so each becomes its own entry.
       const found = removalHunks(git(scratch, 'diff', '-U0', '--', file));
-      found.forEach((block, n) => {
-        const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
-        writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
-        const needs = ownerOf(manifest.features, file, id);
-        const anchor = anchorBeside(after, block.at - 1);
-        if (anchor) {
-          blocks.push({ file, anchor, source, ...(needs ? { needs } : {}) });
-          console.log(`  block  ${file} → ${anchor}${needs ? ` (only with ${needs})` : ''}`);
-          return;
-        }
-        // JSON holds no comments, so it can hold no anchor — and needs none.
-        // What a feature owns in a JSON file is declared in its features.json
-        // entry, and a declaration reads backwards: see the `json` edits
-        // carried in `feature`, which say what to remove and at what index it
-        // goes back.
-        fail(
-          `${file}: no "flama:plugins <slot>" anchor after the block removed at line ${block.at}` +
-            (file.endsWith('.json')
-              ? ` — declare this edit in the feature's "json" list in features.json instead of removing lines`
-              : ` — add one where the block sits, or the installer has nowhere to put it back`),
-        );
-      });
+      const anchors = found.map((block) => anchorBeside(after, block.at - 1));
+      if (anchors.every(Boolean)) {
+        found.forEach((block, n) => {
+          const source = `blocks/${file.replace(/[/.]/g, '_')}${n ? `_${n}` : ''}.txt`;
+          writeFileSync(join(out, source), `${block.lines.join('\n')}\n`);
+          blocks.push({ file, anchor: anchors[n], source, ...(needs ? { needs } : {}) });
+          console.log(`  block  ${file} → ${anchors[n]}${needs ? ` (only with ${needs})` : ''}`);
+        });
+        continue;
+      }
+      // A block with no anchor beside it is a feature the starter still ships:
+      // its fences are all the mark it leaves. The plugin carries the
+      // starter's copy of the file, and the installer merges the blocks back
+      // three-way, so every block in this file comes back that way.
+      const source = `snapshots/${file}`;
+      mkdirSync(dirname(join(out, source)), { recursive: true });
+      cpSync(join(repo, file), join(out, source));
+      snapshots.push({ file, source, ...(needs ? { needs } : {}) });
+      console.log(`  replay ${file} (${found.length} block(s))${needs ? ` (only with ${needs})` : ''}`);
     }
 
     // Co-owned blocks live in files the prune only narrowed, so they do not
@@ -340,7 +353,7 @@ async function main() {
               `"${id}" joins`,
           );
         }
-        const needs = ownerOf(manifest.features, file, id);
+        const needs = ownerOf(manifest, file, id);
         coOwned.push({ file, anchor, order: block.ids, ...(needs ? { needs } : {}) });
         console.log(
           `  shared block ${file} → ${anchor} (${block.ids.join('|')})${needs ? ` (only with ${needs})` : ''}`,
@@ -375,6 +388,17 @@ async function main() {
       console.log(`  shared ${entry.path} (carried — every dependant is leaving)`);
     }
 
+    // A path that lives inside another optional feature's tree, or inside a
+    // shared path, is skipped by an install into a project without it.
+    const filesNeed = {};
+    const filesNeedPath = {};
+    for (const path of Object.keys(files)) {
+      const owner = ownerOf(manifest, path, id);
+      if (!owner) continue;
+      if (manifest.features[owner]) filesNeed[path] = owner;
+      else filesNeedPath[path] = owner;
+    }
+
     const covered = [...Object.keys(files), ...Object.keys(sharedFiles)];
     const orphan = deleted.find((file) => !covered.some((p) => file.startsWith(p)));
     if (orphan) {
@@ -389,6 +413,7 @@ async function main() {
         summary: feature.summary,
         identifiers: feature.identifiers,
         paths: feature.paths,
+        ...(feature.keeps ? { keeps: feature.keeps } : {}),
         ...(feature.requires ? { requires: feature.requires } : {}),
         ...(feature.scripts ? { scripts: feature.scripts } : {}),
         ...(feature.json ? { json: feature.json } : {}),
@@ -400,9 +425,12 @@ async function main() {
         ...(shared.length ? { shared } : {}),
       },
       files,
+      ...(Object.keys(filesNeed).length ? { filesNeed } : {}),
+      ...(Object.keys(filesNeedPath).length ? { filesNeedPath } : {}),
       ...(Object.keys(sharedFiles).length ? { sharedFiles } : {}),
       ...(blocks.length ? { blocks } : {}),
       ...(coOwned.length ? { coOwned } : {}),
+      ...(snapshots.length ? { snapshots } : {}),
     };
     writeFileSync(join(out, 'plugin.json'), `${JSON.stringify(plugin, null, 2)}\n`);
     for (const path of Object.keys(files)) console.log(`  copy   ${path}`);

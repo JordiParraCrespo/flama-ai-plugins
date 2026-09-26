@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { anchorAt, anchorBeside, coOwnedBlocks, removalHunks } from './extract.mjs';
+import { anchorAt, anchorBeside, coOwnedBlocks, ownerOf, removalHunks } from './extract.mjs';
 
 test('removalHunks reads the deleted runs out of a -U0 diff', () => {
   const diff = [
@@ -84,7 +84,9 @@ test('anchorBeside names the block it sits with, and nothing further down', () =
 
   // A block with no anchor beside it gets none, even though the file has one
   // further down — that slot belongs to something else.
-  const orphan = ['# flama:begin web', 'A=', '# flama:end web', 'B=', '# flama:plugins later'].join('\n');
+  const orphan = ['# flama:begin web', 'A=', '# flama:end web', 'B=', '# flama:plugins later'].join(
+    '\n',
+  );
   assert.equal(anchorBeside(orphan, 2), null);
 
   // Anchors stack: several plugins can name the same block.
@@ -102,4 +104,20 @@ test('coOwnedBlocks reports where each block closes', () => {
   const [block] = coOwnedBlocks(content, 'admin-web');
   assert.equal(block.endLine, 3);
   assert.deepEqual(block.ids, ['web', 'admin-web']);
+});
+
+test('ownerOf names the innermost feature or shared path a file lives in', () => {
+  const manifest = {
+    features: {
+      web: { paths: ['apps/web', 'e2e/tests/web'] },
+      e2e: { paths: ['e2e'] },
+      teams: { paths: ['apps/web/src/features/teams', 'packages/kit/src/teams'] },
+    },
+    shared: { 'packages/kit': { neededBy: ['web'] } },
+  };
+  assert.equal(ownerOf(manifest, 'apps/web/src/features/teams', 'teams'), 'web');
+  assert.equal(ownerOf(manifest, 'e2e/tests/web/teams.spec.ts', 'teams'), 'web');
+  assert.equal(ownerOf(manifest, 'e2e/support/teams.ts', 'teams'), 'e2e');
+  assert.equal(ownerOf(manifest, 'packages/kit/src/teams', 'teams'), 'packages/kit');
+  assert.equal(ownerOf(manifest, 'packages/auth/src/teams.ts', 'teams'), null);
 });
