@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jordiparracrespo/flama-ai/packages/go/config"
@@ -107,6 +108,11 @@ func Parse(lookup config.Lookup) (*Config, error) {
 			Workers:   env.Int("RUNNER_JOB_WORKERS", 4),
 			QueueSize: env.Int("RUNNER_JOB_QUEUE_SIZE", 1024),
 		},
+	}
+
+	// The value .env.example ships is long enough to pass, and public.
+	if mode == config.Production && strings.HasPrefix(cfg.BootstrapAPIKey, "change-me") {
+		env.Failf("RUNNER_BOOTSTRAP_API_KEY is the .env.example placeholder; generate one with `openssl rand -base64 32`")
 	}
 
 	if secret := env.Optional("RUNNER_JWT_SECRET"); secret != "" {

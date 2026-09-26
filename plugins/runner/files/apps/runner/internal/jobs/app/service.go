@@ -194,7 +194,10 @@ func (s *Service) Start(ctx context.Context) {
 
 // Recover reconciles jobs a previous run left non-terminal, which only the
 // persistent store can hold across a restart (the in-memory store starts
-// empty, so this is a cheap no-op there):
+// empty, so this is a cheap no-op there). It assumes it is the only process
+// using the database, which is why the runner is deployed as one replica
+// that is stopped before its replacement starts (compose, and the Helm
+// chart's Recreate strategy): a running row can only be a leftover.
 //
 //   - queued jobs are pushed back onto the worker queue, so work submitted
 //     before the restart still runs;
@@ -257,6 +260,9 @@ func (s *Service) Wait() { s.wg.Wait() }
 // Depth is the number of queued job ids, for readiness and metrics.
 func (s *Service) Depth() int { return len(s.queue) }
 
+// Capacity is how many job ids the queue holds before Submit answers 429.
+func (s *Service) Capacity() int { return cap(s.queue) }
+
 func (s *Service) execute(ctx context.Context, log *slog.Logger, id string) {
 	startedAt := s.now()
 	job, err := s.repo.Update(ctx, id, func(j *domain.Job) error {
@@ -285,6 +291,14 @@ func (s *Service) execute(ctx context.Context, log *slog.Logger, id string) {
 		delete(s.running, id)
 		s.mu.Unlock()
 	}()
+
+	// A Cancel that landed between the transition above and the
+	// registration found nothing to interrupt. Cancel persists before it
+	// looks for the job here, so reading the stored state after registering
+	// sees it, and the runner is never started for a cancelled job.
+	if current, err := s.repo.FindByID(ctx, id); err == nil && current.Status != domain.StatusRunning {
+		return
+	}
 
 	runErr := s.run(runCtx, job)
 

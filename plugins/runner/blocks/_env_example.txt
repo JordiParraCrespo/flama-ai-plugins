@@ -15,6 +15,7 @@ RUNNER_LOG_FORMAT=
 # The one credential that exists before any key is issued. Holds every scope.
 # Required — the service refuses to boot without it (>= 32 chars):
 # `openssl rand -base64 32`. Use it once to mint narrower keys, then vault it.
+# The value below only works outside production; production refuses it.
 RUNNER_BOOTSTRAP_API_KEY=change-me-in-production-at-least-32-chars
 # Optional Postgres DSN. Empty keeps the in-memory stores (the default, fine
 # for a stateless runner). When set, API keys and jobs are Postgres-backed

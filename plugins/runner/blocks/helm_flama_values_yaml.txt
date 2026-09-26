@@ -1,7 +1,6 @@
 # flama:begin runner
 runner:
   image: ghcr.io/your-org/flama-runner:latest
-  replicas: 1
   port: 3006
   resources:
     requests:

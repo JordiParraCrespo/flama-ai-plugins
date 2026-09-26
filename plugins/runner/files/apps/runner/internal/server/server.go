@@ -117,7 +117,7 @@ func New(ctx context.Context, cfg *config.Config, logger *slog.Logger) (*Server,
 	})
 	healthModule := health.New(cfg.Version, capabilities)
 	healthModule.Register(health.CheckerFunc{CheckName: "jobs_queue", Fn: func(context.Context) error {
-		if jobsModule.Service.Depth() >= cfg.Jobs.QueueSize {
+		if jobsModule.Service.Depth() >= jobsModule.Service.Capacity() {
 			return errQueueSaturated
 		}
 		return nil

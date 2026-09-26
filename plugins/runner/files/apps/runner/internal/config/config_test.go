@@ -56,3 +56,14 @@ func TestProductionDefaultsToJSONLogs(t *testing.T) {
 		t.Fatalf("unexpected %+v", cfg)
 	}
 }
+
+func TestProductionRejectsThePlaceholderBootstrapKey(t *testing.T) {
+	placeholder := "change-me-in-production-at-least-32-chars"
+	_, err := Parse(lookup(map[string]string{"RUNNER_BOOTSTRAP_API_KEY": placeholder, "RUNNER_ENV": "production"}))
+	if err == nil || !strings.Contains(err.Error(), "placeholder") {
+		t.Fatalf("expected the placeholder to be refused in production, got %v", err)
+	}
+	if _, err := Parse(lookup(map[string]string{"RUNNER_BOOTSTRAP_API_KEY": placeholder})); err != nil {
+		t.Fatalf("development keeps the placeholder working out of the box: %v", err)
+	}
+}

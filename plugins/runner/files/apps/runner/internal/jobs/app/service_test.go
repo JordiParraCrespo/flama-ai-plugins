@@ -144,6 +144,75 @@ func TestCancelWinsOverLateCompletion(t *testing.T) {
 	}
 }
 
+// cancelOnStart cancels a job the moment the worker has marked it running,
+// before the worker has registered it as cancellable: the window a Cancel
+// can land in and find nothing to interrupt.
+type cancelOnStart struct {
+	*memRepo
+	svc *Service
+}
+
+func (r *cancelOnStart) Update(ctx context.Context, id string, fn func(*domain.Job) error) (domain.Job, error) {
+	j, err := r.memRepo.Update(ctx, id, fn)
+	if err == nil && j.Status == domain.StatusRunning && r.svc != nil {
+		svc := r.svc
+		r.svc = nil
+		if _, cerr := svc.Cancel(callerCtx(), id); cerr != nil {
+			return j, cerr
+		}
+	}
+	return j, err
+}
+
+func TestCancelBeforeRegistrationNeverRuns(t *testing.T) {
+	repo := &cancelOnStart{memRepo: newMemRepo()}
+	ran := make(chan struct{}, 1)
+	svc := newService(repo, RunnerFunc(func(context.Context, domain.Job) error {
+		ran <- struct{}{}
+		return nil
+	}), 4)
+	repo.svc = svc
+	ctx, cancel := context.WithCancel(context.Background())
+	svc.Start(ctx)
+
+	job, err := svc.Submit(callerCtx(), SubmitInput{Kind: "r"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	deadline := time.Now().Add(2 * time.Second)
+	for {
+		j, _ := repo.FindByID(context.Background(), job.ID)
+		if j.Status == domain.StatusCancelled || time.Now().After(deadline) {
+			break
+		}
+		time.Sleep(time.Millisecond)
+	}
+	// Let the worker finish execute before looking at the runner.
+	for svc.Depth() > 0 && time.Now().Before(deadline) {
+		time.Sleep(time.Millisecond)
+	}
+	time.Sleep(20 * time.Millisecond)
+	cancel()
+	svc.Wait()
+
+	select {
+	case <-ran:
+		t.Fatal("the runner ran a job that was cancelled before it started")
+	default:
+	}
+	final, _ := repo.FindByID(context.Background(), job.ID)
+	if final.Status != domain.StatusCancelled {
+		t.Fatalf("expected cancelled, got %s", final.Status)
+	}
+}
+
+func TestCapacityIsTheNormalizedQueue(t *testing.T) {
+	svc := newService(newMemRepo(), RunnerFunc(func(context.Context, domain.Job) error { return nil }), 0)
+	if svc.Capacity() != 1 || svc.Depth() >= svc.Capacity() {
+		t.Fatalf("an empty queue of size 0 must read as not full: depth %d, capacity %d", svc.Depth(), svc.Capacity())
+	}
+}
+
 // A restart recovery must run persisted queued jobs and fail interrupted
 // running ones, so persistence makes job processing survive a restart, not
 // just the rows.

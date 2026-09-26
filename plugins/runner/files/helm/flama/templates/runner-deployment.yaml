@@ -5,7 +5,12 @@ metadata:
   labels:
     app: {{ .Release.Name }}-runner
 spec:
-  replicas: {{ .Values.runner.replicas }}
+  # One process per database: on startup the runner fails every job it finds
+  # running, which is only right when no other runner is still working. So
+  # one replica, and the old pod stops before the new one starts.
+  replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ .Release.Name }}-runner
