@@ -37,7 +37,7 @@ pnpm --filter @flama/admin-mobile arch && pnpm check:structure
   passes `requestSignUp: false`: accounts are provisioned by an administrator.
 - Reaching for `useEffect` in a screen. Biome allows it only in `hooks/`; the
   one exception is `app/_layout.tsx`, whose single commented effect loads the
-  config manager and the purchases SDK once per launch.
+  config manager once per launch.
 - Naming a feature after the page. Only kernel modules and `admin-users` /
   `roles` are allowed here; this app has no allowlist entry.
 
