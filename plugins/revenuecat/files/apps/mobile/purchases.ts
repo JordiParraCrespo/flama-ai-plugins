@@ -1,6 +1,6 @@
-// RevenueCat, configured once per launch by importing this module
-// (`@flama/frontend-mobile/purchases`, from the root layout). Keys are per
-// store; without one for this platform the SDK is never configured.
+// RevenueCat, configured once at launch: `index.ts` imports this module right
+// after the polyfills. Keys are per store; without one for this platform the
+// SDK is never configured.
 import { Platform } from 'react-native';
 import Purchases from 'react-native-purchases';
 
