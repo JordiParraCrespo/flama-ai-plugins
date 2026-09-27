@@ -1,0 +1,76 @@
+{
+  "id": "revenuecat",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "RevenueCat in-app purchases",
+    "summary": "@flama/frontend-mobile/purchases — the RevenueCat SDK, configured at launch from per-store keys",
+    "identifiers": [
+      "react-native-purchases",
+      "EXPO_PUBLIC_REVENUECAT_",
+      "frontend-mobile/purchases"
+    ],
+    "paths": [
+      "packages/frontend/mobile/src/platform/lib/purchases.ts"
+    ],
+    "requires": [
+      "mobile"
+    ],
+    "json": [
+      {
+        "file": "packages/frontend/mobile/package.json",
+        "path": [
+          "exports"
+        ],
+        "set": {
+          "./purchases": "./src/platform/lib/purchases.ts"
+        },
+        "setAt": [
+          9
+        ]
+      },
+      {
+        "file": "packages/frontend/mobile/package.json",
+        "path": [
+          "dependencies"
+        ],
+        "set": {
+          "react-native-purchases": "^10.9.1"
+        },
+        "setAt": [
+          8
+        ]
+      },
+      {
+        "file": "apps/mobile/package.json",
+        "path": [
+          "dependencies"
+        ],
+        "set": {
+          "react-native-purchases": "^10.9.1"
+        },
+        "setAt": [
+          50
+        ]
+      }
+    ]
+  },
+  "files": {
+    "packages/frontend/mobile/src/platform/lib/purchases.ts": "files/packages/frontend/mobile/src/platform/lib/purchases.ts"
+  },
+  "filesNeedPath": {
+    "packages/frontend/mobile/src/platform/lib/purchases.ts": "packages/frontend/mobile"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "mobile-env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "apps/mobile/app/_layout.tsx",
+      "anchor": "launch",
+      "source": "blocks/apps_mobile_app__layout_tsx.txt",
+      "needs": "mobile"
+    }
+  ]
+}
