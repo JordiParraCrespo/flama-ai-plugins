@@ -1,0 +1,90 @@
+{
+  "id": "mobile-showcase",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Mobile design-system showcase",
+    "summary": "apps/mobile-showcase — Expo gallery of @flama/design-system-mobile",
+    "identifiers": [
+      "apps/mobile-showcase",
+      "@flama/mobile-showcase"
+    ],
+    "paths": [
+      "apps/mobile-showcase"
+    ],
+    "json": [
+      {
+        "file": "biome.json",
+        "path": [
+          "files",
+          "includes"
+        ],
+        "remove": [
+          "!**/apps/mobile-showcase"
+        ],
+        "at": [
+          21
+        ]
+      }
+    ],
+    "shared": [
+      {
+        "path": "packages/frontend/design-system/mobile",
+        "identifiers": [
+          "packages/frontend/design-system/mobile",
+          "@flama/design-system-mobile"
+        ],
+        "neededBy": [
+          "mobile",
+          "mobile-showcase"
+        ]
+      },
+      {
+        "path": "packages/tsconfig/tsconfig.expo.json",
+        "identifiers": [
+          "tsconfig.expo",
+          "EXPO_PUBLIC_",
+          "@better-auth/expo",
+          "react-native"
+        ],
+        "neededBy": [
+          "mobile",
+          "mobile-showcase"
+        ]
+      }
+    ]
+  },
+  "files": {
+    "apps/mobile-showcase": "files/apps/mobile-showcase"
+  },
+  "coOwned": [
+    {
+      "file": ".github/workflows/ci.yml",
+      "anchor": "design-lint",
+      "order": [
+        "web",
+        "web-showcase",
+        "mobile",
+        "mobile-showcase"
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__design-lint.txt"
+    },
+    {
+      "file": ".gitignore",
+      "anchor": "docs",
+      "order": [
+        "mobile",
+        "mobile-showcase"
+      ],
+      "source": "blocks/shared/gitignore__docs.txt"
+    },
+    {
+      "file": "packages/tsconfig/depcruise/frontend-domain.cjs",
+      "anchor": "native-modules",
+      "order": [
+        "mobile",
+        "mobile-showcase"
+      ],
+      "source": "blocks/shared/packages_tsconfig_depcruise_frontend_domain_cjs__native-modules.txt"
+    }
+  ]
+}

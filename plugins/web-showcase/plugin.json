@@ -1,0 +1,67 @@
+{
+  "id": "web-showcase",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Web design-system showcase",
+    "summary": "apps/web-showcase — Next.js gallery of @flama/design-system-web",
+    "identifiers": [
+      "apps/web-showcase",
+      "@flama/web-showcase"
+    ],
+    "paths": [
+      "apps/web-showcase",
+      ".agents/skills/next-best-practices",
+      ".agents/skills/next-cache-components",
+      ".agents/skills/next-upgrade",
+      "packages/tsconfig/tsconfig.nextjs.json"
+    ],
+    "json": [
+      {
+        "file": "biome.json",
+        "path": [
+          "files",
+          "includes"
+        ],
+        "remove": [
+          "!**/apps/web-showcase"
+        ],
+        "at": [
+          20
+        ]
+      }
+    ],
+    "shared": [
+      {
+        "path": "packages/frontend/design-system/web",
+        "identifiers": [
+          "packages/frontend/design-system/web",
+          "@flama/design-system-web"
+        ],
+        "neededBy": [
+          "web",
+          "web-showcase"
+        ]
+      }
+    ]
+  },
+  "files": {
+    "apps/web-showcase": "files/apps/web-showcase",
+    ".agents/skills/next-best-practices": "files/.agents/skills/next-best-practices",
+    ".agents/skills/next-cache-components": "files/.agents/skills/next-cache-components",
+    ".agents/skills/next-upgrade": "files/.agents/skills/next-upgrade",
+    "packages/tsconfig/tsconfig.nextjs.json": "files/packages/tsconfig/tsconfig.nextjs.json"
+  },
+  "coOwned": [
+    {
+      "file": ".github/workflows/ci.yml",
+      "anchor": "design-lint",
+      "order": [
+        "web",
+        "web-showcase",
+        "mobile",
+        "mobile-showcase"
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__design-lint.txt"
+    }
+  ]
+}
