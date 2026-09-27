@@ -39,6 +39,19 @@
         ]
       },
       {
+        "path": "packages/frontend/react-hooks",
+        "identifiers": [
+          "packages/frontend/react-hooks",
+          "@flama/react-hooks"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "web-showcase",
+          "mobile-showcase"
+        ]
+      },
+      {
         "path": "packages/tsconfig/tsconfig.expo.json",
         "identifiers": [
           "tsconfig.expo",
