@@ -41,6 +41,19 @@
           "web",
           "web-showcase"
         ]
+      },
+      {
+        "path": "packages/frontend/react-hooks",
+        "identifiers": [
+          "packages/frontend/react-hooks",
+          "@flama/react-hooks"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "mobile-showcase",
+          "web-showcase"
+        ]
       }
     ]
   },
