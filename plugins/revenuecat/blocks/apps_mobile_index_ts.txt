@@ -1,0 +1,3 @@
+// flama:begin revenuecat
+import './purchases';
+// flama:end revenuecat

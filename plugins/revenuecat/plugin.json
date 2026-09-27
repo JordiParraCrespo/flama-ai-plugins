@@ -1,0 +1,51 @@
+{
+  "id": "revenuecat",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "RevenueCat in-app purchases",
+    "summary": "apps/mobile/purchases.ts — the RevenueCat SDK, configured at launch from per-store keys",
+    "identifiers": [
+      "react-native-purchases",
+      "EXPO_PUBLIC_REVENUECAT_"
+    ],
+    "paths": [
+      "apps/mobile/purchases.ts"
+    ],
+    "requires": [
+      "mobile"
+    ],
+    "json": [
+      {
+        "file": "apps/mobile/package.json",
+        "path": [
+          "dependencies"
+        ],
+        "set": {
+          "react-native-purchases": "^10.9.1"
+        },
+        "setAt": [
+          50
+        ]
+      }
+    ]
+  },
+  "files": {
+    "apps/mobile/purchases.ts": "files/apps/mobile/purchases.ts"
+  },
+  "filesNeed": {
+    "apps/mobile/purchases.ts": "mobile"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "mobile-env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "apps/mobile/index.ts",
+      "anchor": "launch",
+      "source": "blocks/apps_mobile_index_ts.txt",
+      "needs": "mobile"
+    }
+  ]
+}

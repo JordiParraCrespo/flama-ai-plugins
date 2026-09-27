@@ -23,6 +23,12 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// A scratch tree can still be written to as it is removed (a git process that
+// outlives its command, such as a detached auto-gc), which fails a single
+// rmdir with ENOTEMPTY. Retry rather than report a clean round trip as a
+// failure.
+const CLEANUP = { recursive: true, force: true, maxRetries: 5, retryDelay: 200 };
+
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
 
@@ -265,7 +271,7 @@ function roundtrip(base, pruned, id, keep) {
     console.log('    ✓ round trip clean — the tree is byte-identical to where it started');
   } finally {
     if (keep) console.log(`    (kept ${dir})`);
-    else rmSync(dir, { recursive: true, force: true });
+    else rmSync(dir, CLEANUP);
   }
 }
 
@@ -338,7 +344,7 @@ function main() {
     try {
       for (const id of ids) roundtrip(base, pruned, id, keep);
     } finally {
-      if (!keep) rmSync(base, { recursive: true, force: true });
+      if (!keep) rmSync(base, CLEANUP);
     }
   }
 

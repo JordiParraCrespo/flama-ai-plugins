@@ -1,0 +1,6 @@
+# flama:begin revenuecat
+
+# RevenueCat. Empty disables IAP. iOS and Android use different keys.
+EXPO_PUBLIC_REVENUECAT_IOS_KEY=
+EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=
+# flama:end revenuecat
