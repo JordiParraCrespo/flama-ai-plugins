@@ -22,8 +22,8 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
-          "web-showcase"
+          "web-showcase",
+          "admin-web"
         ]
       },
       {
@@ -39,12 +39,16 @@
         ]
       },
       {
-        "path": "packages/frontend/admin",
+        "path": "packages/frontend/react-hooks",
         "identifiers": [
-          "packages/frontend/admin",
-          "@flama/frontend-admin"
+          "packages/frontend/react-hooks",
+          "@flama/react-hooks"
         ],
         "neededBy": [
+          "web",
+          "mobile",
+          "web-showcase",
+          "mobile-showcase",
           "admin-web"
         ]
       },
@@ -90,8 +94,8 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
-          "mobile"
+          "mobile",
+          "admin-web"
         ]
       },
       {
@@ -101,8 +105,8 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
-          "mobile"
+          "mobile",
+          "admin-web"
         ]
       },
       {
@@ -113,8 +117,8 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
-          "mobile"
+          "mobile",
+          "admin-web"
         ]
       },
       {
@@ -124,8 +128,8 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
-          "mobile"
+          "mobile",
+          "admin-web"
         ]
       },
       {
@@ -135,8 +139,18 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
-          "mobile"
+          "mobile",
+          "admin-web"
+        ]
+      },
+      {
+        "path": "packages/frontend/admin",
+        "identifiers": [
+          "packages/frontend/admin",
+          "@flama/frontend-admin"
+        ],
+        "neededBy": [
+          "admin-web"
         ]
       }
     ]
@@ -145,14 +159,27 @@
     "apps/admin-web": "files/apps/admin-web",
     "helm/flama/templates/admin-web-deployment.yaml": "files/helm/flama/templates/admin-web-deployment.yaml"
   },
+  "filesNeed": {
+    "helm/flama/templates/admin-web-deployment.yaml": "helm"
+  },
   "sharedFiles": {
     "packages/frontend/admin": "shared/packages/frontend/admin"
   },
   "blocks": [
     {
+      "file": ".agents/hooks/arch-check.sh",
+      "anchor": "admin-web",
+      "source": "blocks/_agents_hooks_arch-check_sh.txt"
+    },
+    {
+      "file": ".env.example",
+      "anchor": "api-urls",
+      "source": "blocks/_env_example.txt"
+    },
+    {
       "file": ".env.example",
       "anchor": "admin-web",
-      "source": "blocks/_env_example.txt"
+      "source": "blocks/_env_example_1.txt"
     },
     {
       "file": ".github/workflows/ci.yml",
@@ -160,14 +187,34 @@
       "source": "blocks/_github_workflows_ci_yml.txt"
     },
     {
-      "file": "docker/docker-compose.prod.yml",
-      "anchor": "services",
-      "source": "blocks/docker_docker-compose_prod_yml.txt"
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "auth-consts",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "trusted-origins",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/config/app.config.ts",
+      "anchor": "config-schema",
+      "source": "blocks/apps_api_src_config_app_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/app.config.ts",
+      "anchor": "config-env",
+      "source": "blocks/apps_api_src_config_app_config_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/main.ts",
+      "anchor": "cors-origins",
+      "source": "blocks/apps_api_src_main_ts.txt"
     },
     {
       "file": "docker/docker-compose.prod.yml",
       "anchor": "services",
-      "source": "blocks/docker_docker-compose_prod_yml_1.txt"
+      "source": "blocks/docker_docker-compose_prod_yml.txt"
     },
     {
       "file": "helm/flama/templates/ingress.yaml",
@@ -189,65 +236,27 @@
     },
     {
       "file": "helm/flama/values.yaml",
-      "anchor": "services",
-      "source": "blocks/helm_flama_values_yaml_1.txt",
-      "needs": "helm"
-    },
-    {
-      "file": "helm/flama/values.yaml",
       "anchor": "ingress-hosts",
-      "source": "blocks/helm_flama_values_yaml_2.txt",
+      "source": "blocks/helm_flama_values_yaml_1.txt",
       "needs": "helm"
     },
     {
       "file": "scripts/check-bundle-size.mjs",
       "anchor": "admin-web",
-      "source": "blocks/scripts_check-bundle-size_mjs.txt"
+      "source": "blocks/scripts_check-bundle-size_mjs.txt",
+      "needs": "scripts/check-bundle-size.mjs"
     },
     {
       "file": "scripts/check-frontend-structure.mjs",
       "anchor": "admin-web",
-      "source": "blocks/scripts_check-frontend-structure_mjs.txt"
+      "source": "blocks/scripts_check-frontend-structure_mjs.txt",
+      "needs": "scripts/check-frontend-structure.mjs"
     },
     {
       "file": "scripts/scaffold-feature.mjs",
       "anchor": "admin-web",
-      "source": "blocks/scripts_scaffold-feature_mjs.txt"
-    },
-    {
-      "file": ".agents/hooks/arch-check.sh",
-      "anchor": "admin-web",
-      "source": "blocks/_agents_hooks_arch-check_sh.txt"
-    },
-    {
-      "file": "apps/api/src/config/app.config.ts",
-      "anchor": "config-schema",
-      "source": "blocks/apps_api_src_config_app_config_ts.txt"
-    },
-    {
-      "file": "apps/api/src/config/app.config.ts",
-      "anchor": "config-env",
-      "source": "blocks/apps_api_src_config_app_config_ts_1.txt"
-    },
-    {
-      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
-      "anchor": "auth-consts",
-      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
-    },
-    {
-      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
-      "anchor": "trusted-origins",
-      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
-    },
-    {
-      "file": "apps/api/src/main.ts",
-      "anchor": "cors-origins",
-      "source": "blocks/apps_api_src_main_ts.txt"
-    },
-    {
-      "file": ".env.example",
-      "anchor": "api-urls",
-      "source": "blocks/_env_example_1.txt"
+      "source": "blocks/scripts_scaffold-feature_mjs.txt",
+      "needs": "scripts/scaffold-feature.mjs"
     }
   ],
   "coOwned": [
@@ -298,6 +307,7 @@
         "web",
         "admin-web"
       ],
+      "needs": "scripts/check-frontend-structure.mjs",
       "source": "blocks/shared/scripts_check_frontend_structure_mjs__web-kits.txt"
     },
     {
@@ -307,10 +317,8 @@
         "web",
         "admin-web"
       ],
+      "needs": "scripts/scaffold-feature.mjs",
       "source": "blocks/shared/scripts_scaffold_feature_mjs__web-templates.txt"
     }
-  ],
-  "filesNeed": {
-    "helm/flama/templates/admin-web-deployment.yaml": "helm"
-  }
+  ]
 }

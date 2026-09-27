@@ -1,4 +1,4 @@
-import { Button, Checkbox, FieldGroup, Input } from '@flama/design-system-web';
+import { Button, FieldGroup, Input } from '@flama/design-system-web';
 import {
   AuthField,
   AuthFormError,
@@ -8,7 +8,7 @@ import {
   useZodResolver,
 } from '@flama/frontend-web';
 import { type LoginDto, loginSchema } from '@flama/shared/schemas/auth';
-import { type ReactNode, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -28,11 +28,6 @@ export function LoginForm({
 }) {
   const { t } = useTranslation();
   const resolveError = useErrorMessage();
-
-  // Session lifetime is decided by the API, so this is presentational for now:
-  // the control exists in the design and the preference has nowhere to go
-  // until the login endpoint accepts one.
-  const [keepSignedIn, setKeepSignedIn] = useState(true);
 
   const {
     register,
@@ -78,24 +73,9 @@ export function LoginForm({
           />
         </AuthField>
 
-        {/* 21px is the design's row: a 15px box plus the 3px the UA puts around a
-            native checkbox. Pinned so the column keeps its rhythm. */}
-        <div className="mb-2 flex h-[21px] items-center justify-between">
-          <label
-            htmlFor="keepSignedIn"
-            className="flex cursor-pointer items-center gap-2 text-sm text-ink-600"
-          >
-            <Checkbox
-              id="keepSignedIn"
-              checked={keepSignedIn}
-              onCheckedChange={setKeepSignedIn}
-              disabled={isPending}
-              className="size-[15px] rounded-[4.5px] [&_svg]:size-2.5"
-            />
-            {t('auth.login.keepSignedIn')}
-          </label>
-          {forgotPasswordLink}
-        </div>
+        {/* The design's 21px row, pinned so the column keeps its rhythm. No
+            "keep me signed in" box: session lifetime is the API's to decide. */}
+        <div className="mb-2 flex h-5.25 items-center justify-end">{forgotPasswordLink}</div>
 
         <Button type="submit" disabled={isPending} className={authControlClass}>
           {isPending ? t('auth.login.submitting') : t('auth.login.submit')}
