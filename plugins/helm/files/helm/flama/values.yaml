@@ -19,6 +19,9 @@ api:
     # flama:begin admin-mobile
     ADMIN_MOBILE_SCHEME: flama-admin
     # flama:end admin-mobile
+    # flama:begin admin-web
+    ADMIN_FRONTEND_URL: https://control.flama.dev
+    # flama:end admin-web
     # flama:plugins api-env
     DB_HOST: flama-postgres
     DB_PORT: "5432"
@@ -44,9 +47,6 @@ web:
       memory: 256Mi
 # flama:end web
 
-    # flama:begin admin-web
-    ADMIN_FRONTEND_URL: https://control.flama.dev
-    # flama:end admin-web
 # flama:begin admin-web
 adminWeb:
   # Extra origins for the nginx Content-Security-Policy (space separated).

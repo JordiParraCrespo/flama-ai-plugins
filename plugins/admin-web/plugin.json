@@ -233,6 +233,12 @@
     },
     {
       "file": "helm/flama/values.yaml",
+      "anchor": "api-env",
+      "source": "blocks/helm_flama_values_yaml_2.txt",
+      "needs": "helm"
+    },
+    {
+      "file": "helm/flama/values.yaml",
       "anchor": "services",
       "source": "blocks/helm_flama_values_yaml.txt",
       "needs": "helm"
