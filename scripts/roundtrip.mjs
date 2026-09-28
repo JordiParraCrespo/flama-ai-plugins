@@ -183,9 +183,16 @@ function roundtrip(base, pruned, id, keep) {
     // it cannot install into a project without it. Bring those in first and
     // take them out last, so what is proven is this plugin against a project
     // that can actually hold it. One the project already has is left alone.
-    const needed = (manifest.feature?.requires ?? []).filter(
-      (dep) => existsSync(join(ROOT, 'plugins', dep, 'plugin.json')) && !features[dep],
-    );
+    // Requirements are followed all the way down, each installed after what
+    // it needs in turn: the web control plane itself needs the admin API.
+    const needed = [];
+    const visit = (dep) => {
+      if (needed.includes(dep) || features[dep]) return;
+      if (!existsSync(join(ROOT, 'plugins', dep, 'plugin.json'))) return;
+      for (const next of readManifest(dep).feature?.requires ?? []) visit(next);
+      needed.push(dep);
+    };
+    for (const dep of manifest.feature?.requires ?? []) visit(dep);
     // A requirement that is a shipped feature, pruned from this shape, makes
     // the plugin uninstallable here by design; the installer says so.
     const missing = [manifest, ...needed.map((dep) => readManifest(dep))]
@@ -208,13 +215,13 @@ function roundtrip(base, pruned, id, keep) {
     }
     for (const dep of needed) {
       if (
-        !run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', dep, '--from', ROOT], `add ${dep}`)
+        !run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', '--no-install', dep, '--from', ROOT], `add ${dep}`)
       )
         return;
       console.log(`    ✓ installed ${dep} (required)`);
     }
 
-    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', id, '--from', ROOT], 'add')) return;
+    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', '--no-install', id, '--from', ROOT], 'add')) return;
     console.log('    ✓ installed');
     const revived = git(dir, 'status', '--porcelain', '--untracked-files=all')
       .split('\n')
@@ -243,10 +250,10 @@ function roundtrip(base, pruned, id, keep) {
 
     if (ships && !reproducesStarter(dir, id)) return;
 
-    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', id], 'remove')) return;
+    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', '--no-install', id], 'remove')) return;
     console.log('    ✓ removed');
     for (const dep of [...needed].reverse()) {
-      if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', dep], `remove ${dep}`)) return;
+      if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', '--no-install', dep], `remove ${dep}`)) return;
       console.log(`    ✓ removed ${dep}`);
     }
 

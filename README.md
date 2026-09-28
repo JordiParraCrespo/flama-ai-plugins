@@ -13,11 +13,12 @@ pnpm plugin:remove cli
 | Plugin | What it adds |
 |---|---|
 | `cli` | `apps/cli` — the `flama` command-line interface, driven by scoped API tokens |
-| `mcp` | `apps/mcp` — the MCP server (stdio + Streamable HTTP), and the API's OAuth provider for MCP clients with its consent screen |
+| `mcp` | `apps/mcp` — the MCP server (stdio + Streamable HTTP), and the API's OAuth provider for MCP clients with its consent screen (requires `admin-api`, which its admin tools call) |
 | `runner` | `apps/runner` + `packages/go/*` — the Go service template (REST + WS, API keys) the API delegates long-lived work to, with its own CI workflow, compose service and Helm deployment |
 | `docs` | `apps/docs` — the Docusaurus site |
-| `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags |
-| `admin-mobile` | `apps/admin-mobile` — the Expo control plane |
+| `admin-api` | `apps/api/src/admin` — `/v1/admin/users`, the user-administration API over Better Auth's `admin` plugin |
+| `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags (requires `admin-api`) |
+| `admin-mobile` | `apps/admin-mobile` — the Expo control plane (requires `admin-api`) |
 | `web-showcase` | `apps/web-showcase` — the Next.js gallery of the web design system, and how to rebuild it after `/design-export-port` |
 | `mobile-showcase` | `apps/mobile-showcase` — the Expo gallery of the mobile design system |
 | `revenuecat` | RevenueCat in the mobile app: `apps/mobile/purchases.ts`, configured at launch from per-store keys |
