@@ -16,6 +16,7 @@ pnpm plugin:remove cli
 | `mcp` | `apps/mcp` — the MCP server (stdio + Streamable HTTP), and the API's OAuth provider for MCP clients with its consent screen (requires `admin-api`, which its admin tools call) |
 | `runner` | `apps/runner` + `packages/go/*` — the Go service template (REST + WS, API keys) the API delegates long-lived work to, with its own CI workflow, compose service and Helm deployment |
 | `docs` | `apps/docs` — the Docusaurus site |
+| `helm` | `helm/` — the Kubernetes chart for the Tier 2 deployment, with the deployments and hosts of the plugins already installed |
 | `admin-api` | `apps/api/src/admin` — `/v1/admin/users`, the user-administration API over Better Auth's `admin` plugin |
 | `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags (requires `admin-api`) |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane (requires `admin-api`) |

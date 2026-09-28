@@ -1,0 +1,89 @@
+{
+  "id": "helm",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Kubernetes Helm chart",
+    "summary": "helm/ — chart for the Tier 2 (Kubernetes) deployment",
+    "identifiers": [
+      "helm/"
+    ],
+    "paths": [
+      "helm"
+    ],
+    "json": [
+      {
+        "file": "scripts/starter/features.json",
+        "path": [
+          "features",
+          "web",
+          "paths"
+        ],
+        "remove": [
+          "helm/flama/templates/web-deployment.yaml"
+        ],
+        "at": [
+          2
+        ],
+        "needs": "web"
+      },
+      {
+        "file": "scripts/starter/features.json",
+        "path": [
+          "features",
+          "admin-web",
+          "paths"
+        ],
+        "remove": [
+          "helm/flama/templates/admin-web-deployment.yaml"
+        ],
+        "at": [
+          1
+        ],
+        "needs": "admin-web"
+      },
+      {
+        "file": "scripts/starter/features.json",
+        "path": [
+          "features",
+          "docs",
+          "paths"
+        ],
+        "remove": [
+          "helm/flama/templates/docs-deployment.yaml"
+        ],
+        "at": [
+          1
+        ],
+        "needs": "docs"
+      },
+      {
+        "file": "scripts/starter/features.json",
+        "path": [
+          "features",
+          "runner",
+          "paths"
+        ],
+        "remove": [
+          "helm/flama/templates/runner-deployment.yaml"
+        ],
+        "at": [
+          6
+        ],
+        "needs": "runner"
+      }
+    ]
+  },
+  "files": {
+    "helm": "files/helm",
+    "helm/flama/templates/web-deployment.yaml": "files/helm/flama/templates/web-deployment.yaml",
+    "helm/flama/templates/admin-web-deployment.yaml": "files/helm/flama/templates/admin-web-deployment.yaml",
+    "helm/flama/templates/docs-deployment.yaml": "files/helm/flama/templates/docs-deployment.yaml",
+    "helm/flama/templates/runner-deployment.yaml": "files/helm/flama/templates/runner-deployment.yaml"
+  },
+  "filesNeed": {
+    "helm/flama/templates/web-deployment.yaml": "web",
+    "helm/flama/templates/admin-web-deployment.yaml": "admin-web",
+    "helm/flama/templates/docs-deployment.yaml": "docs",
+    "helm/flama/templates/runner-deployment.yaml": "runner"
+  }
+}
