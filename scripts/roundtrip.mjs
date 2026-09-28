@@ -24,9 +24,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // A scratch tree can still be written to as it is removed (a git process that
-// outlives its command, such as a detached auto-gc), which fails a single
-// rmdir with ENOTEMPTY. Retry rather than report a clean round trip as a
-// failure.
+// outlives its command), which fails a single rmdir with ENOTEMPTY. Retry
+// rather than report a clean round trip as a failure; `scratchCopy` switches
+// off the auto-gc that did it.
 const CLEANUP = { recursive: true, force: true, maxRetries: 5, retryDelay: 200 };
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -107,6 +107,10 @@ function scratchCopy(repo) {
     `tar -c --exclude=node_modules --exclude=.git -C '${repo}' . | tar -x -C '${dir}'`,
   ]);
   git(dir, 'init', '-q');
+  // No background maintenance: a detached auto-gc outlives the command that
+  // started it and writes objects while the tree is being removed.
+  git(dir, 'config', 'gc.auto', '0');
+  git(dir, 'config', 'maintenance.auto', 'false');
   git(dir, 'add', '-A');
   git(dir, '-c', 'user.email=rt@flama', '-c', 'user.name=roundtrip', 'commit', '-qm', 'baseline');
   return dir;
