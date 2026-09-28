@@ -13,9 +13,11 @@ import { auth, closeAuthConnections } from '../auth/infrastructure/better-auth.c
 // flama:begin organizations
 import { AccessGrantOrmEntity } from '../authz/database/access-grant.orm-entity';
 // flama:end organizations
+// flama:begin feature-flags
 import { FeatureFlagOrmEntity } from '../feature-flags/database/feature-flag.orm-entity';
 import { FlagChangeOrmEntity } from '../feature-flags/database/flag-change.orm-entity';
 import { FlagSegmentOrmEntity } from '../feature-flags/database/flag-segment.orm-entity';
+// flama:end feature-flags
 // flama:begin organizations
 import { InvitationOrmEntity } from '../organizations/database/invitation.orm-entity';
 import { MemberOrmEntity } from '../organizations/database/member.orm-entity';
@@ -62,9 +64,11 @@ const dataSource = new DataSource({
     TeamOrmEntity,
     TeamMemberOrmEntity,
     // flama:end organizations
+    // flama:begin feature-flags
     FeatureFlagOrmEntity,
     FlagSegmentOrmEntity,
     FlagChangeOrmEntity,
+    // flama:end feature-flags
     OutboxMessageSchema,
   ],
 });

@@ -2,7 +2,8 @@ import { AuthzModule as AuthzKernelModule } from '@flama/backend-authz';
 import { Global, Module, type Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FeatureFlagResource } from '../feature-flags/feature-flags.resource';
+// flama:begin feature-flags
+// flama:end feature-flags
 // flama:begin organizations
 import { MemberOrmEntity } from '../organizations/database/member.orm-entity';
 import { TeamOrmEntity } from '../organizations/database/team.orm-entity';
@@ -72,7 +73,8 @@ const queryHandlers: Provider[] = [FindAuthzCatalogQueryHandler];
     AuthzKernelModule.forFeature([
       UserResource,
       RoleResource,
-      FeatureFlagResource,
+      // flama:begin feature-flags
+      // flama:end feature-flags
       // flama:begin organizations
       ...ORGANIZATION_RESOURCES,
       // flama:end organizations

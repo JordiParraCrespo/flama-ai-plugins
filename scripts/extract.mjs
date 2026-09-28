@@ -275,8 +275,8 @@ export function pluginsHolding(id) {
  * blocks that need it. Installed without `id` they skipped those; `id`
  * brings them when it arrives after them.
  *
- * And `fenced`: their own files that carry `id`'s fences — the token screen's
- * route, which mounts an organizations field inside them. Installed without
+ * And `fenced`: their own files that carry `id`'s fences — the token API's
+ * e2e spec, which holds an organizations test inside them. Installed without
  * `id`, those fences arrived empty; `id` fills them.
  */
 export function pluginsReaching(id, own = []) {
@@ -287,7 +287,7 @@ export function pluginsReaching(id, own = []) {
     if (other === id || !existsSync(path)) continue;
     const plugin = JSON.parse(readFileSync(path, 'utf8'));
     // One that replays into `id`'s own files is `id`'s fences filled from the
-    // other side — the organizations field in the token route — and `id`
+    // other side — the organizations test in the token spec — and `id`
     // carries those files whole.
     for (const kind of ['coOwned', 'snapshots']) {
       if ((plugin[kind] ?? []).some((entry) => entry.needs === id && !owned(entry.file))) {
@@ -553,8 +553,8 @@ async function main() {
     for (const [holder, held] of pluginsHolding(id)) {
       const holderDir = join(ROOT, 'plugins', holder);
       for (const [path, source] of held) {
-        // Held for this feature but already its own: the token form's
-        // organizations field, which organizations brings back for it.
+        // Held for this feature but already one of its own paths, which it
+        // carries from its own tree.
         if (feature.paths.some((own) => path === own || path.startsWith(`${own}/`))) continue;
         files[path] = `files/${path}`;
         filesNeed[path] = holder;

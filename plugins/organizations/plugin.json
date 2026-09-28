@@ -243,11 +243,6 @@
       "needs": "mcp"
     },
     {
-      "file": "apps/web/src/features/api-tokens/sections/create-token-card.tsx",
-      "source": "snapshots/apps/web/src/features/api-tokens/sections/create-token-card.tsx",
-      "needs": "api-tokens"
-    },
-    {
       "file": "e2e/tests/api/api-tokens.spec.ts",
       "source": "snapshots/e2e/tests/api/api-tokens.spec.ts",
       "needs": "api-tokens"
