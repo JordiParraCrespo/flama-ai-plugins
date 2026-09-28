@@ -16,9 +16,10 @@
     ]
   },
   "files": {
+    "apps/api/src/__tests__/error-catalog-coverage.spec.ts": "files/apps/api/src/__tests__/error-catalog-coverage.spec.ts",
     "apps/docs": "files/apps/docs",
-    "helm/flama/templates/docs-deployment.yaml": "files/helm/flama/templates/docs-deployment.yaml",
-    "apps/api/src/__tests__/error-catalog-coverage.spec.ts": "files/apps/api/src/__tests__/error-catalog-coverage.spec.ts"
+    "apps/docs/docs/architecture/feature-flags.md": "files/apps/docs/docs/architecture/feature-flags.md",
+    "helm/flama/templates/docs-deployment.yaml": "files/helm/flama/templates/docs-deployment.yaml"
   },
   "blocks": [
     {
@@ -62,6 +63,7 @@
     }
   ],
   "filesNeed": {
+    "apps/docs/docs/architecture/feature-flags.md": "feature-flags",
     "helm/flama/templates/docs-deployment.yaml": "helm"
   }
 }
