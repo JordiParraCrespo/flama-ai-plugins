@@ -159,6 +159,17 @@ test('pluginsReaching names the files of a plugin that carry this feature’s fe
   );
 });
 
+test('pluginsReaching leaves a feature the replays into its own files', () => {
+  // Organizations fills its fences in the token route from its side; the
+  // route is api-tokens' own, so extracting api-tokens carries it whole.
+  const reaching = pluginsReaching('api-tokens', [
+    'apps/web/src/routes/_authenticated/settings/api-tokens.tsx',
+    'e2e/tests/api/api-tokens.spec.ts',
+  ]);
+  const docs = reaching.find(({ holder }) => holder === 'docs');
+  assert.deepEqual(docs?.fenced, ['apps/docs/docs/errors.md']);
+});
+
 test('pluginsHolding leaves a plugin its own files, and carries only what it holds', () => {
   assert.deepEqual(pluginsHolding('helm'), []);
   const held = Object.fromEntries(pluginsHolding('organizations'));

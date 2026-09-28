@@ -279,14 +279,18 @@ export function pluginsHolding(id) {
  * route, which mounts an organizations field inside them. Installed without
  * `id`, those fences arrived empty; `id` fills them.
  */
-export function pluginsReaching(id) {
+export function pluginsReaching(id, own = []) {
+  const owned = (file) => own.some((path) => file === path || file.startsWith(`${path}/`));
   const found = [];
   for (const other of readdirSync(join(ROOT, 'plugins')).sort()) {
     const path = join(ROOT, 'plugins', other, 'plugin.json');
     if (other === id || !existsSync(path)) continue;
     const plugin = JSON.parse(readFileSync(path, 'utf8'));
+    // One that replays into `id`'s own files is `id`'s fences filled from the
+    // other side — the organizations field in the token route — and `id`
+    // carries those files whole.
     for (const kind of ['coOwned', 'snapshots']) {
-      if ((plugin[kind] ?? []).some((entry) => entry.needs === id)) {
+      if ((plugin[kind] ?? []).some((entry) => entry.needs === id && !owned(entry.file))) {
         fail(`${other}: ${kind} that need "${id}" cannot be carried by it yet`);
       }
     }
@@ -549,6 +553,9 @@ async function main() {
     for (const [holder, held] of pluginsHolding(id)) {
       const holderDir = join(ROOT, 'plugins', holder);
       for (const [path, source] of held) {
+        // Held for this feature but already its own: the token form's
+        // organizations field, which organizations brings back for it.
+        if (feature.paths.some((own) => path === own || path.startsWith(`${own}/`))) continue;
         files[path] = `files/${path}`;
         filesNeed[path] = holder;
         mkdirSync(dirname(join(out, 'files', path)), { recursive: true });
@@ -574,7 +581,10 @@ async function main() {
     // at its slot, where the install trims it for a plugin the project lacks.
     // Either can then be added after the other.
     const json = [...(feature.json ?? [])];
-    for (const { holder, files: reaching, blocks: woven, fenced } of pluginsReaching(id)) {
+    for (const { holder, files: reaching, blocks: woven, fenced } of pluginsReaching(
+      id,
+      feature.paths,
+    )) {
       const holderDir = join(ROOT, 'plugins', holder);
       for (const file of fenced) {
         if (snapshots.some((snapshot) => snapshot.file === file)) continue;
