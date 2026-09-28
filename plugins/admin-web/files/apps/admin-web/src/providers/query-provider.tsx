@@ -1,5 +1,5 @@
 import { createQueryPersistOptions, defaultQueryClientOptions } from '@flama/frontend-core/react';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { QueryClient } from '@tanstack/react-query';
 import {
   PersistQueryClientProvider,
@@ -25,7 +25,7 @@ function getStorage(): Storage | undefined {
 }
 
 const persistOptions = {
-  persister: createSyncStoragePersister({
+  persister: createAsyncStoragePersister({
     storage: getStorage(),
     key: 'flama.query-cache',
     // localStorage caps out around 5 MB. Rather than lose the whole cache to a

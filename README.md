@@ -24,6 +24,7 @@ pnpm plugin:remove cli
 | `qa` | `qa/` — the scenario-driven Playwright QA pack (requires `admin-web` and `organizations`) |
 | `billing` | `apps/api/src/billing` — Stripe subscriptions: checkout, customer portal, webhooks, revenue metrics |
 | `organizations` | Multi-tenancy — organizations, members, invitations, workspaces, access grants and onboarding. Ships in the starter; this is how a project that pruned it gets it back |
+| `agent-audits` | `.agents/skills/frontend-audit` + `.agents/skills/hexagon-audit` — report-only `/frontend-audit` and `/hexagon-audit` review skills over the starter's frontend and API rules; they change no code and open nothing |
 
 ## The idea
 

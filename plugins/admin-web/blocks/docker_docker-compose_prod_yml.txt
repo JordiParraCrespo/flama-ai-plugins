@@ -1,3 +1,12 @@
       # flama:begin admin-web
       ADMIN_FRONTEND_URL: ${ADMIN_FRONTEND_URL:-http://localhost:3003}
       # flama:end admin-web
+  # flama:begin admin-web
+  admin-web:
+    image: ${ADMIN_WEB_IMAGE:-ghcr.io/your-org/flama-admin-web:latest}
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "3003:3000"
+  # flama:end admin-web

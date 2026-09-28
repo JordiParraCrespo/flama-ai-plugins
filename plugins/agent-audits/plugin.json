@@ -1,0 +1,22 @@
+{
+  "id": "agent-audits",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Agent audits",
+    "summary": ".agents/skills — report-only /frontend-audit and /hexagon-audit review skills over the frontend and API rules",
+    "identifiers": [
+      ".agents/skills/frontend-audit",
+      "/frontend-audit",
+      ".agents/skills/hexagon-audit",
+      "/hexagon-audit"
+    ],
+    "paths": [
+      ".agents/skills/frontend-audit",
+      ".agents/skills/hexagon-audit"
+    ]
+  },
+  "files": {
+    ".agents/skills/frontend-audit": "files/.agents/skills/frontend-audit",
+    ".agents/skills/hexagon-audit": "files/.agents/skills/hexagon-audit"
+  }
+}

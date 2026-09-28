@@ -20,8 +20,8 @@
         ],
         "neededBy": [
           "mobile",
-          "admin-mobile",
-          "mobile-showcase"
+          "mobile-showcase",
+          "admin-mobile"
         ]
       },
       {
@@ -38,12 +38,16 @@
         ]
       },
       {
-        "path": "packages/frontend/admin",
+        "path": "packages/frontend/react-hooks",
         "identifiers": [
-          "packages/frontend/admin",
-          "@flama/frontend-admin"
+          "packages/frontend/react-hooks",
+          "@flama/react-hooks"
         ],
         "neededBy": [
+          "web",
+          "mobile",
+          "web-showcase",
+          "mobile-showcase",
           "admin-web",
           "admin-mobile"
         ]
@@ -82,8 +86,8 @@
         ],
         "neededBy": [
           "mobile",
-          "admin-mobile",
-          "mobile-showcase"
+          "mobile-showcase",
+          "admin-mobile"
         ]
       },
       {
@@ -94,8 +98,8 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
           "mobile",
+          "admin-web",
           "admin-mobile"
         ]
       },
@@ -106,8 +110,8 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
           "mobile",
+          "admin-web",
           "admin-mobile"
         ]
       },
@@ -119,8 +123,8 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
           "mobile",
+          "admin-web",
           "admin-mobile"
         ]
       },
@@ -131,8 +135,8 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
           "mobile",
+          "admin-web",
           "admin-mobile"
         ]
       },
@@ -143,8 +147,19 @@
         ],
         "neededBy": [
           "web",
-          "admin-web",
           "mobile",
+          "admin-web",
+          "admin-mobile"
+        ]
+      },
+      {
+        "path": "packages/frontend/admin",
+        "identifiers": [
+          "packages/frontend/admin",
+          "@flama/frontend-admin"
+        ],
+        "neededBy": [
+          "admin-web",
           "admin-mobile"
         ]
       }
@@ -157,6 +172,11 @@
     "packages/frontend/admin": "shared/packages/frontend/admin"
   },
   "blocks": [
+    {
+      "file": ".agents/hooks/arch-check.sh",
+      "anchor": "admin-mobile",
+      "source": "blocks/_agents_hooks_arch-check_sh.txt"
+    },
     {
       "file": ".env.example",
       "anchor": "admin-mobile",
@@ -196,17 +216,14 @@
     {
       "file": "scripts/check-frontend-structure.mjs",
       "anchor": "admin-mobile",
-      "source": "blocks/scripts_check-frontend-structure_mjs.txt"
+      "source": "blocks/scripts_check-frontend-structure_mjs.txt",
+      "needs": "scripts/check-frontend-structure.mjs"
     },
     {
       "file": "scripts/scaffold-feature.mjs",
       "anchor": "admin-mobile",
-      "source": "blocks/scripts_scaffold-feature_mjs.txt"
-    },
-    {
-      "file": ".agents/hooks/arch-check.sh",
-      "anchor": "admin-mobile",
-      "source": "blocks/_agents_hooks_arch-check_sh.txt"
+      "source": "blocks/scripts_scaffold-feature_mjs.txt",
+      "needs": "scripts/scaffold-feature.mjs"
     }
   ],
   "coOwned": [
@@ -278,6 +295,7 @@
         "mobile",
         "admin-mobile"
       ],
+      "needs": "scripts/check-frontend-structure.mjs",
       "source": "blocks/shared/scripts_check_frontend_structure_mjs__mobile-kits.txt"
     },
     {
@@ -287,6 +305,7 @@
         "mobile",
         "admin-mobile"
       ],
+      "needs": "scripts/scaffold-feature.mjs",
       "source": "blocks/shared/scripts_scaffold_feature_mjs__mobile-templates.txt"
     }
   ]
