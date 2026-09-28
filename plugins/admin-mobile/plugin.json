@@ -28,6 +28,18 @@
         ]
       },
       {
+        "path": "packages/frontend/react-hooks",
+        "identifiers": [
+          "packages/frontend/react-hooks",
+          "@flama/react-hooks"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "admin-mobile"
+        ]
+      },
+      {
         "path": "packages/frontend/core",
         "identifiers": [
           "packages/frontend/core",
