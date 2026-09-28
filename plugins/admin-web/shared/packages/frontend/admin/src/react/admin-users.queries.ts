@@ -1,7 +1,7 @@
 'use client';
 
-import type { AdminCreateUserRequest, AdminUpdateUserRequest } from '@flama/api-client';
 import { usersKeys } from '@flama/frontend-core/react';
+import type { AdminCreateUserDto, AdminUpdateUserDto } from '@flama/shared';
 import {
   type UseMutationOptions,
   type UseQueryOptions,
@@ -90,13 +90,13 @@ function useAdminUserMutation<TVariables>(
 }
 
 export function useCreateAdminUser(
-  options?: UseMutationOptions<unknown, Error, AdminCreateUserRequest>,
+  options?: UseMutationOptions<unknown, Error, AdminCreateUserDto>,
 ) {
   return useAdminUserMutation((app, dto) => app.adminUsers.create(dto), options);
 }
 
 export function useUpdateAdminUser(
-  options?: UseMutationOptions<unknown, Error, { id: string; dto: AdminUpdateUserRequest }>,
+  options?: UseMutationOptions<unknown, Error, { id: string; dto: AdminUpdateUserDto }>,
 ) {
   return useAdminUserMutation((app, { id, dto }) => app.adminUsers.update(id, dto), options);
 }

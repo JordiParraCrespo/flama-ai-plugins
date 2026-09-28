@@ -13,6 +13,9 @@
       "apps/admin-web",
       "helm/flama/templates/admin-web-deployment.yaml"
     ],
+    "requires": [
+      "admin-api"
+    ],
     "shared": [
       {
         "path": "packages/frontend/design-system/web",

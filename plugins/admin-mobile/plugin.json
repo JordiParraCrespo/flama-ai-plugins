@@ -11,6 +11,9 @@
     "paths": [
       "apps/admin-mobile"
     ],
+    "requires": [
+      "admin-api"
+    ],
     "shared": [
       {
         "path": "packages/frontend/design-system/mobile",

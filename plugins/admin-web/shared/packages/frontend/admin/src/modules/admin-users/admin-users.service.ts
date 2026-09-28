@@ -1,4 +1,4 @@
-import type { AdminCreateUserRequest, AdminUpdateUserRequest } from '@flama/api-client';
+import type { AdminCreateUserDto, AdminUpdateUserDto } from '@flama/shared';
 import { inject, injectable } from 'inversify';
 import { TOKENS } from '../../di/tokens';
 import type { AdminUsersListParams, AdminUsersRepository } from './admin-users.repository';
@@ -16,10 +16,10 @@ export class AdminUsersService {
   findById(id: string) {
     return this.repository.findById(id);
   }
-  create(dto: AdminCreateUserRequest) {
+  create(dto: AdminCreateUserDto) {
     return this.repository.create(dto);
   }
-  update(id: string, dto: AdminUpdateUserRequest) {
+  update(id: string, dto: AdminUpdateUserDto) {
     return this.repository.update(id, dto);
   }
   setPlatformRole(id: string, role: string | string[]) {
