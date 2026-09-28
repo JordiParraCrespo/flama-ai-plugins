@@ -45,7 +45,6 @@ export default defineConfig({
       '@flama/shared/schemas/profile',
       '@flama/shared/schemas/role',
       '@flama/shared/permissions',
-      '@flama/shared/feature-flags',
     ],
   },
   build: {
