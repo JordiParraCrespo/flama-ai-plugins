@@ -195,6 +195,25 @@ segment in `usedBy`.
 | `BILLING_009` <a id="billing_009" /> | That price is not offered here               | 400  |
 
 <!-- flama:end billing -->
+<!-- flama:begin admin-api -->
+## Admin
+
+Better Auth's admin plugin owns these operations: its code is folded onto the
+catalog, and the original survives as `upstreamCode`.
+
+| Code                               | Title                                                             | HTTP |
+| ---------------------------------- | ----------------------------------------------------------------- | ---- |
+| `ADMIN_001` <a id="admin_001" /> | User not found                                                    | 404  |
+| `ADMIN_002` <a id="admin_002" /> | A user with that email already exists                             | 409  |
+| `ADMIN_003` <a id="admin_003" /> | Your account is not allowed to perform this administrative action | 403  |
+| `ADMIN_004` <a id="admin_004" /> | An administrator cannot perform this action on their own account  | 403  |
+| `ADMIN_005` <a id="admin_005" /> | That role does not exist or cannot be assigned                    | 400  |
+| `ADMIN_006` <a id="admin_006" /> | That user is banned from this application                         | 403  |
+| `ADMIN_007` <a id="admin_007" /> | The admin service rejected this request                           | 400  |
+| `ADMIN_008` <a id="admin_008" /> | The admin service failed to handle this request                   | 502  |
+| `ADMIN_009` <a id="admin_009" /> | No such session for that user                                     | 404  |
+
+<!-- flama:end admin-api -->
 <!-- flama:plugins integration-errors -->
 
 ## Organizations, teams & invitations
@@ -242,24 +261,6 @@ API's compatibility promise.
 `ORG_015` and `ORG_016` are the fallbacks for an upstream code this version does
 not recognise — a client should treat them as "retry or report", and the
 `upstreamCode` says what actually happened.
-
-## Admin
-
-Same arrangement as organizations: Better Auth's admin plugin owns the
-operation, its code is folded onto the catalog, and the original survives as
-`upstreamCode`.
-
-| Code                               | Title                                                             | HTTP |
-| ---------------------------------- | ----------------------------------------------------------------- | ---- |
-| `ADMIN_001` <a id="admin_001" /> | User not found                                                    | 404  |
-| `ADMIN_002` <a id="admin_002" /> | A user with that email already exists                             | 409  |
-| `ADMIN_003` <a id="admin_003" /> | Your account is not allowed to perform this administrative action | 403  |
-| `ADMIN_004` <a id="admin_004" /> | An administrator cannot perform this action on their own account  | 403  |
-| `ADMIN_005` <a id="admin_005" /> | That role does not exist or cannot be assigned                    | 400  |
-| `ADMIN_006` <a id="admin_006" /> | That user is banned from this application                         | 403  |
-| `ADMIN_007` <a id="admin_007" /> | The admin service rejected this request                           | 400  |
-| `ADMIN_008` <a id="admin_008" /> | The admin service failed to handle this request                   | 502  |
-| `ADMIN_009` <a id="admin_009" /> | No such session for that user                                     | 404  |
 
 <!-- flama:begin runner -->
 ## Runner service
