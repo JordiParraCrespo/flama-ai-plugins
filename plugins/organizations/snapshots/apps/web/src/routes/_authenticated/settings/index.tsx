@@ -1,8 +1,9 @@
-import { Cpu, ShieldCheck } from '@flama/design-system-web/icons';
+import { ShieldCheck } from '@flama/design-system-web/icons';
 import { PageHead, SectionNav } from '@flama/frontend-web';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { ApiKeysSection } from '@/features/api-tokens/sections/api-keys';
+// flama:begin api-tokens
+// flama:end api-tokens
 // flama:begin organizations
 import { GENERAL_SETTINGS_SECTION } from '@/features/organizations/lib/settings-section';
 import { GeneralSettingsSection } from '@/features/organizations/sections/general-settings';
@@ -15,7 +16,8 @@ const SECTIONS = [
   GENERAL_SETTINGS_SECTION,
   // flama:end organizations
   { key: 'security', icon: ShieldCheck },
-  { key: 'api', icon: Cpu },
+  // flama:begin api-tokens
+  // flama:end api-tokens
 ] as const;
 
 type SectionKey = (typeof SECTIONS)[number]['key'];
@@ -30,7 +32,7 @@ const PANES: readonly SectionKey[] = SECTIONS.map((section) => section.key);
  *
  * Everything else in the search string is carried through untouched. What
  * `validateSearch` returns *becomes* the search, so narrowing it to `section`
- * would delete a table's `tokens_page` on the next navigation — the table
+ * would delete a table's page (`<prefix>_page`) on the next navigation — the table
  * would write it and the router would take it away. `section` is still the
  * only key this route reads or trusts.
  */
@@ -69,7 +71,8 @@ function SettingsPage() {
         {section === 'general' && <GeneralSettingsSection />}
         {/* flama:end organizations */}
         {section === 'security' && <SecuritySection />}
-        {section === 'api' && <ApiKeysSection />}
+        {/* flama:begin api-tokens */}
+        {/* flama:end api-tokens */}
       </SectionNav>
     </>
   );

@@ -66,6 +66,21 @@
           }
         },
         "needs": "packages/frontend/consumer"
+      },
+      {
+        "file": "scripts/starter/features.json",
+        "path": [
+          "features",
+          "api-tokens",
+          "paths"
+        ],
+        "remove": [
+          "apps/web/src/features/organizations/sections/token-organizations-field.tsx"
+        ],
+        "at": [
+          3
+        ],
+        "needs": "api-tokens"
       }
     ],
     "regenerate": [
@@ -111,7 +126,8 @@
     "packages/frontend/consumer/src/modules/organizations": "files/packages/frontend/consumer/src/modules/organizations",
     "packages/frontend/consumer/src/organizations": "files/packages/frontend/consumer/src/organizations",
     "apps/mcp/src/tools/organizations.tools.ts": "files/apps/mcp/src/tools/organizations.tools.ts",
-    "apps/mcp/src/tools/workspaces.tools.ts": "files/apps/mcp/src/tools/workspaces.tools.ts"
+    "apps/mcp/src/tools/workspaces.tools.ts": "files/apps/mcp/src/tools/workspaces.tools.ts",
+    "apps/web/src/features/organizations/sections/token-organizations-field.tsx": "files/apps/web/src/features/organizations/sections/token-organizations-field.tsx"
   },
   "filesNeed": {
     "apps/mobile/app/onboarding.tsx": "mobile",
@@ -125,7 +141,8 @@
     "e2e/tests/web/onboarding.spec.ts": "web",
     "e2e/tests/web/organization-settings.spec.ts": "web",
     "apps/mcp/src/tools/organizations.tools.ts": "mcp",
-    "apps/mcp/src/tools/workspaces.tools.ts": "mcp"
+    "apps/mcp/src/tools/workspaces.tools.ts": "mcp",
+    "apps/web/src/features/organizations/sections/token-organizations-field.tsx": "api-tokens"
   },
   "filesNeedPath": {
     "packages/frontend/api-client/src/data-access/api/openapi/services/AccessGrantsApi.ts": "packages/frontend/api-client",
@@ -179,11 +196,6 @@
     {
       "file": "apps/web/src/routes/_authenticated.tsx",
       "source": "snapshots/apps/web/src/routes/_authenticated.tsx",
-      "needs": "web"
-    },
-    {
-      "file": "apps/web/src/routes/_authenticated/settings/api-tokens.tsx",
-      "source": "snapshots/apps/web/src/routes/_authenticated/settings/api-tokens.tsx",
       "needs": "web"
     },
     {
@@ -246,6 +258,16 @@
       "file": "apps/mcp/src/tools/index.ts",
       "source": "snapshots/apps/mcp/src/tools/index.ts",
       "needs": "mcp"
+    },
+    {
+      "file": "apps/web/src/routes/_authenticated/settings/api-tokens.tsx",
+      "source": "snapshots/apps/web/src/routes/_authenticated/settings/api-tokens.tsx",
+      "needs": "api-tokens"
+    },
+    {
+      "file": "e2e/tests/api/api-tokens.spec.ts",
+      "source": "snapshots/e2e/tests/api/api-tokens.spec.ts",
+      "needs": "api-tokens"
     }
   ]
 }
