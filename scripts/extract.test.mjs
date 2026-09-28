@@ -147,6 +147,18 @@ test('pluginsReaching names what the plugins here keep in the Helm chart', () =>
   assert.equal(reaching.helm, undefined);
 });
 
+test('pluginsReaching names the files of a plugin that carry this feature’s fences', () => {
+  const tokens = pluginsReaching('organizations').find(({ holder }) => holder === 'api-tokens');
+  assert.ok(tokens, 'api-tokens reaches into organizations');
+  assert.ok(tokens.fenced.includes('apps/web/src/routes/_authenticated/settings/api-tokens.tsx'));
+  // A file it carries for the feature comes back whole, not as a replay.
+  assert.ok(
+    !tokens.fenced.includes(
+      'apps/web/src/features/organizations/sections/token-organizations-field.tsx',
+    ),
+  );
+});
+
 test('pluginsHolding leaves a plugin its own files, and carries only what it holds', () => {
   assert.deepEqual(pluginsHolding('helm'), []);
   const held = Object.fromEntries(pluginsHolding('organizations'));

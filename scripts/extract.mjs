@@ -274,6 +274,10 @@ export function pluginsHolding(id) {
  * files they own that need `id` (`filesNeed`, and in their own `paths`), and
  * blocks that need it. Installed without `id` they skipped those; `id`
  * brings them when it arrives after them.
+ *
+ * And `fenced`: their own files that carry `id`'s fences — the token screen's
+ * route, which mounts an organizations field inside them. Installed without
+ * `id`, those fences arrived empty; `id` fills them.
  */
 export function pluginsReaching(id) {
   const found = [];
@@ -297,7 +301,17 @@ export function pluginsReaching(id) {
         at: plugin.feature.paths.indexOf(destination),
       }));
     const blocks = (plugin.blocks ?? []).filter((block) => block.needs === id);
-    if (files.length || blocks.length) found.push({ holder: other, files, blocks });
+    const filesDir = join(ROOT, 'plugins', other, 'files');
+    const fenced = existsSync(filesDir)
+      ? fencedFiles(filesDir, id).filter(
+          (file) =>
+            plugin.feature.paths.some((own) => file === own || file.startsWith(`${own}/`)) &&
+            !files.some(({ destination }) => destination === file),
+        )
+      : [];
+    if (files.length || blocks.length || fenced.length) {
+      found.push({ holder: other, files, blocks, fenced });
+    }
   }
   return found;
 }
@@ -560,20 +574,32 @@ async function main() {
     // at its slot, where the install trims it for a plugin the project lacks.
     // Either can then be added after the other.
     const json = [...(feature.json ?? [])];
-    for (const { holder, files: reaching, blocks: woven } of pluginsReaching(id)) {
+    for (const { holder, files: reaching, blocks: woven, fenced } of pluginsReaching(id)) {
       const holderDir = join(ROOT, 'plugins', holder);
+      for (const file of fenced) {
+        if (snapshots.some((snapshot) => snapshot.file === file)) continue;
+        const source = `snapshots/${file}`;
+        mkdirSync(dirname(join(out, source)), { recursive: true });
+        cpSync(join(holderDir, 'files', file), join(out, source));
+        snapshots.push({ file, source, needs: holder });
+        console.log(`  replay ${file} (from ${holder}) (only with ${holder})`);
+      }
       for (const { destination, source, at } of reaching) {
         files[destination] = `files/${destination}`;
         filesNeed[destination] = holder;
         mkdirSync(dirname(join(out, 'files', destination)), { recursive: true });
         cpSync(join(holderDir, source), join(out, 'files', destination), { recursive: true });
-        json.push({
+        const edit = {
           file: 'scripts/starter/features.json',
           path: ['features', holder, 'paths'],
           remove: [destination],
           at: [at],
           needs: holder,
-        });
+        };
+        // A feature the starter ships declares it in its own entry already.
+        if (!json.some((declared) => JSON.stringify(declared) === JSON.stringify(edit))) {
+          json.push(edit);
+        }
         console.log(`  carry  ${destination} (from ${holder}, only with ${holder})`);
       }
       for (const block of woven) {
