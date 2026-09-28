@@ -18,7 +18,7 @@ const { FeatureFlagsAdminRepository } = await import('../feature-flags.repositor
 
 function flagDto(overrides: Record<string, unknown> = {}) {
   return {
-    key: 'api_token_creation',
+    key: 'kill_switch',
     description: 'Allow users to create new personal API tokens.',
     kind: 'ops',
     owner: 'platform',
@@ -47,7 +47,7 @@ describe('FeatureFlagsAdminRepository', () => {
 
     const [flag] = await repository.findAll();
 
-    expect(flag).toMatchObject({ key: 'api_token_creation', targeting: null });
+    expect(flag).toMatchObject({ key: 'kill_switch', targeting: null });
   });
 
   it('turns targeting timestamps into dates', async () => {
@@ -63,12 +63,12 @@ describe('FeatureFlagsAdminRepository', () => {
       }),
     );
 
-    const flag = await repository.toggle('api_token_creation', {
+    const flag = await repository.toggle('kill_switch', {
       enabled: false,
       comment: 'incident 42',
     });
 
-    expect(featureFlagsApi.toggleFeatureFlag).toHaveBeenCalledWith('api_token_creation', {
+    expect(featureFlagsApi.toggleFeatureFlag).toHaveBeenCalledWith('kill_switch', {
       enabled: false,
       comment: 'incident 42',
     });
@@ -82,7 +82,7 @@ describe('FeatureFlagsAdminRepository', () => {
         {
           id: 'c1',
           subjectType: 'flag',
-          subjectKey: 'api_token_creation',
+          subjectKey: 'kill_switch',
           action: 'toggled',
           actorId: 'admin-1',
           comment: null,
@@ -94,7 +94,7 @@ describe('FeatureFlagsAdminRepository', () => {
       meta: { total: 1, page: 1, limit: 20, totalPages: 1 },
     });
 
-    const page = await repository.findChanges({ subjectKey: 'api_token_creation' });
+    const page = await repository.findChanges({ subjectKey: 'kill_switch' });
 
     expect(page.data[0]?.createdAt).toEqual(new Date('2026-09-01T10:00:00.000Z'));
     expect(page.meta.total).toBe(1);
