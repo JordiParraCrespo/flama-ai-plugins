@@ -256,9 +256,48 @@ export function pluginsHolding(id) {
     if (other === id || !existsSync(path)) continue;
     const plugin = JSON.parse(readFileSync(path, 'utf8'));
     const held = Object.entries(plugin.filesNeed ?? {})
-      .filter(([destination, owner]) => owner === id && plugin.files?.[destination])
+      .filter(
+        ([destination, owner]) =>
+          owner === id &&
+          plugin.files?.[destination] &&
+          !plugin.feature.paths.includes(destination),
+      )
       .map(([destination]) => [destination, plugin.files[destination]]);
     if (held.length) found.push([other, held]);
+  }
+  return found;
+}
+
+/**
+ * The plugins here reaching into `id`'s tree with things of their own — the
+ * docs site's deployment in the Helm chart, its hosts at the chart's slots:
+ * files they own that need `id` (`filesNeed`, and in their own `paths`), and
+ * blocks that need it. Installed without `id` they skipped those; `id`
+ * brings them when it arrives after them.
+ */
+export function pluginsReaching(id) {
+  const found = [];
+  for (const other of readdirSync(join(ROOT, 'plugins')).sort()) {
+    const path = join(ROOT, 'plugins', other, 'plugin.json');
+    if (other === id || !existsSync(path)) continue;
+    const plugin = JSON.parse(readFileSync(path, 'utf8'));
+    for (const kind of ['coOwned', 'snapshots']) {
+      if ((plugin[kind] ?? []).some((entry) => entry.needs === id)) {
+        fail(`${other}: ${kind} that need "${id}" cannot be carried by it yet`);
+      }
+    }
+    const files = Object.entries(plugin.filesNeed ?? {})
+      .filter(
+        ([destination, owner]) =>
+          owner === id && plugin.files?.[destination] && plugin.feature.paths.includes(destination),
+      )
+      .map(([destination]) => ({
+        destination,
+        source: plugin.files[destination],
+        at: plugin.feature.paths.indexOf(destination),
+      }));
+    const blocks = (plugin.blocks ?? []).filter((block) => block.needs === id);
+    if (files.length || blocks.length) found.push({ holder: other, files, blocks });
   }
   return found;
 }
@@ -514,6 +553,50 @@ async function main() {
       }
     }
 
+    // And the plugins reaching into this feature's tree: a plugin installed
+    // without it skipped its files and blocks here, so this feature carries
+    // them — each file installed only beside its plugin, and put back on that
+    // plugin's entry by a `json` edit; each block woven into the copied file
+    // at its slot, where the install trims it for a plugin the project lacks.
+    // Either can then be added after the other.
+    const json = [...(feature.json ?? [])];
+    for (const { holder, files: reaching, blocks: woven } of pluginsReaching(id)) {
+      const holderDir = join(ROOT, 'plugins', holder);
+      for (const { destination, source, at } of reaching) {
+        files[destination] = `files/${destination}`;
+        filesNeed[destination] = holder;
+        mkdirSync(dirname(join(out, 'files', destination)), { recursive: true });
+        cpSync(join(holderDir, source), join(out, 'files', destination), { recursive: true });
+        json.push({
+          file: 'scripts/starter/features.json',
+          path: ['features', holder, 'paths'],
+          remove: [destination],
+          at: [at],
+          needs: holder,
+        });
+        console.log(`  carry  ${destination} (from ${holder}, only with ${holder})`);
+      }
+      for (const block of woven) {
+        const target = join(out, 'files', block.file);
+        if (!existsSync(target)) {
+          fail(
+            `${holder}: a block for ${block.file} needs "${id}", which does not carry that file`,
+          );
+        }
+        const lines = readFileSync(target, 'utf8').split('\n');
+        const at = lines.findIndex((line) =>
+          new RegExp(`flama:plugins\\s+${block.anchor}(\\s|$)`).test(line),
+        );
+        if (at === -1) fail(`${block.file} has no "flama:plugins ${block.anchor}" anchor`);
+        const body = readFileSync(join(holderDir, block.source), 'utf8').replace(/\n$/, '');
+        lines.splice(at, 0, body);
+        writeFileSync(target, lines.join('\n'));
+        console.log(
+          `  weave  ${block.file} → ${block.anchor} (from ${holder}, only with ${holder})`,
+        );
+      }
+    }
+
     const covered = [...Object.keys(files), ...Object.keys(sharedFiles)];
     const orphan = deleted.find((file) => !covered.some((p) => file.startsWith(p)));
     if (orphan) {
@@ -531,7 +614,7 @@ async function main() {
         ...(feature.keeps ? { keeps: feature.keeps } : {}),
         ...(feature.requires ? { requires: feature.requires } : {}),
         ...(feature.scripts ? { scripts: feature.scripts } : {}),
-        ...(feature.json ? { json: feature.json } : {}),
+        ...(json.length ? { json } : {}),
         ...(feature.regenerate ? { regenerate: feature.regenerate } : {}),
         // Shared paths this feature is a dependant of. It does not own them —
         // they outlive it while another dependant remains — but its name is

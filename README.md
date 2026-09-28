@@ -16,6 +16,7 @@ pnpm plugin:remove cli
 | `mcp` | `apps/mcp` — the MCP server (stdio + Streamable HTTP), and the API's OAuth provider for MCP clients with its consent screen (requires `admin-api`, which its admin tools call) |
 | `runner` | `apps/runner` + `packages/go/*` — the Go service template (REST + WS, API keys) the API delegates long-lived work to, with its own CI workflow, compose service and Helm deployment |
 | `docs` | `apps/docs` — the Docusaurus site |
+| `helm` | `helm/` — the Kubernetes chart, with the deployments and hosts of the plugins already installed |
 | `admin-api` | `apps/api/src/admin` — `/v1/admin/users`, the user-administration API over Better Auth's `admin` plugin |
 | `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags (requires `admin-api`) |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane (requires `admin-api`) |
@@ -148,6 +149,14 @@ The owner's plugin, extracted from a starter without that tree, carries the
 same files from the plugin that holds them (`filesNeed` naming the holder),
 and replays that plugin's files carrying its fences, so either can be added
 after the other.
+
+A feature that leaves after plugins reached into its tree works the same way
+round. The Helm chart is where the docs site, the runner and the control planes
+keep a deployment of their own and a line at the chart's slots; installed
+without the chart, they skipped those. So the chart carries them: each file
+installed only beside its plugin and put back on that plugin's entry by a
+`json` edit, each block woven into the chart's own files at its slot, where the
+install trims it for a plugin the project lacks.
 
 Two things are excluded from the comparison, deliberately and visibly:
 `.changeset/` and `pnpm-lock.yaml`. The pruner rewrites a changeset's

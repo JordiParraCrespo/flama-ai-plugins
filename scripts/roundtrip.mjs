@@ -24,9 +24,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // A scratch tree can still be written to as it is removed (a git process that
-// outlives its command, such as a detached auto-gc), which fails a single
-// rmdir with ENOTEMPTY. Retry rather than report a clean round trip as a
-// failure.
+// outlives its command), which fails a single rmdir with ENOTEMPTY. Retry
+// rather than report a clean round trip as a failure; `scratchCopy` switches
+// off the auto-gc that did it.
 const CLEANUP = { recursive: true, force: true, maxRetries: 5, retryDelay: 200 };
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -107,6 +107,10 @@ function scratchCopy(repo) {
     `tar -c --exclude=node_modules --exclude=.git -C '${repo}' . | tar -x -C '${dir}'`,
   ]);
   git(dir, 'init', '-q');
+  // No background maintenance: a detached auto-gc outlives the command that
+  // started it and writes objects while the tree is being removed.
+  git(dir, 'config', 'gc.auto', '0');
+  git(dir, 'config', 'maintenance.auto', 'false');
   git(dir, 'add', '-A');
   git(dir, '-c', 'user.email=rt@flama', '-c', 'user.name=roundtrip', 'commit', '-qm', 'baseline');
   return dir;
@@ -215,13 +219,26 @@ function roundtrip(base, pruned, id, keep) {
     }
     for (const dep of needed) {
       if (
-        !run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', '--no-install', dep, '--from', ROOT], `add ${dep}`)
+        !run(
+          dir,
+          'node',
+          ['scripts/plugins/plugin.mjs', 'add', '--no-install', dep, '--from', ROOT],
+          `add ${dep}`,
+        )
       )
         return;
       console.log(`    ✓ installed ${dep} (required)`);
     }
 
-    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', '--no-install', id, '--from', ROOT], 'add')) return;
+    if (
+      !run(
+        dir,
+        'node',
+        ['scripts/plugins/plugin.mjs', 'add', '--no-install', id, '--from', ROOT],
+        'add',
+      )
+    )
+      return;
     console.log('    ✓ installed');
     const revived = git(dir, 'status', '--porcelain', '--untracked-files=all')
       .split('\n')
@@ -250,10 +267,19 @@ function roundtrip(base, pruned, id, keep) {
 
     if (ships && !reproducesStarter(dir, id)) return;
 
-    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', '--no-install', id], 'remove')) return;
+    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', '--no-install', id], 'remove'))
+      return;
     console.log('    ✓ removed');
     for (const dep of [...needed].reverse()) {
-      if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', '--no-install', dep], `remove ${dep}`)) return;
+      if (
+        !run(
+          dir,
+          'node',
+          ['scripts/plugins/plugin.mjs', 'remove', '--no-install', dep],
+          `remove ${dep}`,
+        )
+      )
+        return;
       console.log(`    ✓ removed ${dep}`);
     }
 
