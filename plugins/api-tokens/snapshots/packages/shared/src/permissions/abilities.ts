@@ -255,16 +255,6 @@ export function defineAbilitiesFromPermissions(
   return build();
 }
 
-// flama:begin api-tokens
-/**
- * Placeholder interpolated against the authenticated principal when the ability
- * is built (see {@link AbilityContext}) — it scopes a rule to the caller's own
- * resources.
- */
-// biome-ignore lint/suspicious/noTemplateCurlyInString: this is a condition placeholder, not a template literal
-const OWN_USER_ID = '${user.id}';
-// flama:end api-tokens
-
 /** Placeholder for the caller's active organization (see {@link AbilityContext}). */
 // biome-ignore lint/suspicious/noTemplateCurlyInString: this is a condition placeholder, not a template literal
 const ACTIVE_ORGANIZATION_ID = '${activeOrganizationId}';
@@ -330,23 +320,15 @@ export const SYSTEM_ROLE_PERMISSIONS: Record<string, PermissionDefinition[]> = {
     // workspace besides an invitation.
     { action: 'create', subject: 'Organization' },
     // flama:begin api-tokens
-    // Every user manages their own API tokens; the condition keeps them off
-    // everyone else's.
-    {
-      action: 'read',
+    // Every user manages their own API tokens; the condition — the caller's
+    // id, interpolated when the ability is built — keeps them off everyone
+    // else's.
+    ...(['read', 'create', 'delete'] as const).map((action) => ({
+      action,
       subject: 'ApiToken',
-      conditions: { userId: OWN_USER_ID },
-    },
-    {
-      action: 'create',
-      subject: 'ApiToken',
-      conditions: { userId: OWN_USER_ID },
-    },
-    {
-      action: 'delete',
-      subject: 'ApiToken',
-      conditions: { userId: OWN_USER_ID },
-    },
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: a condition placeholder, not a template literal
+      conditions: { userId: '${user.id}' },
+    })),
     // flama:end api-tokens
   ],
 };

@@ -1,5 +1,4 @@
 import { Checkbox, Field, FieldDescription, FieldLabel, Label } from '@flama/design-system-web';
-import { useOrganizations } from '@flama/frontend-consumer/organizations';
 import { useController, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -7,13 +6,16 @@ import { useTranslation } from 'react-i18next';
 type RestrictedToken = { organizationIds: string[] };
 
 /**
- * The organizations a new API token may be restricted to, as a field of the
- * create-token form: it reads the form from its context, so the API-tokens
- * feature knows nothing of organizations. Nothing to restrict to, nothing shown.
+ * The organizations a new token may be restricted to, as a field of the
+ * create-token form: it reads the form from its context, and the section that
+ * renders it fetches the organizations. Nothing to restrict to, nothing shown.
  */
-export function TokenOrganizationsField() {
+export function OrganizationRestrictionField({
+  organizations,
+}: {
+  organizations: readonly { id: string; name: string }[];
+}) {
   const { t } = useTranslation();
-  const organizations = useOrganizations().data ?? [];
   const { field } = useController<RestrictedToken, 'organizationIds'>({
     name: 'organizationIds',
   });

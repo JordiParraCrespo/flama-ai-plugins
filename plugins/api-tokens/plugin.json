@@ -18,7 +18,6 @@
       "apps/api/src/api-tokens",
       "apps/api/test/api-tokens.integration.spec.ts",
       "apps/web/src/features/api-tokens",
-      "apps/web/src/features/organizations/sections/token-organizations-field.tsx",
       "apps/web/src/routes/_authenticated/settings/api-tokens.tsx",
       "e2e/tests/api/api-tokens.spec.ts",
       "e2e/tests/web/api-tokens.spec.ts",
@@ -404,7 +403,6 @@
     "apps/api/src/api-tokens": "files/apps/api/src/api-tokens",
     "apps/api/test/api-tokens.integration.spec.ts": "files/apps/api/test/api-tokens.integration.spec.ts",
     "apps/web/src/features/api-tokens": "files/apps/web/src/features/api-tokens",
-    "apps/web/src/features/organizations/sections/token-organizations-field.tsx": "files/apps/web/src/features/organizations/sections/token-organizations-field.tsx",
     "apps/web/src/routes/_authenticated/settings/api-tokens.tsx": "files/apps/web/src/routes/_authenticated/settings/api-tokens.tsx",
     "e2e/tests/api/api-tokens.spec.ts": "files/e2e/tests/api/api-tokens.spec.ts",
     "e2e/tests/web/api-tokens.spec.ts": "files/e2e/tests/web/api-tokens.spec.ts",
@@ -426,7 +424,6 @@
   },
   "filesNeed": {
     "apps/web/src/features/api-tokens": "web",
-    "apps/web/src/features/organizations/sections/token-organizations-field.tsx": "organizations",
     "apps/web/src/routes/_authenticated/settings/api-tokens.tsx": "web",
     "e2e/tests/api/api-tokens.spec.ts": "e2e",
     "e2e/tests/web/api-tokens.spec.ts": "web"

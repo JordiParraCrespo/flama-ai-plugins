@@ -66,21 +66,6 @@
           }
         },
         "needs": "packages/frontend/consumer"
-      },
-      {
-        "file": "scripts/starter/features.json",
-        "path": [
-          "features",
-          "api-tokens",
-          "paths"
-        ],
-        "remove": [
-          "apps/web/src/features/organizations/sections/token-organizations-field.tsx"
-        ],
-        "at": [
-          3
-        ],
-        "needs": "api-tokens"
       }
     ],
     "regenerate": [
@@ -126,8 +111,7 @@
     "packages/frontend/consumer/src/modules/organizations": "files/packages/frontend/consumer/src/modules/organizations",
     "packages/frontend/consumer/src/organizations": "files/packages/frontend/consumer/src/organizations",
     "apps/mcp/src/tools/organizations.tools.ts": "files/apps/mcp/src/tools/organizations.tools.ts",
-    "apps/mcp/src/tools/workspaces.tools.ts": "files/apps/mcp/src/tools/workspaces.tools.ts",
-    "apps/web/src/features/organizations/sections/token-organizations-field.tsx": "files/apps/web/src/features/organizations/sections/token-organizations-field.tsx"
+    "apps/mcp/src/tools/workspaces.tools.ts": "files/apps/mcp/src/tools/workspaces.tools.ts"
   },
   "filesNeed": {
     "apps/mobile/app/onboarding.tsx": "mobile",
@@ -141,8 +125,7 @@
     "e2e/tests/web/onboarding.spec.ts": "web",
     "e2e/tests/web/organization-settings.spec.ts": "web",
     "apps/mcp/src/tools/organizations.tools.ts": "mcp",
-    "apps/mcp/src/tools/workspaces.tools.ts": "mcp",
-    "apps/web/src/features/organizations/sections/token-organizations-field.tsx": "api-tokens"
+    "apps/mcp/src/tools/workspaces.tools.ts": "mcp"
   },
   "filesNeedPath": {
     "packages/frontend/api-client/src/data-access/api/openapi/services/AccessGrantsApi.ts": "packages/frontend/api-client",
@@ -260,8 +243,8 @@
       "needs": "mcp"
     },
     {
-      "file": "apps/web/src/routes/_authenticated/settings/api-tokens.tsx",
-      "source": "snapshots/apps/web/src/routes/_authenticated/settings/api-tokens.tsx",
+      "file": "apps/web/src/features/api-tokens/sections/create-token-card.tsx",
+      "source": "snapshots/apps/web/src/features/api-tokens/sections/create-token-card.tsx",
       "needs": "api-tokens"
     },
     {

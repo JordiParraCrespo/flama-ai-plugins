@@ -64,8 +64,8 @@ const EMPTY_TOKEN_FORM: TokenFormFields = {
 
 /**
  * The full-page "create a token" form: name, permissions, lifetime, and the
- * fields another feature adds as `children` — they read the form from its
- * context, the way organizations adds the workspaces a token is restricted to.
+ * fields its section adds as `children` — they read the form from its context,
+ * the way the organizations a token is restricted to does.
  */
 export function CreateTokenForm({
   groups,

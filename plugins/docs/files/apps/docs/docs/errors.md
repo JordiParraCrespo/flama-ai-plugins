@@ -114,7 +114,7 @@ What any scoped credential can fail on — an API token, an OAuth grant.
 
 | Code                             | Title                                                              | HTTP |
 | -------------------------------- | ------------------------------------------------------------------ | ---- |
-| `TOKEN_003` <a id="token_003" /> | Invalid or expired API token                                       | 401  |
+| `TOKEN_003` <a id="token_003" /> | Invalid or expired credential                                      | 401  |
 | `TOKEN_005` <a id="token_005" /> | This credential is missing a permission required by this endpoint  | 403  |
 | `TOKEN_006` <a id="token_006" /> | This endpoint cannot be called with a scoped credential            | 403  |
 | `TOKEN_007` <a id="token_007" /> | This credential is not scoped to that organization                 | 403  |
