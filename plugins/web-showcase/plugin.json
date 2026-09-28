@@ -51,6 +51,7 @@
         "neededBy": [
           "web",
           "mobile",
+          "mobile-showcase",
           "web-showcase"
         ]
       }

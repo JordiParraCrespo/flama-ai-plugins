@@ -59,21 +59,21 @@ export function AssignRolesDialog({
             <Skeleton className="h-12 w-full rounded-xl" />
           </div>
         ) : (
-        <AssignRolesForm
-          roles={roles.data?.data ?? []}
-          assignedRoles={assignedRoles.data}
-          isPending={assign.isPending}
-          error={assign.error}
-          onCancel={onClose}
-          onSubmit={async ({ roleIds }) => {
-            try {
-              await assign.mutateAsync({ userId: user.id, roleIds });
-              onClose();
-            } catch {
-              // The request error stays visible in the dialog.
-            }
-          }}
-        />
+          <AssignRolesForm
+            roles={roles.data?.data ?? []}
+            assignedRoles={assignedRoles.data}
+            isPending={assign.isPending}
+            error={assign.error}
+            onCancel={onClose}
+            onSubmit={async ({ roleIds }) => {
+              try {
+                await assign.mutateAsync({ userId: user.id, roleIds });
+                onClose();
+              } catch {
+                // The request error stays visible in the dialog.
+              }
+            }}
+          />
         )}
       </DialogContent>
     </Dialog>
