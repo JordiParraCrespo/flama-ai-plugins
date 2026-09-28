@@ -13,6 +13,9 @@ import { FeatureFlagMapper } from '../feature-flag.mapper';
 import { FeatureFlagOrmEntity } from './feature-flag.orm-entity';
 import type { FeatureFlagRepositoryPort } from './feature-flag.repository.port';
 
+/** The advisory lock every flag and segment write holds: `'flag'` as a bigint. */
+const FLAG_WRITE_LOCK = 0x666c6167;
+
 /**
  * TypeORM adapter for flag targeting. Stages the aggregate's change events on
  * the transactional outbox with the write, so an audited change and the change
@@ -27,6 +30,9 @@ export class FeatureFlagRepository implements FeatureFlagRepositoryPort {
     private readonly mapper: FeatureFlagMapper,
     private readonly outbox: OutboxService,
   ) {}
+
+  /** The writes this replica has queued, so each holds one connection at a time. */
+  private queue: Promise<unknown> = Promise.resolve();
 
   async insert(entity: FeatureFlagEntity | FeatureFlagEntity[]): Promise<void> {
     const entities = Array.isArray(entity) ? entity : [entity];
@@ -88,6 +94,22 @@ export class FeatureFlagRepository implements FeatureFlagRepositoryPort {
       manager.getRepository(FeatureFlagOrmEntity).delete({ id: entity.id as AggregateID }),
     );
     return result.affected ? result.affected > 0 : false;
+  }
+
+  serialized<T>(work: () => Promise<T>): Promise<T> {
+    // Queued here first: a write waiting on the lock holds a pooled
+    // connection, and the one holding it needs another for its own queries,
+    // so replica-wide waiters could otherwise starve the pool. The lock is
+    // transaction-scoped: it is released when the transaction ends, after
+    // `work` has committed its writes.
+    const run = this.queue.then(() =>
+      this.dataSource.transaction(async (manager) => {
+        await manager.query('SELECT pg_advisory_xact_lock($1)', [FLAG_WRITE_LOCK]);
+        return work();
+      }),
+    );
+    this.queue = run.catch(() => undefined);
+    return run;
   }
 
   transaction<T>(handler: () => Promise<T>): Promise<T> {

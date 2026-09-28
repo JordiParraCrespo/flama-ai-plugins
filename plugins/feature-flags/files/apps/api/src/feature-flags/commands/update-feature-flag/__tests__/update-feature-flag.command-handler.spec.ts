@@ -15,7 +15,7 @@ vi.mock('@flama/shared', async (importOriginal) => {
 });
 
 describe('UpdateFeatureFlagCommandHandler', () => {
-  let flags: Pick<FeatureFlagRepositoryPort, 'findOneByKey' | 'save'>;
+  let flags: Pick<FeatureFlagRepositoryPort, 'findOneByKey' | 'save' | 'serialized'>;
   let segments: Pick<FlagSegmentRepositoryPort, 'findAll'>;
   let handler: UpdateFeatureFlagCommandHandler;
 
@@ -23,6 +23,7 @@ describe('UpdateFeatureFlagCommandHandler', () => {
     flags = {
       findOneByKey: vi.fn().mockResolvedValue(None),
       save: vi.fn().mockImplementation(async (flag) => flag),
+      serialized: vi.fn((work) => work()),
     };
     segments = {
       findAll: vi.fn().mockResolvedValue([
@@ -58,6 +59,14 @@ describe('UpdateFeatureFlagCommandHandler', () => {
       actorId: 'admin-1',
       ...overrides,
     });
+
+  it('checks the segments and saves under the flag write lock', async () => {
+    vi.mocked(flags.serialized).mockImplementation(async () => 'held');
+
+    expect(await handler.execute(command())).toBe('held');
+    expect(segments.findAll).not.toHaveBeenCalled();
+    expect(flags.save).not.toHaveBeenCalled();
+  });
 
   it('creates the row on first save and audits the change', async () => {
     await handler.execute(command());
