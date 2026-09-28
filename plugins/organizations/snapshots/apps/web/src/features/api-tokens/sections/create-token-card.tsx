@@ -48,7 +48,7 @@ export function CreateTokenCard() {
   const [secret, setSecret] = useState<string | null>(null);
   const creationEnabled = useFeatureFlag('api_token_creation');
   // flama:begin organizations
-  const organizations = useOrganizations().data ?? [];
+  const organizations = useOrganizations();
   // flama:end organizations
 
   return (
@@ -81,7 +81,10 @@ export function CreateTokenCard() {
               }}
             >
               {/* flama:begin organizations */}
-              <OrganizationRestrictionField organizations={organizations} />
+              <OrganizationRestrictionField
+                organizations={organizations.data}
+                status={organizations.status}
+              />
               {/* flama:end organizations */}
             </CreateTokenForm>
           </CardContent>

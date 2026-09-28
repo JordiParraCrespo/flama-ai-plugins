@@ -11,6 +11,7 @@
   "permissionsHint": "Editar incluye Leer. Concede lo mínimo necesario.",
   "organizations": "Organizaciones",
   "organizationsHint": "Déjalas sin marcar para que el token siga tus membresías.",
+  "organizationsUnavailable": "Tus organizaciones no se han cargado, así que aún no se puede crear este token.",
   "expiry": "Caduca",
   "never": "Nunca",
   "days": "{{count}} días",

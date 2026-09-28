@@ -11,6 +11,7 @@
   "permissionsHint": "Edit includes Read. Grant the least that will do the job.",
   "organizations": "Organizations",
   "organizationsHint": "Leave all unticked to let the token follow your memberships.",
+  "organizationsUnavailable": "Your organizations have not loaded, so this token cannot be created yet.",
   "expiry": "Expires",
   "never": "Never",
   "days": "{{count}} days",
