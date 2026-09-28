@@ -11,6 +11,9 @@
     "paths": [
       "apps/cli",
       "apps/docs/docs/tooling/cli.md"
+    ],
+    "requires": [
+      "api-tokens"
     ]
   },
   "files": {

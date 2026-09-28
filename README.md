@@ -12,11 +12,12 @@ pnpm plugin:remove cli
 
 | Plugin | What it adds |
 |---|---|
-| `cli` | `apps/cli` — the `flama` command-line interface, driven by scoped API tokens |
-| `mcp` | `apps/mcp` — the MCP server (stdio + Streamable HTTP), and the API's OAuth provider for MCP clients with its consent screen (requires `admin-api`, which its admin tools call) |
+| `cli` | `apps/cli` — the `flama` command-line interface, driven by scoped API tokens (requires `api-tokens`) |
+| `mcp` | `apps/mcp` — the MCP server (stdio + Streamable HTTP), and the API's OAuth provider for MCP clients with its consent screen (requires `admin-api`, which its admin tools call, and `api-tokens`) |
 | `runner` | `apps/runner` + `packages/go/*` — the Go service template (REST + WS, API keys) the API delegates long-lived work to, with its own CI workflow, compose service and Helm deployment |
 | `docs` | `apps/docs` — the Docusaurus site |
 | `helm` | `helm/` — the Kubernetes chart, with the deployments and hosts of the plugins already installed |
+| `api-tokens` | `apps/api/src/api-tokens` — `/v1/tokens`, the personal access tokens a script, the CLI or the MCP server acts with, and the settings screen that mints and revokes them; the API's scoped credential, bound to the kernel's `SCOPED_CREDENTIAL` |
 | `admin-api` | `apps/api/src/admin` — `/v1/admin/users`, the user-administration API over Better Auth's `admin` plugin |
 | `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags (requires `admin-api`) |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane (requires `admin-api`) |
