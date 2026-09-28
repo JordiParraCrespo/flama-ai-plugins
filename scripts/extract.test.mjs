@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { anchorAt, anchorBeside, coOwnedBlocks, ownerOf, removalHunks } from './extract.mjs';
+import {
+  anchorAt,
+  anchorBeside,
+  coOwnedBlocks,
+  ownerOf,
+  pluginsHolding,
+  pluginsReaching,
+  removalHunks,
+} from './extract.mjs';
 
 test('removalHunks reads the deleted runs out of a -U0 diff', () => {
   const diff = [
@@ -120,4 +128,30 @@ test('ownerOf names the innermost feature or shared path a file lives in', () =>
   assert.equal(ownerOf(manifest, 'e2e/support/teams.ts', 'teams'), 'e2e');
   assert.equal(ownerOf(manifest, 'packages/kit/src/teams', 'teams'), 'packages/kit');
   assert.equal(ownerOf(manifest, 'packages/auth/src/teams.ts', 'teams'), null);
+});
+
+test('pluginsReaching names what the plugins here keep in the Helm chart', () => {
+  const reaching = Object.fromEntries(
+    pluginsReaching('helm').map(({ holder, files, blocks }) => [
+      holder,
+      {
+        files: files.map((file) => file.destination),
+        blocks: blocks.map((block) => `${block.file} ${block.anchor}`),
+      },
+    ]),
+  );
+  assert.deepEqual(reaching.docs.files, ['helm/flama/templates/docs-deployment.yaml']);
+  assert.ok(reaching.docs.blocks.includes('helm/flama/values.yaml services'));
+  assert.deepEqual(reaching['admin-mobile'].files, []);
+  assert.deepEqual(reaching['admin-mobile'].blocks, ['helm/flama/values.yaml api-env']);
+  assert.equal(reaching.helm, undefined);
+});
+
+test('pluginsHolding leaves a plugin its own files, and carries only what it holds', () => {
+  assert.deepEqual(pluginsHolding('helm'), []);
+  const held = Object.fromEntries(pluginsHolding('organizations'));
+  assert.deepEqual(
+    held.mcp.map(([destination]) => destination),
+    ['apps/mcp/src/tools/organizations.tools.ts', 'apps/mcp/src/tools/workspaces.tools.ts'],
+  );
 });

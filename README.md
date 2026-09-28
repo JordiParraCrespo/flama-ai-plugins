@@ -149,6 +149,14 @@ same files from the plugin that holds them (`filesNeed` naming the holder),
 and replays that plugin's files carrying its fences, so either can be added
 after the other.
 
+A feature that leaves after plugins reached into its tree works the same way
+round. The Helm chart is where the docs site, the runner and the control planes
+keep a deployment of their own and a line at the chart's slots; installed
+without the chart, they skipped those. So the chart carries them: each file
+installed only beside its plugin and put back on that plugin's entry by a
+`json` edit, each block woven into the chart's own files at its slot, where the
+install trims it for a plugin the project lacks.
+
 Two things are excluded from the comparison, deliberately and visibly:
 `.changeset/` and `pnpm-lock.yaml`. The pruner rewrites a changeset's
 frontmatter to drop a removed package, and a plugin restoring that would be

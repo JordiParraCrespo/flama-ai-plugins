@@ -215,13 +215,26 @@ function roundtrip(base, pruned, id, keep) {
     }
     for (const dep of needed) {
       if (
-        !run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', '--no-install', dep, '--from', ROOT], `add ${dep}`)
+        !run(
+          dir,
+          'node',
+          ['scripts/plugins/plugin.mjs', 'add', '--no-install', dep, '--from', ROOT],
+          `add ${dep}`,
+        )
       )
         return;
       console.log(`    ✓ installed ${dep} (required)`);
     }
 
-    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'add', '--no-install', id, '--from', ROOT], 'add')) return;
+    if (
+      !run(
+        dir,
+        'node',
+        ['scripts/plugins/plugin.mjs', 'add', '--no-install', id, '--from', ROOT],
+        'add',
+      )
+    )
+      return;
     console.log('    ✓ installed');
     const revived = git(dir, 'status', '--porcelain', '--untracked-files=all')
       .split('\n')
@@ -250,10 +263,19 @@ function roundtrip(base, pruned, id, keep) {
 
     if (ships && !reproducesStarter(dir, id)) return;
 
-    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', '--no-install', id], 'remove')) return;
+    if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', '--no-install', id], 'remove'))
+      return;
     console.log('    ✓ removed');
     for (const dep of [...needed].reverse()) {
-      if (!run(dir, 'node', ['scripts/plugins/plugin.mjs', 'remove', '--no-install', dep], `remove ${dep}`)) return;
+      if (
+        !run(
+          dir,
+          'node',
+          ['scripts/plugins/plugin.mjs', 'remove', '--no-install', dep],
+          `remove ${dep}`,
+        )
+      )
+        return;
       console.log(`    ✓ removed ${dep}`);
     }
 
