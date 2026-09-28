@@ -18,7 +18,7 @@ mobile.
 | Package                   | Name                      | Holds                                                                                                  |
 | ------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `packages/frontend/core`      | `@flama/frontend-core`      | The kernel every app loads: `auth`, `users`, `user-settings`, `capabilities`, `analytics`, the InversifyJS container (`FlamaApp`, `TOKENS`), `config/`, `validation/` |
-| `packages/frontend/consumer`  | `@flama/frontend-consumer`  | The consumer product: `api-tokens`, `organizations`, `profile`                                        |
+| `packages/frontend/consumer`  | `@flama/frontend-consumer`  | The consumer product: `organizations`, `profile`                                                      |
 | `packages/frontend/admin`     | `@flama/frontend-admin`     | The control plane: `admin-users`, `roles`                                                             |
 | `packages/frontend/api-client`| `@flama/api-client`         | The typed client generated from the API's OpenAPI spec                                                |
 | `packages/frontend/web`       | `@flama/frontend-web`       | What both Vite apps share, by concern: `shell`, `auth`, `table`, `layout`, `forms`, `theme`, `i18n`, `analytics`, `platform`, `roles` |
@@ -152,8 +152,7 @@ The consumer app's account flows sit under `apps/web/src/routes`:
 | `/onboarding`             | Where a signed-in account with no workspace lands. It creates the first organization or accepts an invitation already addressed to the account. `_authenticated` redirects here once the organizations list resolves empty. | `features/organizations`       |
 | `/accept-invitation`      | Invitation links carry `id`, `email`, `name`, `role` and `inviter`. A newcomer registers from the link and the acceptance completes in the same submission; an existing account signs in and is returned to the link. | `features/organizations`       |
 | `/profile`                | The signed-in user's own account, as four panes: details, password, sessions and preferences. Theme and language apply to the device at once and the saved copy becomes the default elsewhere.        | `features/profile`             |
-| `/settings`               | Three panes, with the open one in `?section=`: the workspace's name and mark (`general`), the reader's sessions (`security`), and their API keys (`api`).                                              | `features/organizations`, `features/profile`, `features/api-tokens` |
-| `/settings/api-tokens`    | The full API-token screen behind the settings pane.                                                                                                                                                    | `features/api-tokens`          |
+| `/settings`               | Two panes, with the open one in `?section=`: the workspace's name and mark (`general`) and the reader's sessions (`security`). | `features/organizations`, `features/profile` |
 | `/oauth/consent`          | The consent screen an OAuth client is sent to.                                                                                                                                                         | `features/auth`                |
 
 The sidebar and command palette are gated by the caller's permissions: each nav

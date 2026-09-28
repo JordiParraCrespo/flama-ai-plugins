@@ -533,6 +533,11 @@
     {
       "file": "packages/translations/namespaces.ts",
       "source": "snapshots/packages/translations/namespaces.ts"
+    },
+    {
+      "file": "apps/docs/docs/errors.md",
+      "source": "snapshots/apps/docs/docs/errors.md",
+      "needs": "docs"
     }
   ]
 }

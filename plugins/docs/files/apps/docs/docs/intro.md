@@ -17,7 +17,7 @@ Full-stack monorepo boilerplate for bootstrapping applications fast.
 - **apps/docs** — This documentation site (Docusaurus)
 - **packages/shared** — Zod schemas, types, CASL permissions
 - **packages/frontend/core** — The kernel every app loads: session, users, user settings, capabilities, analytics, InversifyJS DI
-- **packages/frontend/consumer** — The consumer product's domain: organizations, profile, api-tokens
+- **packages/frontend/consumer** — The consumer product's domain: organizations, profile
 - **packages/frontend/admin** — The control plane's domain: admin-users, roles
 - **packages/frontend/web** — What both Vite apps share below their routes
 - **packages/frontend/mobile** — What both Expo apps share below their routes
