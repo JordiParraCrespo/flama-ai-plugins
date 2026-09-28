@@ -41,6 +41,12 @@
       "e2e/tests/web/organization-settings.spec.ts",
       "packages/auth/src/organization-client.ts",
       "packages/auth/src/organization-options.ts",
+      "packages/frontend/api-client/src/data-access/api/openapi/services/AccessGrantsApi.ts",
+      "packages/frontend/api-client/src/data-access/api/openapi/services/InvitationsApi.ts",
+      "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationInvitationsApi.ts",
+      "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationMembersApi.ts",
+      "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationsApi.ts",
+      "packages/frontend/api-client/src/data-access/api/openapi/services/WorkspacesApi.ts",
       "packages/frontend/consumer/src/modules/organizations",
       "packages/frontend/consumer/src/organizations"
     ],
@@ -96,6 +102,12 @@
     "e2e/tests/web/organization-settings.spec.ts": "files/e2e/tests/web/organization-settings.spec.ts",
     "packages/auth/src/organization-client.ts": "files/packages/auth/src/organization-client.ts",
     "packages/auth/src/organization-options.ts": "files/packages/auth/src/organization-options.ts",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/AccessGrantsApi.ts": "files/packages/frontend/api-client/src/data-access/api/openapi/services/AccessGrantsApi.ts",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/InvitationsApi.ts": "files/packages/frontend/api-client/src/data-access/api/openapi/services/InvitationsApi.ts",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationInvitationsApi.ts": "files/packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationInvitationsApi.ts",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationMembersApi.ts": "files/packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationMembersApi.ts",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationsApi.ts": "files/packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationsApi.ts",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/WorkspacesApi.ts": "files/packages/frontend/api-client/src/data-access/api/openapi/services/WorkspacesApi.ts",
     "packages/frontend/consumer/src/modules/organizations": "files/packages/frontend/consumer/src/modules/organizations",
     "packages/frontend/consumer/src/organizations": "files/packages/frontend/consumer/src/organizations",
     "apps/mcp/src/tools/organizations.tools.ts": "files/apps/mcp/src/tools/organizations.tools.ts",
@@ -116,6 +128,12 @@
     "apps/mcp/src/tools/workspaces.tools.ts": "mcp"
   },
   "filesNeedPath": {
+    "packages/frontend/api-client/src/data-access/api/openapi/services/AccessGrantsApi.ts": "packages/frontend/api-client",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/InvitationsApi.ts": "packages/frontend/api-client",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationInvitationsApi.ts": "packages/frontend/api-client",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationMembersApi.ts": "packages/frontend/api-client",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationsApi.ts": "packages/frontend/api-client",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/WorkspacesApi.ts": "packages/frontend/api-client",
     "packages/frontend/consumer/src/modules/organizations": "packages/frontend/consumer",
     "packages/frontend/consumer/src/organizations": "packages/frontend/consumer"
   },
