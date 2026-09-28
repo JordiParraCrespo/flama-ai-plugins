@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import {
   anchorAt,
@@ -145,6 +146,22 @@ test('pluginsReaching names what the plugins here keep in the Helm chart', () =>
   assert.deepEqual(reaching['admin-mobile'].files, []);
   assert.deepEqual(reaching['admin-mobile'].blocks, ['helm/flama/values.yaml api-env']);
   assert.equal(reaching.helm, undefined);
+});
+
+test('pluginsReaching names the files of a plugin that carry this feature’s fences', () => {
+  const tokens = pluginsReaching('organizations').find(({ holder }) => holder === 'api-tokens');
+  assert.ok(tokens, 'api-tokens reaches into organizations');
+  assert.ok(tokens.fenced.includes('apps/web/src/features/api-tokens/sections/create-token-card.tsx'));
+});
+
+test('pluginsReaching leaves a feature the replays into its own files', () => {
+  // Organizations fills its fences in the token screen from its side; those
+  // files are api-tokens' own, so extracting api-tokens carries them whole.
+  const own = JSON.parse(
+    readFileSync(new URL('../plugins/api-tokens/plugin.json', import.meta.url), 'utf8'),
+  ).feature.paths;
+  const docs = pluginsReaching('api-tokens', own).find(({ holder }) => holder === 'docs');
+  assert.deepEqual(docs?.fenced, ['apps/docs/docs/errors.md']);
 });
 
 test('pluginsHolding leaves a plugin its own files, and carries only what it holds', () => {

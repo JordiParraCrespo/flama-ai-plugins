@@ -23,7 +23,7 @@ flama/
 │   ├── config/           # Shared TS and tooling configs
 │   ├── frontend/
 │   │   ├── core/         # Kernel every app loads: session, users, settings, DI (@flama/frontend-core)
-│   │   ├── consumer/     # Consumer domain: organizations, profile, api-tokens (@flama/frontend-consumer)
+│   │   ├── consumer/     # Consumer domain: organizations, profile (@flama/frontend-consumer)
 │   │   ├── admin/        # Control-plane domain: admin-users, roles (@flama/frontend-admin)
 │   │   ├── api-client/   # Auto-generated typed client from Swagger (@flama/api-client)
 │   │   ├── web/          # What both Vite apps share (@flama/frontend-web)

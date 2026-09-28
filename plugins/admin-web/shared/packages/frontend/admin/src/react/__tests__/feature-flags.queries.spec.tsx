@@ -22,11 +22,11 @@ import { fakeKernel } from './fake-kernel';
 function setup() {
   const featureFlags = {
     findAll: vi.fn().mockResolvedValue([]),
-    update: vi.fn().mockResolvedValue({ key: 'api_token_creation' }),
-    toggle: vi.fn().mockResolvedValue({ key: 'api_token_creation' }),
+    update: vi.fn().mockResolvedValue({ key: 'kill_switch' }),
+    toggle: vi.fn().mockResolvedValue({ key: 'kill_switch' }),
     evaluate: vi
       .fn()
-      .mockResolvedValue({ key: 'api_token_creation', value: true, reason: 'DEFAULT' }),
+      .mockResolvedValue({ key: 'kill_switch', value: true, reason: 'DEFAULT' }),
     deleteSegment: vi.fn().mockResolvedValue(undefined),
   };
   const app = fakeKernel({ [TOKENS.FeatureFlagsAdminService]: featureFlags });
@@ -50,12 +50,12 @@ describe('flag writes', () => {
     const { result } = renderHook(() => useToggleFeatureFlag(), { wrapper });
 
     result.current.mutate({
-      key: 'api_token_creation',
+      key: 'kill_switch',
       dto: { enabled: false, comment: 'incident' },
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(featureFlags.toggle).toHaveBeenCalledWith('api_token_creation', {
+    expect(featureFlags.toggle).toHaveBeenCalledWith('kill_switch', {
       enabled: false,
       comment: 'incident',
     });
@@ -68,7 +68,7 @@ describe('flag writes', () => {
     const { result } = renderHook(() => useUpdateFeatureFlag(), { wrapper });
 
     result.current.mutate({
-      key: 'api_token_creation',
+      key: 'kill_switch',
       dto: { enabled: true, rules: [], fallthrough: { value: true } },
     });
 
@@ -93,7 +93,7 @@ describe('useExplainFeatureFlag', () => {
     const { wrapper, featureFlags } = setup();
     const { result, rerender } = renderHook(
       ({ context }: { context: { userId?: string } | null }) =>
-        useExplainFeatureFlag('api_token_creation', context),
+        useExplainFeatureFlag('kill_switch', context),
       { wrapper, initialProps: { context: null as { userId?: string } | null } },
     );
 
@@ -101,6 +101,6 @@ describe('useExplainFeatureFlag', () => {
 
     rerender({ context: { userId: 'u1' } });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(featureFlags.evaluate).toHaveBeenCalledWith('api_token_creation', { userId: 'u1' });
+    expect(featureFlags.evaluate).toHaveBeenCalledWith('kill_switch', { userId: 'u1' });
   });
 });

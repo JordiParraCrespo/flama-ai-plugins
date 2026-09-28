@@ -107,6 +107,10 @@ jobs:
       # An absolute path: `--from` resolves against the starter's root, not the
       # working directory, so that the same argument means the same thing from
       # anywhere in a project. `.` would name the starter checkout itself.
+      # The CLI acts with an API token, so the plugin that mints them goes in
+      # first. Its generated client is rebuilt by nothing the CLI builds on.
+      - name: Install what the plugin requires
+        run: node .flama-ai/scripts/plugins/plugin.mjs add api-tokens --from "$GITHUB_WORKSPACE" --no-install
       - name: Install the plugin
         run: node .flama-ai/scripts/plugins/plugin.mjs add cli --from "$GITHUB_WORKSPACE"
       - name: Install dependencies

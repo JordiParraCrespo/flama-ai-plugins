@@ -25,7 +25,8 @@
       "e2e/tests/web/oauth-consent.spec.ts"
     ],
     "requires": [
-      "admin-api"
+      "admin-api",
+      "api-tokens"
     ],
     "keeps": {
       "apps/api/src/migrations": "the OAuth tables arrive in the same migration as the API tokens, which stay, so a project without the MCP server keeps them, empty"
