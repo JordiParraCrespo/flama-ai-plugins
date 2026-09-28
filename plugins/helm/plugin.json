@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Kubernetes Helm chart",
-    "summary": "helm/ — chart for the Tier 2 (Kubernetes) deployment",
+    "summary": "helm/ — the Kubernetes chart",
     "identifiers": [
       "helm/"
     ],

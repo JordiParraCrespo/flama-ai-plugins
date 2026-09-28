@@ -23,9 +23,10 @@ api:
     ADMIN_FRONTEND_URL: https://control.flama.dev
     # flama:end admin-web
     # flama:plugins api-env
-    DB_HOST: flama-postgres
+    # Rendered as templates, so a host can follow the release name.
+    DB_HOST: "{{ .Release.Name }}-postgres"
     DB_PORT: "5432"
-    REDIS_HOST: flama-redis
+    REDIS_HOST: "{{ .Release.Name }}-redis"
     REDIS_PORT: "6379"
 
 # flama:begin web

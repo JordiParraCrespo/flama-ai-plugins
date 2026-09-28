@@ -26,7 +26,7 @@ spec:
           env:
             {{- range $key, $value := .Values.api.env }}
             - name: {{ $key }}
-              value: {{ $value | quote }}
+              value: {{ tpl (toString $value) $ | quote }}
             {{- end }}
           resources:
             {{- toYaml .Values.api.resources | nindent 12 }}

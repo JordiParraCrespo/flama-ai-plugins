@@ -1,16 +1,13 @@
-# Tier 2: Production Deployment (~€15-35/mo)
+# Helm chart
 
-For production applications with Kubernetes on Hetzner.
-
-## Architecture
-
-Everything runs as Docker containers in a Hetzner Kubernetes cluster, deployed via Helm charts.
+Deploys the API, the consumer web app, Postgres and Redis to a Kubernetes
+cluster, each as a Docker container.
 
 ## Setup
 
-### 1. Create a Hetzner K8s Cluster
+### 1. Create a cluster
 
-Use Hetzner Cloud Console or `hcloud` CLI to create a cluster.
+Any Kubernetes cluster with an ingress controller will do.
 
 ### 2. Install Helm Charts
 
@@ -21,10 +18,11 @@ helm install flama ./helm/flama \
   --set web.image=ghcr.io/your-org/flama-web:latest
 ```
 
-The chart ships what the starter ships: the API, the consumer web app,
-Postgres and Redis. `pnpm plugin:add admin-web`, `pnpm plugin:add docs` and
-`pnpm plugin:add runner` add their deployments, values and ingress rules back,
-and then `adminWeb.image`, `docs.image` and `runner.image` are settable too.
+The release name prefixes every resource, and the API finds Postgres and
+Redis through it. `pnpm plugin:add admin-web`, `pnpm plugin:add docs` and
+`pnpm plugin:add runner` bring their deployments, values and ingress rules,
+added before the chart or after it, and then `adminWeb.image`, `docs.image`
+and `runner.image` are settable too.
 
 ### 3. Configure Ingress
 
