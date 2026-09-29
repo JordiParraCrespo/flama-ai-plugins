@@ -3,8 +3,7 @@
 The control plane's domain, on top of the kernel. It holds what
 `apps/admin-web` and `apps/admin-mobile` need and the consumer apps do not:
 platform user lifecycle (create, update, ban, delete, sessions, passwords,
-platform role), the database-backed roles and permissions, and operating
-feature flags (targeting, kill switches, segments, the audit trail). Each module is
+platform role) and the database-backed roles and permissions. Each module is
 an entity, an error catalog, a repository over `@flama/api-client`, a service
 and an InversifyJS `ContainerModule`; `src/react/` turns those services into
 TanStack Query hooks. It is platform-free, and it never imports
@@ -19,17 +18,12 @@ An app becomes the control plane by loading `adminModules` into
 
 - **di** — `AdminApp`, `adminModules`, `TOKENS` (the kernel's spread, plus
   `AdminUsersRepository`, `AdminUsersService`, `RolesRepository`,
-  `RolesService`, `FeatureFlagsAdminRepository`, `FeatureFlagsAdminService`).
+  `RolesService`).
 - **modules/admin-users** — `AdminUserEntity`, `AdminSessionEntity`,
   `AdminUsersService`, `AdminUsersRepository`, `AdminUsersModule`,
   `AdminUsersErrors`, `AdminUsersListParams`.
 - **modules/roles** — `RoleEntity` and the rest of `role.entity.ts`,
   `RolesService`, `RolesRepository`, `RolesModule`, `RolesErrors`.
-- **modules/feature-flags** — `FeatureFlag`, `FlagSegment`, `FlagChange` and
-  the rest of `feature-flag.entity.ts`, `FeatureFlagsAdminService`,
-  `FeatureFlagsAdminRepository`, `FeatureFlagsAdminModule`,
-  `FeatureFlagsAdminErrors`. Operating flags, as opposed to reading the
-  caller's own, which is the kernel's `useFeatureFlag`.
 
 `@flama/frontend-admin/react` (`src/react/index.ts`):
 
@@ -42,11 +36,6 @@ An app becomes the control plane by loading `adminModules` into
 - Roles: `useRoles`, `useCreateRole`, `useUpdateRole`, `useDeleteRole`,
   `useUserRoles`, `useUsersRoles`, `useAssignUserRoles`,
   `useAuthorizationCatalog`, `rolesKeys`.
-- Feature flags: `useManagedFeatureFlags`, `useUpdateFeatureFlag`,
-  `useToggleFeatureFlag`, `useExplainFeatureFlag`, `useFlagSegments`,
-  `useCreateFlagSegment`, `useUpdateFlagSegment`, `useDeleteFlagSegment`,
-  `useFlagChanges`, `flagAdminKeys`. Every write also invalidates the kernel's
-  `featureFlagKeys`, since the operator's own flags may have moved.
 
 ## How to use it
 

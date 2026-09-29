@@ -151,11 +151,11 @@ test('pluginsReaching names what the plugins here keep in the Helm chart', () =>
 test('pluginsReaching names the files of a plugin that carry this feature’s fences', () => {
   const tokens = pluginsReaching('organizations').find(({ holder }) => holder === 'api-tokens');
   assert.ok(tokens, 'api-tokens reaches into organizations');
-  assert.ok(tokens.fenced.includes('apps/web/src/features/api-tokens/sections/create-token-card.tsx'));
+  assert.ok(tokens.fenced.includes('e2e/tests/api/api-tokens.spec.ts'));
 });
 
 test('pluginsReaching leaves a feature the replays into its own files', () => {
-  // Organizations fills its fences in the token screen from its side; those
+  // Organizations fills its fences in the token spec from its side; those
   // files are api-tokens' own, so extracting api-tokens carries them whole.
   const own = JSON.parse(
     readFileSync(new URL('../plugins/api-tokens/plugin.json', import.meta.url), 'utf8'),

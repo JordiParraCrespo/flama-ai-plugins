@@ -1,0 +1,3 @@
+  // flama:begin feature-flags
+  'feature-flags.ts',
+  // flama:end feature-flags

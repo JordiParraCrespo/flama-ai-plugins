@@ -7,7 +7,6 @@ import { describe, expect, it } from 'vitest';
 // flama:begin api-tokens
 import { FindApiTokensHttpController } from '../../api-tokens/queries/find-api-tokens/find-api-tokens.http.controller';
 // flama:end api-tokens
-import { FindFeatureFlagsHttpController } from '../../feature-flags/queries/find-feature-flags/find-feature-flags.http.controller';
 // flama:plugins handler-imports
 // flama:begin organizations
 import { MembersController } from '../../organizations/members.controller';
@@ -42,10 +41,6 @@ const HANDLERS: Record<GuardedEndpoint, { controller: object; handler: string }>
   // flama:end api-tokens
   // flama:begin admin-api
   // flama:end admin-api
-  '/feature-flags/admin': {
-    controller: FindFeatureFlagsHttpController,
-    handler: 'findFeatureFlags',
-  },
   // flama:plugins guarded-handlers
 };
 

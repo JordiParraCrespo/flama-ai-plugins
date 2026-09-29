@@ -1,5 +1,4 @@
 import { adminTools } from './admin.tools';
-import { flagTools } from './flags.tools';
 // flama:begin organizations
 import { organizationTools } from './organizations.tools';
 // flama:end organizations
@@ -26,7 +25,6 @@ export const ALL_TOOLS: readonly ToolDefinition[] = [
   ...workspaceTools,
   // flama:end organizations
   ...adminTools,
-  ...flagTools,
 ] as ToolDefinition[];
 
 export * from './tool';

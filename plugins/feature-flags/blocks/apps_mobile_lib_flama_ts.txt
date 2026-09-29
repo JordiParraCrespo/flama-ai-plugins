@@ -1,0 +1,3 @@
+// flama:begin feature-flags
+import { featureFlagsModule } from './feature-flags';
+// flama:end feature-flags

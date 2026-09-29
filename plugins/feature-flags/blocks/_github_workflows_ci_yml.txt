@@ -1,0 +1,7 @@
+      # flama:begin feature-flags
+      # Every flag in the catalog is read somewhere, and no temporary flag is
+      # past its expiry date — flags are debt with a due date, and this is
+      # where it falls due.
+      - name: Feature flags
+        run: pnpm check:flags
+      # flama:end feature-flags

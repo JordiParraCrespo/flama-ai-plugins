@@ -1,0 +1,6 @@
+  // flama:begin feature-flags
+  '/feature-flags/admin': {
+    controller: FindFeatureFlagsHttpController,
+    handler: 'findFeatureFlags',
+  },
+  // flama:end feature-flags

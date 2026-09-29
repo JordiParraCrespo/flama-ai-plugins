@@ -17,9 +17,10 @@ pnpm plugin:remove cli
 | `runner` | `apps/runner` + `packages/go/*` — the Go service template (REST + WS, API keys) the API delegates long-lived work to, with its own CI workflow, compose service and Helm deployment |
 | `docs` | `apps/docs` — the Docusaurus site |
 | `helm` | `helm/` — the Kubernetes chart, with the deployments and hosts of the plugins already installed |
-| `api-tokens` | `apps/api/src/api-tokens` — `/v1/tokens`, the personal access tokens a script, the CLI or the MCP server acts with, and the settings screen that mints and revokes them; the API's scoped credential, bound to the kernel's `SCOPED_CREDENTIAL` |
+| `api-tokens` | `apps/api/src/api-tokens` — `/v1/tokens`, the personal access tokens a script, the CLI or the MCP server acts with, and the consumer module and queries over them; the API's scoped credential, bound to the kernel's `SCOPED_CREDENTIAL` |
+| `feature-flags` | `apps/api/src/feature-flags` — flags declared in code, targeted in the database and evaluated on the server: `@RequireFlag`, `GET /v1/feature-flags`, the targeting and audit API, `pnpm check:flags`, and the `useFeatureFlag` hooks, from a module each app loads in its `lib/feature-flags.ts` |
 | `admin-api` | `apps/api/src/admin` — `/v1/admin/users`, the user-administration API over Better Auth's `admin` plugin |
-| `admin-web` | `apps/admin-web` — the Vite control plane for users, roles, permissions and feature flags (requires `admin-api`) |
+| `admin-web` | `apps/admin-web` — the Vite control plane for users, roles and permissions (requires `admin-api`) |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane (requires `admin-api`) |
 | `web-showcase` | `apps/web-showcase` — the Next.js gallery of the web design system, and how to rebuild it after `/design-export-port` |
 | `mobile-showcase` | `apps/mobile-showcase` — the Expo gallery of the mobile design system |

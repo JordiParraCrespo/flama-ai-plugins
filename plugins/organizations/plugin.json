@@ -50,6 +50,11 @@
       "packages/frontend/consumer/src/modules/organizations",
       "packages/frontend/consumer/src/organizations"
     ],
+    "slots": {
+      "apps/api/src/app.module.ts": [
+        "api-modules"
+      ]
+    },
     "keeps": {
       "apps/api/src/migrations": "the schema history is one line: later migrations build on these tables, so a project without organizations keeps them, empty"
     },
@@ -241,11 +246,6 @@
       "file": "apps/mcp/src/tools/index.ts",
       "source": "snapshots/apps/mcp/src/tools/index.ts",
       "needs": "mcp"
-    },
-    {
-      "file": "apps/web/src/features/api-tokens/sections/create-token-card.tsx",
-      "source": "snapshots/apps/web/src/features/api-tokens/sections/create-token-card.tsx",
-      "needs": "api-tokens"
     },
     {
       "file": "e2e/tests/api/api-tokens.spec.ts",

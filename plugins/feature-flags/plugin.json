@@ -1,0 +1,419 @@
+{
+  "id": "feature-flags",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Feature flags",
+    "summary": "apps/api/src/feature-flags — flags declared in code, targeted in the database and evaluated on the server; `@RequireFlag`, `GET /v1/feature-flags`, and the `useFeatureFlag` hooks every client reads them with",
+    "identifiers": [
+      "apps/api/src/feature-flags",
+      "FeatureFlagsModule",
+      "createFeatureFlagsModule",
+      "feature-flags.queries",
+      "@flama/shared/feature-flags",
+      "@flama/frontend-core/feature-flags",
+      "useFeatureFlag",
+      "RequireFlag",
+      "FEATURE_FLAGS",
+      "FEATURE_FLAG_EXPOSED",
+      "check:flags",
+      "check-feature-flags",
+      "/v1/feature-flags"
+    ],
+    "paths": [
+      ".agents/rules/feature-flags.md",
+      "apps/api/src/feature-flags",
+      "apps/docs/docs/architecture/feature-flags.md",
+      "apps/mobile/lib/feature-flags.ts",
+      "apps/web/src/lib/feature-flags.ts",
+      "packages/frontend/api-client/src/data-access/api/openapi/services/FeatureFlagsApi.ts",
+      "packages/frontend/core/src/modules/feature-flags",
+      "packages/frontend/core/src/react/__tests__/feature-flags.queries.spec.tsx",
+      "packages/frontend/core/src/react/feature-flags.queries.ts",
+      "packages/shared/src/feature-flags",
+      "scripts/check-feature-flags.mjs",
+      "scripts/check-feature-flags.test.mjs"
+    ],
+    "slots": {
+      ".github/workflows/ci.yml": [
+        "ci-checks"
+      ],
+      "apps/api/src/app.module.ts": [
+        "api-module-imports-d-g",
+        "api-modules"
+      ],
+      "apps/api/src/auth/__tests__/endpoint-policies.spec.ts": [
+        "guarded-handlers",
+        "handler-imports"
+      ],
+      "apps/api/src/config/data-source.ts": [
+        "entities",
+        "entity-imports-b-n"
+      ],
+      "apps/mobile/lib/flama.ts": [
+        "app-imports",
+        "app-modules"
+      ],
+      "apps/web/src/lib/flama.ts": [
+        "app-imports",
+        "app-modules"
+      ],
+      "apps/web/vite.config.ts": [
+        "optimize-deps"
+      ],
+      "packages/frontend/core/src/modules/analytics/analytics.events.ts": [
+        "analytics-events"
+      ],
+      "packages/shared/src/permissions/abilities.ts": [
+        "known-subjects"
+      ],
+      "packages/shared/src/permissions/endpoint-policies.ts": [
+        "endpoint-policies"
+      ],
+      "packages/shared/src/scopes/catalog.ts": [
+        "permission-groups",
+        "scope-resources"
+      ],
+      "scripts/check-frontend-structure.mjs": [
+        "app-config-files"
+      ]
+    },
+    "keeps": {
+      "apps/api/src/migrations": "the schema history is one line: later migrations build on the flag tables, so a project without feature flags keeps them, empty"
+    },
+    "scripts": [
+      "check:flags"
+    ],
+    "json": [
+      {
+        "file": "package.json",
+        "path": [
+          "scripts"
+        ],
+        "set": {
+          "check:flags": "node --no-warnings scripts/check-feature-flags.mjs && node --no-warnings --test scripts/check-feature-flags.test.mjs"
+        },
+        "setAt": [
+          14
+        ]
+      },
+      {
+        "file": "packages/shared/package.json",
+        "path": [],
+        "set": {
+          "typesVersions": {
+            "*": {
+              "feature-flags": [
+                "./dist/feature-flags/index.d.ts"
+              ],
+              "feature-flags/catalog": [
+                "./dist/feature-flags/catalog.d.ts"
+              ],
+              "feature-flags/testing": [
+                "./dist/feature-flags/testing.d.ts"
+              ]
+            }
+          }
+        },
+        "setAt": [
+          5
+        ],
+        "expand": true
+      },
+      {
+        "file": "packages/shared/package.json",
+        "path": [
+          "exports"
+        ],
+        "set": {
+          "./feature-flags": {
+            "types": "./dist/feature-flags/index.d.ts",
+            "import": "./dist/feature-flags/index.js",
+            "require": "./dist/feature-flags/index.js",
+            "default": "./dist/feature-flags/index.js"
+          },
+          "./feature-flags/catalog": {
+            "types": "./dist/feature-flags/catalog.d.ts",
+            "import": "./dist/feature-flags/catalog.js",
+            "require": "./dist/feature-flags/catalog.js",
+            "default": "./dist/feature-flags/catalog.js"
+          },
+          "./feature-flags/testing": {
+            "types": "./dist/feature-flags/testing.d.ts",
+            "import": "./dist/feature-flags/testing.js",
+            "require": "./dist/feature-flags/testing.js",
+            "default": "./dist/feature-flags/testing.js"
+          }
+        },
+        "setAt": [
+          9,
+          10,
+          11
+        ]
+      },
+      {
+        "file": "packages/frontend/core/package.json",
+        "path": [
+          "exports"
+        ],
+        "set": {
+          "./feature-flags": {
+            "types": "./dist/modules/feature-flags/index.d.ts",
+            "import": "./dist/modules/feature-flags/index.js"
+          },
+          "./feature-flags/react": {
+            "types": "./dist/react/feature-flags.queries.d.ts",
+            "import": "./dist/react/feature-flags.queries.js"
+          }
+        },
+        "setAt": [
+          4,
+          5
+        ],
+        "needs": "packages/frontend/core"
+      },
+      {
+        "file": "packages/translations/en/errors.json",
+        "path": [
+          "byCode"
+        ],
+        "set": {
+          "FLAG_001": "That feature flag does not exist.",
+          "FLAG_002": "Those targeting rules are not valid for this flag.",
+          "FLAG_003": "This feature is not available right now.",
+          "FLAG_004": "That segment could not be found.",
+          "FLAG_005": "A segment with that key already exists.",
+          "FLAG_006": "That segment is still used by a flag. Remove it from the flag's rules first.",
+          "FLAG_007": "Those segment conditions are not valid."
+        },
+        "setAt": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67
+        ]
+      },
+      {
+        "file": "packages/translations/en/index.json",
+        "path": [
+          "errors",
+          "byCode"
+        ],
+        "set": {
+          "FLAG_001": "That feature flag does not exist.",
+          "FLAG_002": "Those targeting rules are not valid for this flag.",
+          "FLAG_003": "This feature is not available right now.",
+          "FLAG_004": "That segment could not be found.",
+          "FLAG_005": "A segment with that key already exists.",
+          "FLAG_006": "That segment is still used by a flag. Remove it from the flag's rules first.",
+          "FLAG_007": "Those segment conditions are not valid."
+        },
+        "setAt": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67
+        ]
+      },
+      {
+        "file": "packages/translations/es/errors.json",
+        "path": [
+          "byCode"
+        ],
+        "set": {
+          "FLAG_001": "Ese feature flag no existe.",
+          "FLAG_002": "Esas reglas de segmentación no son válidas para este flag.",
+          "FLAG_003": "Esta funcionalidad no está disponible en este momento.",
+          "FLAG_004": "No se ha encontrado ese segmento.",
+          "FLAG_005": "Ya existe un segmento con esa clave.",
+          "FLAG_006": "Ese segmento todavía lo usa un flag. Quítalo primero de sus reglas.",
+          "FLAG_007": "Las condiciones de ese segmento no son válidas."
+        },
+        "setAt": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67
+        ]
+      },
+      {
+        "file": "packages/translations/es/index.json",
+        "path": [
+          "errors",
+          "byCode"
+        ],
+        "set": {
+          "FLAG_001": "Ese feature flag no existe.",
+          "FLAG_002": "Esas reglas de segmentación no son válidas para este flag.",
+          "FLAG_003": "Esta funcionalidad no está disponible en este momento.",
+          "FLAG_004": "No se ha encontrado ese segmento.",
+          "FLAG_005": "Ya existe un segmento con esa clave.",
+          "FLAG_006": "Ese segmento todavía lo usa un flag. Quítalo primero de sus reglas.",
+          "FLAG_007": "Las condiciones de ese segmento no son válidas."
+        },
+        "setAt": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67
+        ]
+      }
+    ],
+    "regenerate": [
+      "generate:api-client",
+      "generate:openapi"
+    ]
+  },
+  "files": {
+    ".agents/rules/feature-flags.md": "files/.agents/rules/feature-flags.md",
+    "apps/api/src/feature-flags": "files/apps/api/src/feature-flags",
+    "apps/mobile/lib/feature-flags.ts": "files/apps/mobile/lib/feature-flags.ts",
+    "apps/web/src/lib/feature-flags.ts": "files/apps/web/src/lib/feature-flags.ts",
+    "packages/frontend/api-client/src/data-access/api/openapi/services/FeatureFlagsApi.ts": "files/packages/frontend/api-client/src/data-access/api/openapi/services/FeatureFlagsApi.ts",
+    "packages/frontend/core/src/modules/feature-flags": "files/packages/frontend/core/src/modules/feature-flags",
+    "packages/frontend/core/src/react/__tests__/feature-flags.queries.spec.tsx": "files/packages/frontend/core/src/react/__tests__/feature-flags.queries.spec.tsx",
+    "packages/frontend/core/src/react/feature-flags.queries.ts": "files/packages/frontend/core/src/react/feature-flags.queries.ts",
+    "packages/shared/src/feature-flags": "files/packages/shared/src/feature-flags",
+    "scripts/check-feature-flags.mjs": "files/scripts/check-feature-flags.mjs",
+    "scripts/check-feature-flags.test.mjs": "files/scripts/check-feature-flags.test.mjs",
+    "apps/docs/docs/architecture/feature-flags.md": "files/apps/docs/docs/architecture/feature-flags.md"
+  },
+  "filesNeed": {
+    "apps/mobile/lib/feature-flags.ts": "mobile",
+    "apps/web/src/lib/feature-flags.ts": "web",
+    "apps/docs/docs/architecture/feature-flags.md": "docs"
+  },
+  "filesNeedPath": {
+    "packages/frontend/api-client/src/data-access/api/openapi/services/FeatureFlagsApi.ts": "packages/frontend/api-client",
+    "packages/frontend/core/src/modules/feature-flags": "packages/frontend/core",
+    "packages/frontend/core/src/react/__tests__/feature-flags.queries.spec.tsx": "packages/frontend/core",
+    "packages/frontend/core/src/react/feature-flags.queries.ts": "packages/frontend/core"
+  },
+  "blocks": [
+    {
+      "file": ".github/workflows/ci.yml",
+      "anchor": "ci-checks",
+      "source": "blocks/_github_workflows_ci_yml.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "api-module-imports-d-g",
+      "source": "blocks/apps_api_src_app_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "api-modules",
+      "source": "blocks/apps_api_src_app_module_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
+      "anchor": "handler-imports",
+      "source": "blocks/apps_api_src_auth___tests___endpoint-policies_spec_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
+      "anchor": "guarded-handlers",
+      "source": "blocks/apps_api_src_auth___tests___endpoint-policies_spec_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/config/data-source.ts",
+      "anchor": "entity-imports-b-n",
+      "source": "blocks/apps_api_src_config_data-source_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/data-source.ts",
+      "anchor": "entities",
+      "source": "blocks/apps_api_src_config_data-source_ts_1.txt"
+    },
+    {
+      "file": "apps/mobile/lib/flama.ts",
+      "anchor": "app-imports",
+      "source": "blocks/apps_mobile_lib_flama_ts.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/mobile/lib/flama.ts",
+      "anchor": "app-modules",
+      "source": "blocks/apps_mobile_lib_flama_ts_1.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/web/src/lib/flama.ts",
+      "anchor": "app-imports",
+      "source": "blocks/apps_web_src_lib_flama_ts.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/lib/flama.ts",
+      "anchor": "app-modules",
+      "source": "blocks/apps_web_src_lib_flama_ts_1.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/vite.config.ts",
+      "anchor": "optimize-deps",
+      "source": "blocks/apps_web_vite_config_ts.txt",
+      "needs": "web"
+    },
+    {
+      "file": "packages/frontend/core/src/modules/analytics/analytics.events.ts",
+      "anchor": "analytics-events",
+      "source": "blocks/packages_frontend_core_src_modules_analytics_analytics_events_ts.txt",
+      "needs": "packages/frontend/core"
+    },
+    {
+      "file": "packages/shared/src/permissions/abilities.ts",
+      "anchor": "known-subjects",
+      "source": "blocks/packages_shared_src_permissions_abilities_ts.txt"
+    },
+    {
+      "file": "packages/shared/src/permissions/endpoint-policies.ts",
+      "anchor": "endpoint-policies",
+      "source": "blocks/packages_shared_src_permissions_endpoint-policies_ts.txt"
+    },
+    {
+      "file": "packages/shared/src/scopes/catalog.ts",
+      "anchor": "scope-resources",
+      "source": "blocks/packages_shared_src_scopes_catalog_ts.txt"
+    },
+    {
+      "file": "packages/shared/src/scopes/catalog.ts",
+      "anchor": "permission-groups",
+      "source": "blocks/packages_shared_src_scopes_catalog_ts_1.txt"
+    },
+    {
+      "file": "scripts/check-frontend-structure.mjs",
+      "anchor": "app-config-files",
+      "source": "blocks/scripts_check-frontend-structure_mjs.txt",
+      "needs": "scripts/check-frontend-structure.mjs"
+    }
+  ],
+  "snapshots": [
+    {
+      "file": "apps/docs/docs/architecture/analytics.md",
+      "source": "snapshots/apps/docs/docs/architecture/analytics.md",
+      "needs": "docs"
+    },
+    {
+      "file": "apps/docs/docs/errors.md",
+      "source": "snapshots/apps/docs/docs/errors.md",
+      "needs": "docs"
+    },
+    {
+      "file": "apps/docs/sidebars.ts",
+      "source": "snapshots/apps/docs/sidebars.ts",
+      "needs": "docs"
+    }
+  ]
+}

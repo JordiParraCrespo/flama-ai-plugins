@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Admin control plane (web)",
-    "summary": "apps/admin-web — Vite control plane for users, roles, permissions and feature flags",
+    "summary": "apps/admin-web — Vite control plane for users, roles and permissions",
     "identifiers": [
       "apps/admin-web",
       "@flama/admin-web",

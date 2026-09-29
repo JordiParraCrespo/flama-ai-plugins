@@ -1,0 +1,5 @@
+// flama:begin feature-flags
+import { FeatureFlagOrmEntity } from '../feature-flags/database/feature-flag.orm-entity';
+import { FlagChangeOrmEntity } from '../feature-flags/database/flag-change.orm-entity';
+import { FlagSegmentOrmEntity } from '../feature-flags/database/flag-segment.orm-entity';
+// flama:end feature-flags

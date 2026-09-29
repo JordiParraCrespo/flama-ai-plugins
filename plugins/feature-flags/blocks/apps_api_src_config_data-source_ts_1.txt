@@ -1,0 +1,5 @@
+    // flama:begin feature-flags
+    FeatureFlagOrmEntity,
+    FlagSegmentOrmEntity,
+    FlagChangeOrmEntity,
+    // flama:end feature-flags
