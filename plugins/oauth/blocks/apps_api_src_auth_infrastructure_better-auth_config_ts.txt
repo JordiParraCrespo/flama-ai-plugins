@@ -1,0 +1,4 @@
+// flama:begin oauth
+
+import { oauthProviders } from './oauth-providers.config';
+// flama:end oauth

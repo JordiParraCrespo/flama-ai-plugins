@@ -1,0 +1,3 @@
+  // flama:begin oauth
+  'social-providers.tsx',
+  // flama:end oauth

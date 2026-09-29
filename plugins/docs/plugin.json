@@ -19,6 +19,7 @@
     "apps/api/src/__tests__/error-catalog-coverage.spec.ts": "files/apps/api/src/__tests__/error-catalog-coverage.spec.ts",
     "apps/docs": "files/apps/docs",
     "apps/docs/docs/architecture/feature-flags.md": "files/apps/docs/docs/architecture/feature-flags.md",
+    "apps/docs/docs/getting-started/google-sign-in.md": "files/apps/docs/docs/getting-started/google-sign-in.md",
     "helm/flama/templates/docs-deployment.yaml": "files/helm/flama/templates/docs-deployment.yaml"
   },
   "blocks": [
@@ -64,6 +65,7 @@
   ],
   "filesNeed": {
     "apps/docs/docs/architecture/feature-flags.md": "feature-flags",
+    "apps/docs/docs/getting-started/google-sign-in.md": "oauth",
     "helm/flama/templates/docs-deployment.yaml": "helm"
   }
 }
