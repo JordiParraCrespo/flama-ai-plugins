@@ -31,7 +31,7 @@ Full-stack monorepo boilerplate for bootstrapping applications fast.
 Reusable NestJS modules under `packages/backend/`, each following a pluggable service pattern:
 
 - **@flama/backend-core** — Errors, filters, interceptors, pipes, mapper interface
-- **@flama/backend-email** — Pluggable email (Console / Nodemailer / Resend) with React Email templates
+- **@flama/backend-email** — Email behind pluggable drivers (the console by default), with React Email templates
 - **@flama/backend-cache** — Redis cache abstraction
 - **@flama/backend-storage** — File storage behind pluggable drivers (local disk by default)
 - **@flama/backend-queue** — BullMQ async jobs

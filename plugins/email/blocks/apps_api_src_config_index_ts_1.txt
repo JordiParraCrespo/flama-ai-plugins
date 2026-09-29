@@ -1,0 +1,4 @@
+  // flama:begin email
+  smtpConfig,
+  resendConfig,
+  // flama:end email
