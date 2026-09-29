@@ -1,0 +1,9 @@
+  // flama:begin sentry
+  // Sentry's Metro config stamps each bundle with the debug ID its source maps are
+  // uploaded under.
+  (getConfig) => (root, options) =>
+    require('@sentry/react-native/metro').getSentryExpoConfig(root, {
+      ...options,
+      getDefaultConfig: getConfig,
+    }),
+  // flama:end sentry
