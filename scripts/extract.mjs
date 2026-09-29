@@ -171,14 +171,24 @@ export function coOwnedBlocks(content, id) {
 /**
  * The anchor immediately beside the block closing on `endLine`, or null.
  *
- * Immediately: only other anchors and blank lines may sit between, so this
- * names *this* block rather than whatever slot happens to appear next in the
- * file. That distinction matters for a co-owned block, which is not removed
- * and so has no gap to mark its place — only the anchor that sits with it.
+ * Immediately: only other anchors, blank lines and other whole blocks may sit
+ * between, so this names *this* block rather than whatever slot happens to
+ * appear next in the file. That distinction matters for a co-owned block,
+ * which is not removed and so has no gap to mark its place — only the anchor
+ * that sits with it. The whole blocks are the stack several plugins leave
+ * above one slot, the same rule `slotOf` in the starter's `markers.mjs` reads.
  */
 export function anchorBeside(content, endLine) {
   const lines = content.split('\n');
+  let depth = 0;
   for (let i = endLine + 1; i < lines.length; i += 1) {
+    const fence = FENCE_RE.exec(lines[i]);
+    if (fence) {
+      depth += fence[2] === 'begin' ? 1 : -1;
+      if (depth < 0) return null;
+      continue;
+    }
+    if (depth > 0) continue;
     const match = /flama:plugins\s+([\w-]+)\b/.exec(lines[i]);
     if (match) return match[1];
     if (lines[i].trim()) return null;

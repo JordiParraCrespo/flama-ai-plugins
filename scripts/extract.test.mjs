@@ -101,6 +101,24 @@ test('anchorBeside names the block it sits with, and nothing further down', () =
   // Anchors stack: several plugins can name the same block.
   const stacked = ['# flama:end web', '# flama:plugins one', '# flama:plugins two'].join('\n');
   assert.equal(anchorBeside(stacked, 0), 'one');
+
+  // Blocks stack too: another plugin's block between this one and the anchor
+  // leaves the slot this block's own.
+  const blocks = [
+    '# flama:begin bull-board',
+    'A=',
+    '# flama:end bull-board',
+    '# flama:begin storage-s3',
+    'B=',
+    '',
+    '# flama:end storage-s3',
+    '# flama:plugins api-integrations-env',
+  ].join('\n');
+  assert.equal(anchorBeside(blocks, 2), 'api-integrations-env');
+
+  // But a block this one sits inside is not a sibling: its end is not a slot.
+  const nested = ['# flama:begin web', '# flama:end posthog', '# flama:end web', '# flama:plugins x'];
+  assert.equal(anchorBeside(nested.join('\n'), 0), null);
 });
 
 test('coOwnedBlocks reports where each block closes', () => {
