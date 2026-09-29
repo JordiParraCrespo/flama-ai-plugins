@@ -153,7 +153,8 @@ consumer app (`apps/web`) on purpose:
 - **`flama.ts`** — `FlamaApp.create({ modules: adminModules })`. Loading the
   admin product's modules is what makes this app the control plane; `apps/web`
   runs the same file with `consumerModules`, which is why the control plane's
-  bundle never carries organizations or API tokens.
+  bundle never carries organizations or API tokens. It passes no
+  `socialProviders`, so the login screen offers no social sign-in.
 - **`auth-client.ts`** — the same Better Auth browser client with two
   deliberate refusals. `signUp` throws *"Control-plane accounts must be
   provisioned by an administrator"* — there is no registration route here — and
