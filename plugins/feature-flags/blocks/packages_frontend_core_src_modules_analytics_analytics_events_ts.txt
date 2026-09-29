@@ -1,0 +1,8 @@
+  // flama:begin feature-flags
+  /**
+   * An experiment's variant was shown. Carries `flag` and `variant`; recorded
+   * once per variant per session by `FeatureFlagsService`, so an experiment's
+   * result can be attributed to the arm people actually saw.
+   */
+  FEATURE_FLAG_EXPOSED: 'feature_flag_exposed',
+  // flama:end feature-flags

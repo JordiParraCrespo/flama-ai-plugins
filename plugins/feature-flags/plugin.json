@@ -10,9 +10,11 @@
       "createFeatureFlagsModule",
       "feature-flags.queries",
       "@flama/shared/feature-flags",
+      "@flama/frontend-core/feature-flags",
       "useFeatureFlag",
       "RequireFlag",
       "FEATURE_FLAGS",
+      "FEATURE_FLAG_EXPOSED",
       "check:flags",
       "check-feature-flags",
       "/v1/feature-flags"
@@ -21,6 +23,8 @@
       ".agents/rules/feature-flags.md",
       "apps/api/src/feature-flags",
       "apps/docs/docs/architecture/feature-flags.md",
+      "apps/mobile/lib/feature-flags.ts",
+      "apps/web/src/lib/feature-flags.ts",
       "packages/frontend/api-client/src/data-access/api/openapi/services/FeatureFlagsApi.ts",
       "packages/frontend/core/src/modules/feature-flags",
       "packages/frontend/core/src/react/__tests__/feature-flags.queries.spec.tsx",
@@ -29,6 +33,50 @@
       "scripts/check-feature-flags.mjs",
       "scripts/check-feature-flags.test.mjs"
     ],
+    "slots": {
+      ".github/workflows/ci.yml": [
+        "ci-checks"
+      ],
+      "apps/api/src/app.module.ts": [
+        "api-module-imports-d-g",
+        "api-modules"
+      ],
+      "apps/api/src/auth/__tests__/endpoint-policies.spec.ts": [
+        "guarded-handlers",
+        "handler-imports"
+      ],
+      "apps/api/src/config/data-source.ts": [
+        "entities",
+        "entity-imports-b-n"
+      ],
+      "apps/mobile/lib/flama.ts": [
+        "app-imports",
+        "app-modules"
+      ],
+      "apps/web/src/lib/flama.ts": [
+        "app-imports",
+        "app-modules"
+      ],
+      "apps/web/vite.config.ts": [
+        "optimize-deps"
+      ],
+      "packages/frontend/core/src/modules/analytics/analytics.events.ts": [
+        "analytics-events"
+      ],
+      "packages/shared/src/permissions/abilities.ts": [
+        "known-subjects"
+      ],
+      "packages/shared/src/permissions/endpoint-policies.ts": [
+        "endpoint-policies"
+      ],
+      "packages/shared/src/scopes/catalog.ts": [
+        "permission-groups",
+        "scope-resources"
+      ],
+      "scripts/check-frontend-structure.mjs": [
+        "app-config-files"
+      ]
+    },
     "keeps": {
       "apps/api/src/migrations": "the schema history is one line: later migrations build on the flag tables, so a project without feature flags keeps them, empty"
     },
@@ -54,6 +102,12 @@
         "set": {
           "typesVersions": {
             "*": {
+              "feature-flags": [
+                "./dist/feature-flags/index.d.ts"
+              ],
+              "feature-flags/catalog": [
+                "./dist/feature-flags/catalog.d.ts"
+              ],
               "feature-flags/testing": [
                 "./dist/feature-flags/testing.d.ts"
               ]
@@ -62,7 +116,8 @@
         },
         "setAt": [
           5
-        ]
+        ],
+        "expand": true
       },
       {
         "file": "packages/shared/package.json",
@@ -94,6 +149,27 @@
           10,
           11
         ]
+      },
+      {
+        "file": "packages/frontend/core/package.json",
+        "path": [
+          "exports"
+        ],
+        "set": {
+          "./feature-flags": {
+            "types": "./dist/modules/feature-flags/index.d.ts",
+            "import": "./dist/modules/feature-flags/index.js"
+          },
+          "./feature-flags/react": {
+            "types": "./dist/react/feature-flags.queries.d.ts",
+            "import": "./dist/react/feature-flags.queries.js"
+          }
+        },
+        "setAt": [
+          4,
+          5
+        ],
+        "needs": "packages/frontend/core"
       },
       {
         "file": "packages/translations/en/errors.json",
@@ -202,6 +278,8 @@
   "files": {
     ".agents/rules/feature-flags.md": "files/.agents/rules/feature-flags.md",
     "apps/api/src/feature-flags": "files/apps/api/src/feature-flags",
+    "apps/mobile/lib/feature-flags.ts": "files/apps/mobile/lib/feature-flags.ts",
+    "apps/web/src/lib/feature-flags.ts": "files/apps/web/src/lib/feature-flags.ts",
     "packages/frontend/api-client/src/data-access/api/openapi/services/FeatureFlagsApi.ts": "files/packages/frontend/api-client/src/data-access/api/openapi/services/FeatureFlagsApi.ts",
     "packages/frontend/core/src/modules/feature-flags": "files/packages/frontend/core/src/modules/feature-flags",
     "packages/frontend/core/src/react/__tests__/feature-flags.queries.spec.tsx": "files/packages/frontend/core/src/react/__tests__/feature-flags.queries.spec.tsx",
@@ -212,6 +290,8 @@
     "apps/docs/docs/architecture/feature-flags.md": "files/apps/docs/docs/architecture/feature-flags.md"
   },
   "filesNeed": {
+    "apps/mobile/lib/feature-flags.ts": "mobile",
+    "apps/web/src/lib/feature-flags.ts": "web",
     "apps/docs/docs/architecture/feature-flags.md": "docs"
   },
   "filesNeedPath": {
@@ -222,88 +302,104 @@
   },
   "blocks": [
     {
-      "file": "packages/shared/src/permissions/abilities.ts",
-      "anchor": "known-subjects",
-      "source": "blocks/packages_shared_src_permissions_abilities_ts.txt"
-    }
-  ],
-  "snapshots": [
-    {
       "file": ".github/workflows/ci.yml",
-      "source": "snapshots/.github/workflows/ci.yml"
+      "anchor": "ci-checks",
+      "source": "blocks/_github_workflows_ci_yml.txt"
     },
     {
       "file": "apps/api/src/app.module.ts",
-      "source": "snapshots/apps/api/src/app.module.ts"
+      "anchor": "api-module-imports-d-g",
+      "source": "blocks/apps_api_src_app_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "api-modules",
+      "source": "blocks/apps_api_src_app_module_ts_1.txt"
     },
     {
       "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
-      "source": "snapshots/apps/api/src/auth/__tests__/endpoint-policies.spec.ts"
+      "anchor": "handler-imports",
+      "source": "blocks/apps_api_src_auth___tests___endpoint-policies_spec_ts.txt"
     },
     {
-      "file": "apps/api/src/authz/authz.module.ts",
-      "source": "snapshots/apps/api/src/authz/authz.module.ts"
+      "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
+      "anchor": "guarded-handlers",
+      "source": "blocks/apps_api_src_auth___tests___endpoint-policies_spec_ts_1.txt"
     },
     {
       "file": "apps/api/src/config/data-source.ts",
-      "source": "snapshots/apps/api/src/config/data-source.ts"
+      "anchor": "entity-imports-b-n",
+      "source": "blocks/apps_api_src_config_data-source_ts.txt"
     },
     {
-      "file": "apps/api/src/database/seed.ts",
-      "source": "snapshots/apps/api/src/database/seed.ts"
+      "file": "apps/api/src/config/data-source.ts",
+      "anchor": "entities",
+      "source": "blocks/apps_api_src_config_data-source_ts_1.txt"
     },
     {
       "file": "apps/mobile/lib/flama.ts",
-      "source": "snapshots/apps/mobile/lib/flama.ts",
+      "anchor": "app-imports",
+      "source": "blocks/apps_mobile_lib_flama_ts.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/mobile/lib/flama.ts",
+      "anchor": "app-modules",
+      "source": "blocks/apps_mobile_lib_flama_ts_1.txt",
       "needs": "mobile"
     },
     {
       "file": "apps/web/src/lib/flama.ts",
-      "source": "snapshots/apps/web/src/lib/flama.ts",
+      "anchor": "app-imports",
+      "source": "blocks/apps_web_src_lib_flama_ts.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/lib/flama.ts",
+      "anchor": "app-modules",
+      "source": "blocks/apps_web_src_lib_flama_ts_1.txt",
       "needs": "web"
     },
     {
       "file": "apps/web/vite.config.ts",
-      "source": "snapshots/apps/web/vite.config.ts",
+      "anchor": "optimize-deps",
+      "source": "blocks/apps_web_vite_config_ts.txt",
       "needs": "web"
     },
     {
-      "file": "packages/frontend/core/src/di/tokens.ts",
-      "source": "snapshots/packages/frontend/core/src/di/tokens.ts",
-      "needs": "packages/frontend/core"
-    },
-    {
       "file": "packages/frontend/core/src/modules/analytics/analytics.events.ts",
-      "source": "snapshots/packages/frontend/core/src/modules/analytics/analytics.events.ts",
+      "anchor": "analytics-events",
+      "source": "blocks/packages_frontend_core_src_modules_analytics_analytics_events_ts.txt",
       "needs": "packages/frontend/core"
     },
     {
-      "file": "packages/frontend/core/src/modules/index.ts",
-      "source": "snapshots/packages/frontend/core/src/modules/index.ts",
-      "needs": "packages/frontend/core"
-    },
-    {
-      "file": "packages/frontend/core/src/react/auth.queries.ts",
-      "source": "snapshots/packages/frontend/core/src/react/auth.queries.ts",
-      "needs": "packages/frontend/core"
-    },
-    {
-      "file": "packages/frontend/core/src/react/index.ts",
-      "source": "snapshots/packages/frontend/core/src/react/index.ts",
-      "needs": "packages/frontend/core"
-    },
-    {
-      "file": "packages/shared/src/index.ts",
-      "source": "snapshots/packages/shared/src/index.ts"
+      "file": "packages/shared/src/permissions/abilities.ts",
+      "anchor": "known-subjects",
+      "source": "blocks/packages_shared_src_permissions_abilities_ts.txt"
     },
     {
       "file": "packages/shared/src/permissions/endpoint-policies.ts",
-      "source": "snapshots/packages/shared/src/permissions/endpoint-policies.ts"
+      "anchor": "endpoint-policies",
+      "source": "blocks/packages_shared_src_permissions_endpoint-policies_ts.txt"
     },
     {
       "file": "packages/shared/src/scopes/catalog.ts",
-      "source": "snapshots/packages/shared/src/scopes/catalog.ts"
+      "anchor": "scope-resources",
+      "source": "blocks/packages_shared_src_scopes_catalog_ts.txt"
     },
+    {
+      "file": "packages/shared/src/scopes/catalog.ts",
+      "anchor": "permission-groups",
+      "source": "blocks/packages_shared_src_scopes_catalog_ts_1.txt"
+    },
+    {
+      "file": "scripts/check-frontend-structure.mjs",
+      "anchor": "app-config-files",
+      "source": "blocks/scripts_check-frontend-structure_mjs.txt",
+      "needs": "scripts/check-frontend-structure.mjs"
+    }
+  ],
+  "snapshots": [
     {
       "file": "apps/docs/docs/architecture/analytics.md",
       "source": "snapshots/apps/docs/docs/architecture/analytics.md",

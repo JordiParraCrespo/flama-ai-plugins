@@ -5,13 +5,13 @@ import type {
   ClientFeatureFlagKey,
   ClientFeatureFlags,
   FeatureFlagValueOf,
-} from '@flama/shared';
+} from '@flama/shared/feature-flags';
 import { type UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import type { FlamaApp } from '../di/flama-app';
-import { TOKENS } from '../di/tokens';
 import { isFlagEnabled, resolveFlagValue } from '../modules/feature-flags/feature-flags';
 import type { FeatureFlagsService } from '../modules/feature-flags/feature-flags.service';
+import { FEATURE_FLAGS_TOKENS } from '../modules/feature-flags/feature-flags.tokens';
 import { useFlamaApp } from './context';
 import { useAuthState } from './hooks';
 
@@ -19,7 +19,7 @@ type FlagAudience = 'signed-in' | 'anonymous';
 
 /** The flags service, which the app bound with `createFeatureFlagsModule`. */
 function featureFlagsOf(app: FlamaApp): FeatureFlagsService {
-  return app.container.get<FeatureFlagsService>(TOKENS.FeatureFlagsService);
+  return app.container.get<FeatureFlagsService>(FEATURE_FLAGS_TOKENS.Service);
 }
 
 /**
@@ -38,9 +38,8 @@ export const featureFlagKeys = {
 };
 
 /**
- * The one definition of the flags query, shared by the hook and by the
- * prefetch `useSessionRestore` starts, so the two can never disagree on key or
- * freshness.
+ * The one definition of the flags query, for the hook and for any prefetch an
+ * app adds, so the two can never disagree on key or freshness.
  */
 export function featureFlagsQueryOptions(app: FlamaApp, audience: FlagAudience) {
   return {
@@ -58,10 +57,10 @@ export function featureFlagsQueryOptions(app: FlamaApp, audience: FlagAudience) 
  * Like every query this is persisted, so a cold start renders the flags the
  * app last saw — offline included — instead of flashing defaults, and a failed
  * refetch keeps the last good answer rather than reverting to defaults. It is
- * fetched as soon as the session is known (see `useSessionRestore`), and again
- * when the window regains focus — the app returns to the foreground on
- * mobile — and on reconnect, which is how a pulled kill switch reaches a
- * long-open tab without a push channel.
+ * fetched when the first component reads a flag, and again when the window
+ * regains focus — the app returns to the foreground on mobile — and on
+ * reconnect, which is how a pulled kill switch reaches a long-open tab without
+ * a push channel.
  *
  * Most code wants {@link useFeatureFlag} or {@link useFeatureFlagValue}; reach
  * for this when you need the loading state.

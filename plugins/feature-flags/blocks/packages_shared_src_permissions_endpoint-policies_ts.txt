@@ -1,0 +1,3 @@
+  // flama:begin feature-flags
+  '/feature-flags/admin': [{ action: 'read', subject: 'FeatureFlag' }],
+  // flama:end feature-flags

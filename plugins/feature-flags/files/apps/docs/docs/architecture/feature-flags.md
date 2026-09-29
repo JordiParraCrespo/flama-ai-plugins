@@ -49,7 +49,7 @@ export const FEATURE_FLAGS = {
 ## Reading a flag
 
 ```tsx
-import { useFeatureFlag, useFeatureFlagValue } from '@flama/frontend-core/react';
+import { useFeatureFlag, useFeatureFlagValue } from '@flama/frontend-core/feature-flags/react';
 
 function Checkout() {
   const newCheckout = useFeatureFlag('new_checkout');
@@ -61,9 +61,9 @@ const copy = useFeatureFlagValue('checkout_copy'); // 'control' | 'bold'
 ```
 
 Until flags load — and if they never do — a read returns the catalog default.
-The flags query is prefetched as soon as the session is known, persisted with
+The flags query starts when the first component reads a flag, is persisted with
 the rest of the query cache (so a cold start renders last-known values, offline
-too), and refetched when the window regains focus or the app returns to the
+too), and is refetched when the window regains focus or the app returns to the
 foreground. A failed refetch keeps the last good answer rather than reverting
 to defaults.
 

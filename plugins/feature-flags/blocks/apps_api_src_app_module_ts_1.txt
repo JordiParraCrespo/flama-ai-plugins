@@ -1,0 +1,3 @@
+    // flama:begin feature-flags
+    FeatureFlagsModule,
+    // flama:end feature-flags

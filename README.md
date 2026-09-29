@@ -18,7 +18,7 @@ pnpm plugin:remove cli
 | `docs` | `apps/docs` — the Docusaurus site |
 | `helm` | `helm/` — the Kubernetes chart, with the deployments and hosts of the plugins already installed |
 | `api-tokens` | `apps/api/src/api-tokens` — `/v1/tokens`, the personal access tokens a script, the CLI or the MCP server acts with, and the consumer module and queries over them; the API's scoped credential, bound to the kernel's `SCOPED_CREDENTIAL` |
-| `feature-flags` | `apps/api/src/feature-flags` — flags declared in code, targeted in the database and evaluated on the server: `@RequireFlag`, `GET /v1/feature-flags`, the targeting and audit API, `pnpm check:flags`, and the `useFeatureFlag` hooks, which an app loads with `createFeatureFlagsModule` |
+| `feature-flags` | `apps/api/src/feature-flags` — flags declared in code, targeted in the database and evaluated on the server: `@RequireFlag`, `GET /v1/feature-flags`, the targeting and audit API, `pnpm check:flags`, and the `useFeatureFlag` hooks, from a module each app loads in its `lib/feature-flags.ts` |
 | `admin-api` | `apps/api/src/admin` — `/v1/admin/users`, the user-administration API over Better Auth's `admin` plugin |
 | `admin-web` | `apps/admin-web` — the Vite control plane for users, roles and permissions (requires `admin-api`) |
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane (requires `admin-api`) |
