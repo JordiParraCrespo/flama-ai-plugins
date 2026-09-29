@@ -15,6 +15,7 @@
     ],
     "paths": [
       "apps/api/src/billing",
+      "apps/api/src/capabilities/__tests__/stripe-billing.capability.spec.ts",
       "apps/api/src/config/stripe.config.ts",
       "apps/api/src/migrations/1781000000000-AddBilling.ts",
       "apps/api/src/migrations/1781200000000-AddSubscriptionLastEventAt.ts",
@@ -155,6 +156,7 @@
   },
   "files": {
     "apps/api/src/billing": "files/apps/api/src/billing",
+    "apps/api/src/capabilities/__tests__/stripe-billing.capability.spec.ts": "files/apps/api/src/capabilities/__tests__/stripe-billing.capability.spec.ts",
     "apps/api/src/config/stripe.config.ts": "files/apps/api/src/config/stripe.config.ts",
     "apps/api/src/migrations/1781000000000-AddBilling.ts": "files/apps/api/src/migrations/1781000000000-AddBilling.ts",
     "apps/api/src/migrations/1781200000000-AddSubscriptionLastEventAt.ts": "files/apps/api/src/migrations/1781200000000-AddSubscriptionLastEventAt.ts",
@@ -172,19 +174,19 @@
       "source": "blocks/apps_api_src_app_module_ts.txt"
     },
     {
-      "file": "apps/api/src/app.module.ts",
+      "file": "apps/api/src/config/index.ts",
       "anchor": "api-config-imports",
-      "source": "blocks/apps_api_src_app_module_ts_1.txt"
+      "source": "blocks/apps_api_src_config_index_ts.txt"
     },
     {
-      "file": "apps/api/src/app.module.ts",
+      "file": "apps/api/src/config/index.ts",
       "anchor": "api-config",
-      "source": "blocks/apps_api_src_app_module_ts_2.txt"
+      "source": "blocks/apps_api_src_config_index_ts_1.txt"
     },
     {
       "file": "apps/api/src/app.module.ts",
       "anchor": "api-modules",
-      "source": "blocks/apps_api_src_app_module_ts_3.txt"
+      "source": "blocks/apps_api_src_app_module_ts_1.txt"
     },
     {
       "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
@@ -195,16 +197,6 @@
       "file": "apps/api/src/auth/__tests__/endpoint-policies.spec.ts",
       "anchor": "guarded-handlers",
       "source": "blocks/apps_api_src_auth___tests___endpoint-policies_spec_ts_1.txt"
-    },
-    {
-      "file": "apps/api/src/capabilities/__tests__/capabilities.module.spec.ts",
-      "anchor": "bare-capabilities",
-      "source": "blocks/apps_api_src_capabilities___tests___capabilities_module_spec_ts.txt"
-    },
-    {
-      "file": "apps/api/src/capabilities/__tests__/capabilities.module.spec.ts",
-      "anchor": "capability-tests",
-      "source": "blocks/apps_api_src_capabilities___tests___capabilities_module_spec_ts_1.txt"
     },
     {
       "file": "apps/api/src/capabilities/capabilities.module.ts",
@@ -249,13 +241,8 @@
     },
     {
       "file": "packages/shared/src/types/deployment-capabilities.ts",
-      "anchor": "deployment-capabilities",
-      "source": "blocks/packages_shared_src_types_deployment-capabilities_ts.txt"
-    },
-    {
-      "file": "packages/shared/src/types/deployment-capabilities.ts",
       "anchor": "client-capabilities",
-      "source": "blocks/packages_shared_src_types_deployment-capabilities_ts_1.txt"
+      "source": "blocks/packages_shared_src_types_deployment-capabilities_ts.txt"
     }
   ]
 }

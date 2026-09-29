@@ -1,3 +1,3 @@
   // flama:begin billing
-  'stripe_billing',
+  stripeConfig,
   // flama:end billing
