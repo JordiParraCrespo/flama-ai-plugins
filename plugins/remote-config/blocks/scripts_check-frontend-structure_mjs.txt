@@ -1,0 +1,3 @@
+  // flama:begin remote-config
+  'remote-config.ts',
+  // flama:end remote-config
