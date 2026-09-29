@@ -7,15 +7,11 @@ import { describe, expect, it } from 'vitest';
 // flama:begin api-tokens
 import { FindApiTokensHttpController } from '../../api-tokens/queries/find-api-tokens/find-api-tokens.http.controller';
 // flama:end api-tokens
-// flama:begin feature-flags
-import { FindFeatureFlagsHttpController } from '../../feature-flags/queries/find-feature-flags/find-feature-flags.http.controller';
-// flama:end feature-flags
+// flama:plugins handler-imports
 // flama:begin organizations
 import { MembersController } from '../../organizations/members.controller';
 // flama:end organizations
 import { FindRolesHttpController } from '../../roles/queries/find-roles/find-roles.http.controller';
-
-// flama:plugins handler-imports
 
 /**
  * The clients and the guards must not drift.
@@ -39,18 +35,12 @@ const HANDLERS: Record<GuardedEndpoint, { controller: object; handler: string }>
   // flama:begin organizations
   '/organizations/:orgId/members': { controller: MembersController, handler: 'list' },
   // flama:end organizations
+  '/roles': { controller: FindRolesHttpController, handler: 'findAll' },
   // flama:begin api-tokens
   '/tokens': { controller: FindApiTokensHttpController, handler: 'findAll' },
   // flama:end api-tokens
   // flama:begin admin-api
   // flama:end admin-api
-  // flama:begin feature-flags
-  '/feature-flags/admin': {
-    controller: FindFeatureFlagsHttpController,
-    handler: 'findFeatureFlags',
-  },
-  // flama:end feature-flags
-  '/roles': { controller: FindRolesHttpController, handler: 'findAll' },
   // flama:plugins guarded-handlers
 };
 

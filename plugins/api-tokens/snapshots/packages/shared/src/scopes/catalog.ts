@@ -17,16 +17,13 @@ export const SCOPE_RESOURCES = [
   // flama:begin admin-api
   // flama:end admin-api
   'roles',
-  // flama:begin api-tokens
-  'tokens',
-  // flama:end api-tokens
-  // flama:begin feature-flags
-  'flags',
-  // flama:end feature-flags
   'organizations',
   'members',
   'invitations',
   'workspaces',
+  // flama:begin api-tokens
+  'tokens',
+  // flama:end api-tokens
   // flama:plugins scope-resources
 ] as const;
 export type ScopeResource = (typeof SCOPE_RESOURCES)[number];
@@ -144,53 +141,6 @@ export const PERMISSION_GROUPS: readonly PermissionGroup[] = [
       },
     },
   },
-  // flama:begin api-tokens
-  {
-    resource: 'tokens',
-    label: 'API tokens',
-    description: "The credential owner's own API tokens.",
-    sensitive: true,
-    levels: {
-      read: {
-        scope: 'tokens:read',
-        label: 'Read',
-        description: 'List the owner’s API tokens (never their secrets).',
-        policies: [{ action: 'read', subject: 'ApiToken' }],
-      },
-      write: {
-        scope: 'tokens:write',
-        label: 'Edit',
-        description: 'Mint and revoke API tokens on the owner’s behalf.',
-        policies: [
-          { action: 'create', subject: 'ApiToken' },
-          { action: 'delete', subject: 'ApiToken' },
-        ],
-      },
-    },
-  },
-  // flama:end api-tokens
-  // flama:begin feature-flags
-  {
-    resource: 'flags',
-    label: 'Feature flags',
-    description: 'Feature-flag targeting, kill switches and audience segments on this deployment.',
-    sensitive: true,
-    levels: {
-      read: {
-        scope: 'flags:read',
-        label: 'Read',
-        description: 'List flags, their targeting, segments and change history.',
-        policies: [{ action: 'read', subject: 'FeatureFlag' }],
-      },
-      write: {
-        scope: 'flags:write',
-        label: 'Edit',
-        description: 'Change targeting, pull kill switches and edit segments — for every user.',
-        policies: [{ action: 'update', subject: 'FeatureFlag' }],
-      },
-    },
-  },
-  // flama:end feature-flags
   {
     resource: 'organizations',
     label: 'Organizations',
@@ -282,6 +232,31 @@ export const PERMISSION_GROUPS: readonly PermissionGroup[] = [
       },
     },
   },
+  // flama:begin api-tokens
+  {
+    resource: 'tokens',
+    label: 'API tokens',
+    description: "The credential owner's own API tokens.",
+    sensitive: true,
+    levels: {
+      read: {
+        scope: 'tokens:read',
+        label: 'Read',
+        description: 'List the owner’s API tokens (never their secrets).',
+        policies: [{ action: 'read', subject: 'ApiToken' }],
+      },
+      write: {
+        scope: 'tokens:write',
+        label: 'Edit',
+        description: 'Mint and revoke API tokens on the owner’s behalf.',
+        policies: [
+          { action: 'create', subject: 'ApiToken' },
+          { action: 'delete', subject: 'ApiToken' },
+        ],
+      },
+    },
+  },
+  // flama:end api-tokens
   // flama:plugins permission-groups
 ];
 

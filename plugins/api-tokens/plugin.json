@@ -30,6 +30,14 @@
       "packages/frontend/consumer/src/react/api-tokens.queries.ts",
       "packages/shared/src/schemas/api-token.schema.ts"
     ],
+    "slots": {
+      "apps/api/src/config/data-source.ts": [
+        "entities"
+      ],
+      "apps/api/src/database/seed.ts": [
+        "entities"
+      ]
+    },
     "keeps": {
       "apps/api/src/migrations": "the schema history is one line: later migrations build on the token table, so a project without API tokens keeps it, empty"
     },
