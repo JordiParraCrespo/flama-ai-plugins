@@ -32,6 +32,7 @@ import { auth } from './auth/infrastructure/better-auth.config';
 import { AuthzModule } from './authz/authz.module';
 import { CapabilitiesModule } from './capabilities/capabilities.module';
 import { configs } from './config';
+import { emailDrivers } from './config/email.config';
 import { storageDrivers } from './config/storage.config';
 import { TypeOrmQueryLogger } from './config/typeorm-query.logger';
 import { HealthModule } from './health/health.module';
@@ -126,7 +127,7 @@ import { UsersModule } from './users/user.module';
     }),
     EventEmitterModule.forRoot(),
     CapabilitiesModule,
-    EmailModule.register(),
+    EmailModule.register(emailDrivers),
     StorageModule.register(storageDrivers),
     CacheModule.register(),
     // `bodyParser.rawBody` attaches the raw request buffer to `req.rawBody`,
