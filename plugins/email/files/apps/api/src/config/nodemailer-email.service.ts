@@ -19,13 +19,18 @@ export class NodemailerEmailService extends EmailService {
 
   constructor(private readonly configService: ConfigService) {
     super();
+    const port = this.configService.get<number>('smtp.port');
+    const user = this.configService.get<string>('smtp.user');
+    const pass = this.configService.get<string>('smtp.pass');
     this.transporter = nodemailer.createTransport({
       host: this.configService.get('smtp.host'),
-      port: this.configService.get('smtp.port'),
-      auth: {
-        user: this.configService.get('smtp.user'),
-        pass: this.configService.get('smtp.pass'),
-      },
+      port,
+      // 465 speaks TLS from the first byte; other ports upgrade with STARTTLS
+      // when the server offers it.
+      secure: port === 465,
+      // A relay that trusts the sender's network takes no credentials, and
+      // blank ones would make nodemailer try to log in anyway.
+      ...(user && pass ? { auth: { user, pass } } : {}),
     });
   }
 
