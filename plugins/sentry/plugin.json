@@ -3,18 +3,16 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Sentry error reporting",
-    "summary": "Sentry in the mobile app: `apps/mobile/sentry.ts`, imported at launch, initialises the SDK when `EXPO_PUBLIC_SENTRY_DSN` is set and becomes the reporter the kit's error boundaries send what they catch to; the Expo config plugin uploads source maps from release builds when `SENTRY_ORG` and `SENTRY_PROJECT` are set, and Metro builds its config through Sentry's factory so each bundle carries the debug ID its source maps are uploaded under",
+    "summary": "Sentry in the mobile app: `apps/mobile/sentry.ts`, imported at launch, initialises the SDK when `EXPO_PUBLIC_SENTRY_DSN` is set and reports the errors the app logs, which is where the kit's error boundaries put what they catch; the Expo config plugin uploads source maps from release builds when `SENTRY_ORG` and `SENTRY_PROJECT` are set, and Metro builds its base config through Sentry's factory so each bundle carries the debug ID its source maps are uploaded under",
     "identifiers": [
       "Sentry",
       "@sentry/",
       "getSentryExpoConfig",
       "EXPO_PUBLIC_SENTRY_DSN",
       "SENTRY_ORG",
-      "SENTRY_PROJECT",
-      ".sentryclirc"
+      "SENTRY_PROJECT"
     ],
     "paths": [
-      "apps/mobile/.gitignore",
       "apps/mobile/sentry.ts",
       "apps/mobile/types/sentry-env.d.ts"
     ],
@@ -29,7 +27,7 @@
         "launch"
       ],
       "apps/mobile/metro.config.js": [
-        "metro-factories"
+        "metro-config-factory"
       ]
     },
     "requires": [
@@ -51,12 +49,10 @@
     ]
   },
   "files": {
-    "apps/mobile/.gitignore": "files/apps/mobile/.gitignore",
     "apps/mobile/sentry.ts": "files/apps/mobile/sentry.ts",
     "apps/mobile/types/sentry-env.d.ts": "files/apps/mobile/types/sentry-env.d.ts"
   },
   "filesNeed": {
-    "apps/mobile/.gitignore": "mobile",
     "apps/mobile/sentry.ts": "mobile",
     "apps/mobile/types/sentry-env.d.ts": "mobile"
   },
@@ -80,7 +76,7 @@
     },
     {
       "file": "apps/mobile/metro.config.js",
-      "anchor": "metro-factories",
+      "anchor": "metro-config-factory",
       "source": "blocks/apps_mobile_metro_config_js.txt",
       "needs": "mobile"
     }
