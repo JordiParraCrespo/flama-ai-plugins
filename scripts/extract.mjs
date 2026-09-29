@@ -647,6 +647,10 @@ async function main() {
         summary: feature.summary,
         identifiers: feature.identifiers,
         paths,
+        // Where the starter's prune took this feature's blocks out whole. An
+        // install records its own; a feature the starter ships replays its
+        // snapshots against the base this says the prune left.
+        ...(feature.slots ? { slots: feature.slots } : {}),
         ...(feature.keeps ? { keeps: feature.keeps } : {}),
         ...(feature.requires ? { requires: feature.requires } : {}),
         ...(feature.scripts ? { scripts: feature.scripts } : {}),
