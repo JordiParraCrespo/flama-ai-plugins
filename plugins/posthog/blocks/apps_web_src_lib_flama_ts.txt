@@ -1,0 +1,4 @@
+// flama:begin posthog
+
+import { createPostHogClient } from './posthog';
+// flama:end posthog

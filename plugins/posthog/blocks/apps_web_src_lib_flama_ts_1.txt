@@ -1,0 +1,3 @@
+  // flama:begin posthog
+  analytics: createPostHogClient(),
+  // flama:end posthog

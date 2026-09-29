@@ -33,5 +33,5 @@ Reusable NestJS modules under `packages/backend/`, each following a pluggable se
 - **@flama/backend-core** — Errors, filters, interceptors, pipes, mapper interface
 - **@flama/backend-email** — Pluggable email (Console / Nodemailer / Resend) with React Email templates
 - **@flama/backend-cache** — Redis cache abstraction
-- **@flama/backend-storage** — File storage (Local / S3)
-- **@flama/backend-queue** — BullMQ async jobs + Bull Board admin UI
+- **@flama/backend-storage** — File storage behind pluggable drivers (local disk by default)
+- **@flama/backend-queue** — BullMQ async jobs

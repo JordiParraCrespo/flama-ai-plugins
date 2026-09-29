@@ -144,7 +144,7 @@ switch stays pulled.
 ## What is not a flag
 
 - **Entitlement.** Who may use a feature is a role or a plan, not a flag.
-- **Deployment capabilities.** Whether S3 is configured is `CapabilitiesService`.
+- **Deployment capabilities.** Whether email delivery is configured is `CapabilitiesService`.
 - **Remote config.** Copy, limits and endpoints for the mobile app are the
   `ConfigManager` document — untargeted and unaudited.
-- **Analytics.** PostHog is for events; its own flags are switched off.
+- **Analytics.** A provider records events; no flag is read from its own flag system.

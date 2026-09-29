@@ -16,7 +16,7 @@ The API (`apps/api`) is built with NestJS and consumes 5 reusable backend packag
 - **Caching**: Redis via [`@flama/backend-cache`](./backend-packages#flamabackend-cache)
 - **Queues**: BullMQ via [`@flama/backend-queue`](./backend-packages#flamabackend-queue)
 - **Email**: Pluggable with React Email templates via [`@flama/backend-email`](./backend-packages#flamabackend-email)
-- **Storage**: Pluggable (Local / S3) via [`@flama/backend-storage`](./backend-packages#flamabackend-storage)
+- **Storage**: Pluggable drivers, local disk by default, via [`@flama/backend-storage`](./backend-packages#flamabackend-storage)
 - **Cross-cutting**: Structured errors, correlation IDs, input sanitization via [`@flama/backend-core`](./backend-packages#flamabackend-core)
 - **Logging**: Pino structured JSON logs
 - **Rate limiting**: @nestjs/throttler

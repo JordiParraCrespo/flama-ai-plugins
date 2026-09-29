@@ -1,0 +1,3 @@
+  // flama:begin posthog
+  'posthog.ts',
+  // flama:end posthog

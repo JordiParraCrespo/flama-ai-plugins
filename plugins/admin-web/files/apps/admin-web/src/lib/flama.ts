@@ -1,6 +1,6 @@
 import { adminModules } from '@flama/frontend-admin';
 import { FlamaApp } from '@flama/frontend-core';
-import { createWebAnalyticsClient, LocalStorageService } from '@flama/frontend-web';
+import { LocalStorageService } from '@flama/frontend-web';
 import { webAuthClient } from './auth-client';
 
 // Same-origin by default: the Vite dev server proxies `/api` to the API so the
@@ -12,7 +12,6 @@ export const app = FlamaApp.create({
   apiBaseUrl,
   storage: new LocalStorageService(),
   authClient: webAuthClient,
-  analytics: createWebAnalyticsClient(),
   // Loading the admin product's modules is what makes this app that product.
   modules: adminModules,
 });

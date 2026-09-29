@@ -1,0 +1,3 @@
+    // flama:begin bull-board
+    BullBoardModule,
+    // flama:end bull-board

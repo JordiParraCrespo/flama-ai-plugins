@@ -1,0 +1,15 @@
+# flama:begin posthog
+# flama:begin web
+# Analytics (PostHog). Leave the key empty to disable analytics entirely — the
+# app falls back to a no-op client and the SDK is never downloaded. The host
+# defaults to the EU cloud region: use https://us.i.posthog.com for a US
+# project, or your own origin when self-hosting.
+VITE_POSTHOG_KEY=
+VITE_POSTHOG_HOST=
+# The origins the web image's Content-Security-Policy must admit for PostHog
+# (docker compose passes this to nginx; see apps/web/nginx.conf). These are the
+# EU endpoints, matching the host's default.
+CSP_EXTRA_ORIGINS=https://eu.i.posthog.com https://eu-assets.i.posthog.com
+# flama:end web
+
+# flama:end posthog

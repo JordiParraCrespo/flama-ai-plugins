@@ -9,10 +9,6 @@
 # and add that origin to the API's trusted origins if needed.
 EXPO_PUBLIC_API_URL=http://localhost:3001
 
-# Analytics (PostHog) — same semantics as the VITE_ pair above
-EXPO_PUBLIC_POSTHOG_KEY=
-EXPO_PUBLIC_POSTHOG_HOST=
-
 # Error reporting (Sentry). Empty disables the SDK. The native plugin still
 # runs at prebuild; a missing DSN means nothing is sent.
 EXPO_PUBLIC_SENTRY_DSN=

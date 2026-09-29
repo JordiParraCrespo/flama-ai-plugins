@@ -1,0 +1,4 @@
+// flama:begin storage-s3
+
+import { s3Config } from './s3.config';
+// flama:end storage-s3

@@ -1,0 +1,136 @@
+{
+  "id": "posthog",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "PostHog analytics",
+    "summary": "The PostHog adapters behind the kernel's analytics port — `createPostHogClient` in each app's own `posthog.ts`, which its `flama.ts` passes to `FlamaApp.create({ analytics })` and which reads `VITE_POSTHOG_KEY` / `EXPO_PUBLIC_POSTHOG_KEY`; without them every event goes to the no-op client",
+    "identifiers": [
+      "PostHog",
+      "posthog-js",
+      "posthog-react-native",
+      "posthog.com",
+      "createPostHogClient",
+      "VITE_POSTHOG_KEY",
+      "VITE_POSTHOG_HOST",
+      "EXPO_PUBLIC_POSTHOG_KEY",
+      "EXPO_PUBLIC_POSTHOG_HOST"
+    ],
+    "paths": [
+      "apps/mobile/lib/posthog.ts",
+      "apps/mobile/types/posthog-env.d.ts",
+      "apps/web/src/lib/posthog.ts",
+      "apps/web/src/types/posthog-env.d.ts"
+    ],
+    "slots": {
+      ".env.example": [
+        "mobile-env",
+        "web-env"
+      ],
+      "apps/mobile/lib/flama.ts": [
+        "app-config",
+        "app-imports"
+      ],
+      "apps/web/src/lib/flama.ts": [
+        "app-config",
+        "app-imports"
+      ],
+      "scripts/check-frontend-structure.mjs": [
+        "app-config-files"
+      ]
+    },
+    "json": [
+      {
+        "file": "apps/web/package.json",
+        "path": [
+          "dependencies"
+        ],
+        "set": {
+          "posthog-js": "^1.432.0"
+        },
+        "setAt": [
+          18
+        ],
+        "needs": "web"
+      },
+      {
+        "file": "apps/mobile/package.json",
+        "path": [
+          "dependencies"
+        ],
+        "set": {
+          "posthog-react-native": "^4.11.2"
+        },
+        "setAt": [
+          38
+        ],
+        "needs": "mobile"
+      }
+    ]
+  },
+  "files": {
+    "apps/mobile/lib/posthog.ts": "files/apps/mobile/lib/posthog.ts",
+    "apps/mobile/types/posthog-env.d.ts": "files/apps/mobile/types/posthog-env.d.ts",
+    "apps/web/src/lib/posthog.ts": "files/apps/web/src/lib/posthog.ts",
+    "apps/web/src/types/posthog-env.d.ts": "files/apps/web/src/types/posthog-env.d.ts"
+  },
+  "filesNeed": {
+    "apps/mobile/lib/posthog.ts": "mobile",
+    "apps/mobile/types/posthog-env.d.ts": "mobile",
+    "apps/web/src/lib/posthog.ts": "web",
+    "apps/web/src/types/posthog-env.d.ts": "web"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "web-env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": ".env.example",
+      "anchor": "mobile-env",
+      "source": "blocks/_env_example_1.txt"
+    },
+    {
+      "file": "apps/mobile/lib/flama.ts",
+      "anchor": "app-imports",
+      "source": "blocks/apps_mobile_lib_flama_ts.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/mobile/lib/flama.ts",
+      "anchor": "app-config",
+      "source": "blocks/apps_mobile_lib_flama_ts_1.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/web/src/lib/flama.ts",
+      "anchor": "app-imports",
+      "source": "blocks/apps_web_src_lib_flama_ts.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/lib/flama.ts",
+      "anchor": "app-config",
+      "source": "blocks/apps_web_src_lib_flama_ts_1.txt",
+      "needs": "web"
+    },
+    {
+      "file": "scripts/check-frontend-structure.mjs",
+      "anchor": "app-config-files",
+      "source": "blocks/scripts_check-frontend-structure_mjs.txt",
+      "needs": "scripts/check-frontend-structure.mjs"
+    }
+  ],
+  "snapshots": [
+    {
+      "file": "apps/docs/docs/architecture/analytics.md",
+      "source": "snapshots/apps/docs/docs/architecture/analytics.md",
+      "needs": "docs"
+    },
+    {
+      "file": "apps/docs/docs/architecture/frontend-architecture.md",
+      "source": "snapshots/apps/docs/docs/architecture/frontend-architecture.md",
+      "needs": "docs"
+    }
+  ]
+}

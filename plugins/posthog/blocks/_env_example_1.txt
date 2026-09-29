@@ -1,0 +1,8 @@
+# flama:begin posthog
+# flama:begin mobile
+# Analytics (PostHog) — same semantics as the VITE_ pair above
+EXPO_PUBLIC_POSTHOG_KEY=
+EXPO_PUBLIC_POSTHOG_HOST=
+# flama:end mobile
+
+# flama:end posthog
