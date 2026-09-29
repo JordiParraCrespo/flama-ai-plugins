@@ -6,14 +6,11 @@ import { describe, expect, it } from 'vitest';
 // flama:end admin-api
 // flama:begin api-tokens
 // flama:end api-tokens
-// flama:begin feature-flags
-// flama:end feature-flags
+// flama:plugins handler-imports
 // flama:begin organizations
 import { MembersController } from '../../organizations/members.controller';
 // flama:end organizations
 import { FindRolesHttpController } from '../../roles/queries/find-roles/find-roles.http.controller';
-
-// flama:plugins handler-imports
 
 /**
  * The clients and the guards must not drift.
@@ -37,13 +34,11 @@ const HANDLERS: Record<GuardedEndpoint, { controller: object; handler: string }>
   // flama:begin organizations
   '/organizations/:orgId/members': { controller: MembersController, handler: 'list' },
   // flama:end organizations
+  '/roles': { controller: FindRolesHttpController, handler: 'findAll' },
   // flama:begin api-tokens
   // flama:end api-tokens
   // flama:begin admin-api
   // flama:end admin-api
-  // flama:begin feature-flags
-  // flama:end feature-flags
-  '/roles': { controller: FindRolesHttpController, handler: 'findAll' },
   // flama:plugins guarded-handlers
 };
 

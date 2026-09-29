@@ -10,8 +10,7 @@ import { Verification } from '../auth/database/verification.orm-entity';
 // flama:begin organizations
 import { AccessGrantOrmEntity } from '../authz/database/access-grant.orm-entity';
 // flama:end organizations
-// flama:begin feature-flags
-// flama:end feature-flags
+// flama:plugins entity-imports-b-n
 // flama:begin organizations
 import { InvitationOrmEntity } from '../organizations/database/invitation.orm-entity';
 import { MemberOrmEntity } from '../organizations/database/member.orm-entity';
@@ -57,8 +56,6 @@ export default new DataSource({
     TeamOrmEntity,
     TeamMemberOrmEntity,
     // flama:end organizations
-    // flama:begin feature-flags
-    // flama:end feature-flags
     OutboxMessageSchema,
   ],
   migrations: [`${__dirname}/../migrations/*{.ts,.js}`],
