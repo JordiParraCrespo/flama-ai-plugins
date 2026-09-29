@@ -101,10 +101,11 @@ client reports, so gate on flags that target identity.
 - **Who may use a feature** is a role (`rbac-roles.md`) or a plan (the
   billing plugin). Entitlement in flags is an unaudited second permission
   system.
-- **Deployment capabilities** (is S3 configured?) are `CapabilitiesService`.
+- **Deployment capabilities** (is email delivery configured?) are `CapabilitiesService`.
 - **Remote config** (copy, limits, endpoints) is the mobile `ConfigManager`.
   It is untargeted and unaudited; never put a flag there.
-- **PostHog** is analytics only. Its own flag loading is switched off.
+- **Analytics** records events only. No flag is read from a provider's own
+  flag system.
 
 ## Changing targeting
 

@@ -1,0 +1,5 @@
+  // flama:begin storage-s3
+  s3_storage: (config: ConfigService) =>
+    config.get('storage.provider') === 's3' &&
+    Boolean(config.get('s3.accessKeyId') && config.get('s3.secretAccessKey')),
+  // flama:end storage-s3

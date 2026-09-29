@@ -1,0 +1,110 @@
+{
+  "id": "storage-s3",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "S3 storage",
+    "summary": "apps/api/src/config/s3-storage.service.ts — the S3-compatible storage driver (AWS, Hetzner Object Storage, MinIO) with presigned reads, in the API's storage drivers as `STORAGE_PROVIDER=s3`; its `s3` config section, its `S3_*` settings and the `s3_storage` capability",
+    "identifiers": [
+      "S3",
+      "MinIO",
+      "S3StorageService",
+      "s3-storage.service",
+      "s3Config",
+      "s3.config",
+      "s3_storage",
+      "@aws-sdk/client-s3",
+      "@aws-sdk/s3-request-presigner",
+      "S3_ENDPOINT",
+      "S3_REGION",
+      "S3_BUCKET",
+      "S3_ACCESS_KEY_ID",
+      "S3_SECRET_ACCESS_KEY"
+    ],
+    "paths": [
+      "apps/api/src/capabilities/__tests__/s3-storage.capability.spec.ts",
+      "apps/api/src/config/s3-storage.service.ts",
+      "apps/api/src/config/s3.config.ts"
+    ],
+    "slots": {
+      ".env.example": [
+        "api-integrations-env"
+      ],
+      "apps/api/src/capabilities/capabilities.module.ts": [
+        "capabilities"
+      ],
+      "apps/api/src/config/index.ts": [
+        "api-config",
+        "api-config-imports"
+      ],
+      "apps/api/src/config/storage.config.ts": [
+        "storage-driver-imports",
+        "storage-drivers"
+      ]
+    },
+    "json": [
+      {
+        "file": "apps/api/package.json",
+        "path": [
+          "dependencies"
+        ],
+        "set": {
+          "@aws-sdk/client-s3": "^3.1095.0",
+          "@aws-sdk/s3-request-presigner": "^3.1095.0"
+        },
+        "setAt": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "files": {
+    "apps/api/src/capabilities/__tests__/s3-storage.capability.spec.ts": "files/apps/api/src/capabilities/__tests__/s3-storage.capability.spec.ts",
+    "apps/api/src/config/s3-storage.service.ts": "files/apps/api/src/config/s3-storage.service.ts",
+    "apps/api/src/config/s3.config.ts": "files/apps/api/src/config/s3.config.ts"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "api-integrations-env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "apps/api/src/capabilities/capabilities.module.ts",
+      "anchor": "capabilities",
+      "source": "blocks/apps_api_src_capabilities_capabilities_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/index.ts",
+      "anchor": "api-config-imports",
+      "source": "blocks/apps_api_src_config_index_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/index.ts",
+      "anchor": "api-config",
+      "source": "blocks/apps_api_src_config_index_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/config/storage.config.ts",
+      "anchor": "storage-driver-imports",
+      "source": "blocks/apps_api_src_config_storage_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/storage.config.ts",
+      "anchor": "storage-drivers",
+      "source": "blocks/apps_api_src_config_storage_config_ts_1.txt"
+    }
+  ],
+  "snapshots": [
+    {
+      "file": "apps/docs/docs/architecture/api-architecture.md",
+      "source": "snapshots/apps/docs/docs/architecture/api-architecture.md",
+      "needs": "docs"
+    },
+    {
+      "file": "apps/docs/docs/architecture/backend-packages.md",
+      "source": "snapshots/apps/docs/docs/architecture/backend-packages.md",
+      "needs": "docs"
+    }
+  ]
+}

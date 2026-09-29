@@ -1,0 +1,93 @@
+{
+  "id": "bull-board",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Bull Board queue dashboard",
+    "summary": "apps/api/src/bull-board — `BullBoardModule`, the Bull Board dashboard over the API's queues at `/admin/queues`, mounted behind HTTP Basic auth only when `BULL_BOARD_USERNAME` and `BULL_BOARD_PASSWORD` are set",
+    "identifiers": [
+      "apps/api/src/bull-board",
+      "BullBoardModule",
+      "mountBullBoard",
+      "@bull-board",
+      "bullBoardUsername",
+      "bullBoardPassword",
+      "BULL_BOARD_USERNAME",
+      "BULL_BOARD_PASSWORD",
+      "/admin/queues"
+    ],
+    "paths": [
+      "apps/api/src/bull-board"
+    ],
+    "slots": {
+      ".env.example": [
+        "api-integrations-env"
+      ],
+      "apps/api/src/app.module.ts": [
+        "api-module-imports",
+        "api-modules"
+      ],
+      "apps/api/src/config/app.config.ts": [
+        "config-env",
+        "config-schema"
+      ]
+    },
+    "json": [
+      {
+        "file": "apps/api/package.json",
+        "path": [
+          "dependencies"
+        ],
+        "set": {
+          "@bull-board/api": "^8.3.0",
+          "@bull-board/express": "^8.3.0"
+        },
+        "setAt": [
+          3,
+          4
+        ]
+      }
+    ]
+  },
+  "files": {
+    "apps/api/src/bull-board": "files/apps/api/src/bull-board"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "api-integrations-env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "api-module-imports",
+      "source": "blocks/apps_api_src_app_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "anchor": "api-modules",
+      "source": "blocks/apps_api_src_app_module_ts_1.txt"
+    },
+    {
+      "file": "apps/api/src/config/app.config.ts",
+      "anchor": "config-schema",
+      "source": "blocks/apps_api_src_config_app_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/app.config.ts",
+      "anchor": "config-env",
+      "source": "blocks/apps_api_src_config_app_config_ts_1.txt"
+    }
+  ],
+  "snapshots": [
+    {
+      "file": "apps/docs/docs/architecture/api-architecture.md",
+      "source": "snapshots/apps/docs/docs/architecture/api-architecture.md",
+      "needs": "docs"
+    },
+    {
+      "file": "apps/docs/docs/architecture/backend-packages.md",
+      "source": "snapshots/apps/docs/docs/architecture/backend-packages.md",
+      "needs": "docs"
+    }
+  ]
+}

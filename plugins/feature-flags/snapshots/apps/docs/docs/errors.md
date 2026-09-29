@@ -108,6 +108,15 @@ The caller's own account: profile fields, avatar, password and sessions.
 `PROFILE_003` is returned for a session belonging to someone else as well as one
 that does not exist, so session ids cannot be probed.
 
+## Rate limiting
+
+The limiter is global, so any route can answer with this. `Retry-After` says
+how long to wait.
+
+| Code                           | Title             | HTTP |
+| ------------------------------ | ----------------- | ---- |
+| `RATE_001` <a id="rate_001" /> | Too many requests | 429  |
+
 ## Scoped credentials
 
 What any scoped credential can fail on — an API token, an OAuth grant.

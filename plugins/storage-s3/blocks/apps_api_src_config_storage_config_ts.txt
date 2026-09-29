@@ -1,0 +1,4 @@
+// flama:begin storage-s3
+
+import { S3StorageService } from './s3-storage.service';
+// flama:end storage-s3

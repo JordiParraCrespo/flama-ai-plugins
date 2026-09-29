@@ -24,9 +24,12 @@ pnpm plugin:remove cli
 | `admin-mobile` | `apps/admin-mobile` — the Expo control plane (requires `admin-api`) |
 | `web-showcase` | `apps/web-showcase` — the Next.js gallery of the web design system, and how to rebuild it after `/design-export-port` |
 | `mobile-showcase` | `apps/mobile-showcase` — the Expo gallery of the mobile design system |
+| `posthog` | PostHog analytics — the web and mobile adapters behind the kernel's analytics port, each app's own `lib/posthog.ts` passed to `FlamaApp.create({ analytics })`, with their env vars and the origins the web image's CSP admits |
 | `revenuecat` | RevenueCat in the mobile app: `apps/mobile/purchases.ts`, configured at launch from per-store keys |
 | `qa` | `qa/` — the scenario-driven Playwright QA pack (requires `admin-web` and `organizations`) |
 | `billing` | `apps/api/src/billing` — Stripe subscriptions: checkout, customer portal, webhooks, revenue metrics |
+| `bull-board` | `apps/api/src/bull-board` — `BullBoardModule`, the Bull Board dashboard over the API's queues at `/admin/queues`, behind HTTP Basic auth and mounted only when `BULL_BOARD_USERNAME` and `BULL_BOARD_PASSWORD` are set |
+| `storage-s3` | The S3-compatible storage driver (AWS, Hetzner Object Storage, MinIO) with presigned reads: `apps/api/src/config/s3-storage.service.ts`, in the API's storage drivers as `STORAGE_PROVIDER=s3`, with its `s3` config section, its `S3_*` settings and the `s3_storage` capability |
 | `organizations` | Multi-tenancy — organizations, members, invitations, workspaces, access grants and onboarding. Ships in the starter; this is how a project that pruned it gets it back |
 | `agent-audits` | `.agents/skills/frontend-audit` + `.agents/skills/hexagon-audit` — report-only `/frontend-audit` and `/hexagon-audit` review skills over the starter's frontend and API rules; they change no code and open nothing |
 

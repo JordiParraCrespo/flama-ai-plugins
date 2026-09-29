@@ -38,7 +38,7 @@
         "ci-checks"
       ],
       "apps/api/src/app.module.ts": [
-        "api-module-imports-d-g",
+        "api-module-imports",
         "api-modules"
       ],
       "apps/api/src/auth/__tests__/endpoint-policies.spec.ts": [
@@ -47,7 +47,7 @@
       ],
       "apps/api/src/config/data-source.ts": [
         "entities",
-        "entity-imports-b-n"
+        "entity-imports"
       ],
       "apps/mobile/lib/flama.ts": [
         "app-imports",
@@ -308,7 +308,7 @@
     },
     {
       "file": "apps/api/src/app.module.ts",
-      "anchor": "api-module-imports-d-g",
+      "anchor": "api-module-imports",
       "source": "blocks/apps_api_src_app_module_ts.txt"
     },
     {
@@ -328,7 +328,7 @@
     },
     {
       "file": "apps/api/src/config/data-source.ts",
-      "anchor": "entity-imports-b-n",
+      "anchor": "entity-imports",
       "source": "blocks/apps_api_src_config_data-source_ts.txt"
     },
     {

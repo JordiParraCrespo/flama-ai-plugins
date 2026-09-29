@@ -6,20 +6,29 @@ sidebar_position: 6
 
 Analytics lives in `packages/frontend` as a pluggable module, following the same
 platform-adapter pattern as storage and authentication. The shared code never
-imports a vendor SDK — each app supplies an adapter, so swapping providers is a
-change in one file per platform rather than a refactor.
+imports a vendor SDK — each app supplies an adapter of its own, so swapping
+providers is a change to that file rather than a refactor.
 
-The boilerplate ships PostHog adapters. Nothing outside the two adapter files
-depends on that choice.
+The kernel ships the port, `IAnalyticsClient`, and `NoopAnalyticsClient`, the
+client an app gets when it passes none to `FlamaApp.create({ analytics })`:
+every event is then dropped. The event catalog, the hooks and the URL
+sanitizing below work the same whichever client is bound, and adding a
+provider is one adapter per platform — see
+[Adding a provider](#adding-a-provider).
+<!-- flama:begin posthog -->
 
-PostHog's own flag loading is switched off, so an ad blocker that eats the
-analytics SDK cannot change what the product shows.
+Each consumer app carries a PostHog adapter, `lib/posthog.ts`, and passes it
+to `FlamaApp.create`. Nothing outside those files depends on that choice. PostHog's own flag loading is
+switched off, so an ad blocker that eats the analytics SDK cannot change what
+the product shows.
+<!-- flama:end posthog -->
 <!-- flama:begin feature-flags -->
 
 Feature flags are not part of analytics: the API evaluates them and every
 client reads its values from `GET /v1/feature-flags` — see
 [Feature flags](./feature-flags.md).
 <!-- flama:end feature-flags -->
+<!-- flama:begin posthog -->
 
 ## Setup
 
@@ -43,6 +52,7 @@ entirely — Vite inlines the unset env var and eliminates the unreachable clien
 so an unconfigured build ships zero analytics bytes. With a key set, the SDK is
 loaded through a dynamic `import()` and lands in its own chunk, keeping it off
 the critical path.
+<!-- flama:end posthog -->
 
 ## Capturing events
 
@@ -104,10 +114,10 @@ sign-out and both password-reset steps. It also calls `identify()` on login and
 `reset()` on logout, so events are attributed correctly and a shared device
 doesn't leak one user's activity into another's profile.
 
-Page views are driven from the router by a tracker component in each app's
-analytics module — `PageViewTracker` in `apps/web/src/lib/analytics/` and
-`ScreenViewTracker` in `apps/mobile/lib/analytics/`, both wrapping
-`usePageView` and mounted at the app root. Neither router emits navigations a
+Page views are driven from the router by a tracker component in each platform
+kit's analytics concern — `PageViewTracker` in `@flama/frontend-web` and
+`ScreenViewTracker` in `@flama/frontend-mobile`, both wrapping `usePageView`
+and mounted at the app root. Neither router emits navigations a
 provider can observe on its own, so without this only the first load would ever
 be counted.
 
@@ -115,19 +125,22 @@ be counted.
 
 Several routes carry secrets in the query string — `/reset-password?token=…`
 most obviously. Providers attach the current location to _every_ event
-automatically (PostHog sends `$current_url`, `$referrer` and their `$initial_`
+automatically (the current URL, the referrer and often their first-visit
 variants, including on autocapture events the app never raises itself), so
 sending only the pathname from `pageView()` is not sufficient on its own.
 
 `sanitizeUrlProperties` strips the query string and fragment from every
-URL-valued property, and the web adapter wires it into PostHog's `before_send`
-so it applies to all outgoing events. It is provider-independent — any new
-adapter should hook it into the equivalent facility.
+URL-valued property. It is provider-independent: an adapter hooks it into its
+provider's "before send" facility, so it applies to all outgoing events.
+<!-- flama:begin posthog -->
 
-Campaign attribution is unaffected: `before_send` runs after PostHog has
-extracted UTM parameters into their own properties. If you need a specific
-query parameter in your analytics, add it as an explicit event property rather
-than relaxing the sanitizer.
+The PostHog web adapter wires it into `before_send`. Campaign attribution is
+unaffected: `before_send` runs after PostHog has extracted UTM parameters into
+their own properties.
+<!-- flama:end posthog -->
+
+If you need a specific query parameter in your analytics, add it as an explicit
+event property rather than relaxing the sanitizer.
 
 ## Failure behavior
 
@@ -140,7 +153,13 @@ dropped event is always preferable to a broken login.
 Implement `IAnalyticsClient` (`analytics.client.ts`) and pass it to
 `FlamaApp.create({ analytics })`. The port is four fire-and-forget methods
 (`capture`, `identify`, `reset`, `pageView`) — nothing that assumes a particular
-vendor's capabilities. The web adapter in
-`packages/frontend/web/src/analytics/lib/posthog-client.ts`
-is the reference: it queues calls made before the SDK finishes loading and
-replays them on arrival, since the DI container is built synchronously.
+vendor's capabilities. The DI container is built synchronously, so an adapter
+whose SDK loads asynchronously queues the calls made before it arrives and
+replays them then. The adapter is the app's own file — `lib/` beside
+`flama.ts`, which imports it — and the kits keep only the trackers
+(`PageViewTracker`, `ScreenViewTracker`).
+<!-- flama:begin posthog -->
+
+The PostHog web adapter, `apps/web/src/lib/posthog.ts`, is the reference:
+it loads the SDK through a dynamic `import()` and queues until it arrives.
+<!-- flama:end posthog -->

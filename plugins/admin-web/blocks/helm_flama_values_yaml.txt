@@ -1,9 +1,9 @@
 # flama:begin admin-web
 adminWeb:
   # Extra origins for the nginx Content-Security-Policy (space separated).
-  # Empty keeps the image default: the PostHog EU endpoints. Widen it when
-  # analytics lives in another region, or VITE_API_URL points the bundle at an
-  # origin other than the one serving it.
+  # Empty admits none beyond 'self', as the image does by default. Set it for
+  # a third-party service the app talks to, or when VITE_API_URL points the
+  # bundle at an origin other than the one serving it.
   cspExtraOrigins: ""
   image: ghcr.io/your-org/flama-admin-web:latest
   replicas: 1

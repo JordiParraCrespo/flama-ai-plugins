@@ -1,0 +1,4 @@
+    // flama:begin bull-board
+    bullBoardUsername: 'BULL_BOARD_USERNAME',
+    bullBoardPassword: 'BULL_BOARD_PASSWORD',
+    // flama:end bull-board

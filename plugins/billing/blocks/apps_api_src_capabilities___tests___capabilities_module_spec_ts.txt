@@ -1,3 +1,0 @@
-      // flama:begin billing
-      stripe_billing: false,
-      // flama:end billing

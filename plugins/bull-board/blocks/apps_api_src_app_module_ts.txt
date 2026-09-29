@@ -1,0 +1,4 @@
+// flama:begin bull-board
+
+import { BullBoardModule } from './bull-board/bull-board.module';
+// flama:end bull-board

@@ -1,0 +1,3 @@
+  // flama:begin storage-s3
+  s3Config,
+  // flama:end storage-s3

@@ -18,8 +18,8 @@ flama/
 │   │   ├── cache/        # Redis cache abstraction (@flama/backend-cache)
 │   │   ├── core/         # Errors, filters, pipes, interceptors (@flama/backend-core)
 │   │   ├── email/        # Pluggable email + React Email templates (@flama/backend-email)
-│   │   ├── queue/        # BullMQ + Bull Board (@flama/backend-queue)
-│   │   └── storage/      # File storage Local/S3 (@flama/backend-storage)
+│   │   ├── queue/        # BullMQ job queues (@flama/backend-queue)
+│   │   └── storage/      # Pluggable file storage (@flama/backend-storage)
 │   ├── config/           # Shared TS and tooling configs
 │   ├── frontend/
 │   │   ├── core/         # Kernel every app loads: session, users, settings, DI (@flama/frontend-core)

@@ -1,0 +1,9 @@
+# flama:begin bull-board
+# Bull Board queue dashboard (/admin/queues). Mounted ONLY when both are set,
+# and then behind HTTP Basic auth. Job payloads carry tokenized reset/invite
+# URLs, so leave these empty to keep the dashboard off in any exposed
+# deployment.
+BULL_BOARD_USERNAME=
+BULL_BOARD_PASSWORD=
+
+# flama:end bull-board
