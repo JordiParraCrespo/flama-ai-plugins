@@ -102,7 +102,7 @@ client reports, so gate on flags that target identity.
   billing plugin). Entitlement in flags is an unaudited second permission
   system.
 - **Deployment capabilities** (is email delivery configured?) are `CapabilitiesService`.
-- **Remote config** (copy, limits, endpoints) is the mobile `ConfigManager`.
+- **Remote config** (copy, limits, endpoints) is a `ConfigManager` document.
   It is untargeted and unaudited; never put a flag there.
 - **Analytics** records events only. No flag is read from a provider's own
   flag system.
