@@ -14,8 +14,4 @@ EXPO_PUBLIC_API_URL=http://localhost:3001
 EXPO_PUBLIC_SENTRY_DSN=
 SENTRY_ORG=
 SENTRY_PROJECT=
-
-# Optional remote config document (JSON). Static defaults always apply; a
-# missing URL skips the remote layer.
-EXPO_PUBLIC_CONFIG_URL=
 # flama:end admin-mobile

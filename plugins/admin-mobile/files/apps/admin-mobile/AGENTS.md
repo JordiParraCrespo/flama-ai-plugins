@@ -35,9 +35,8 @@ pnpm --filter @flama/admin-mobile arch && pnpm check:structure
 
 - Adding a registration screen. `lib/auth-client.ts` throws from `signUp` and
   passes `requestSignUp: false`: accounts are provisioned by an administrator.
-- Reaching for `useEffect` in a screen. Biome allows it only in `hooks/`; the
-  one exception is `app/_layout.tsx`, whose single commented effect loads the
-  config manager once per launch.
+- Reaching for `useEffect` in a screen, or in `app/_layout.tsx`. Biome allows
+  it only in `hooks/`.
 - Naming a feature after the page. Only kernel modules and `admin-users` /
   `roles` are allowed here; this app has no allowlist entry.
 
