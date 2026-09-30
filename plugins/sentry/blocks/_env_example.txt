@@ -1,0 +1,9 @@
+# flama:begin sentry
+
+# Error reporting (Sentry). An empty DSN leaves the SDK uninitialised. The
+# native plugin, which uploads source maps from release builds, runs only when
+# the organization and project are set.
+EXPO_PUBLIC_SENTRY_DSN=
+SENTRY_ORG=
+SENTRY_PROJECT=
+# flama:end sentry

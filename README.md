@@ -26,6 +26,7 @@ pnpm plugin:remove cli
 | `mobile-showcase` | `apps/mobile-showcase` — the Expo gallery of the mobile design system |
 | `posthog` | PostHog analytics — the web and mobile adapters behind the kernel's analytics port, each app's own `lib/posthog.ts` passed to `FlamaApp.create({ analytics })`, with their env vars and the origins the web image's CSP admits |
 | `revenuecat` | RevenueCat in the mobile app: `apps/mobile/purchases.ts`, configured at launch from per-store keys |
+| `sentry` | Sentry in the mobile app: `apps/mobile/sentry.ts`, initialised at launch from `EXPO_PUBLIC_SENTRY_DSN`, reporting the errors the app logs (which is where the kit's error boundaries put what they catch), with the Expo config plugin that uploads source maps and Sentry's Metro factory that stamps each bundle's debug ID |
 | `qa` | `qa/` — the scenario-driven Playwright QA pack (requires `admin-web` and `organizations`) |
 | `billing` | `apps/api/src/billing` — Stripe subscriptions: checkout, customer portal, webhooks, revenue metrics |
 | `bull-board` | `apps/api/src/bull-board` — `BullBoardModule`, the Bull Board dashboard over the API's queues at `/admin/queues`, behind HTTP Basic auth and mounted only when `BULL_BOARD_USERNAME` and `BULL_BOARD_PASSWORD` are set |
