@@ -26,7 +26,7 @@ provider on.
 | Web button            | `apps/web/src/lib/social-providers.ts`, drawn by the kit's `SocialLoginButtons`      | Renders only when the capability read says Google is available                      |
 | Mobile button         | `apps/mobile/lib/social-providers.ts`, drawn by the kit's `SocialLoginButtons`       | The same, and deep-links back via the `flama://` scheme                             |
 | Sign-up gating        | `apps/api/src/auth/infrastructure/oauth-providers.config.ts` (`disableImplicitSignUp`) | Refuses a Google account with no user here, unless the caller asked to register   |
-| Account linking       | `apps/api/src/auth/infrastructure/better-auth.config.ts` (`account.accountLinking`)  | Attaches Google to an existing email/password account on the same verified address |
+| Account linking       | `apps/api/src/auth/infrastructure/oauth-providers.config.ts` (`accountLinking`)      | Attaches Google to an existing email/password account on the same verified address |
 | Post-sign-up hooks    | `apps/api/src/auth/infrastructure/better-auth.config.ts` (`databaseHooks`)           | Welcome email, default `user` role                                                  |
 
 A missing `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` is not an error — it is a
@@ -190,7 +190,8 @@ second one, and from then on either method lands in the same place. Nothing has
 to be done by hand and no password is asked for at the door.
 
 Two checks guard that link, both configured under `account.accountLinking` in
-`apps/api/src/auth/infrastructure/better-auth.config.ts`:
+`apps/api/src/auth/infrastructure/oauth-providers.config.ts`, which
+`better-auth.config.ts` passes in:
 
 - **The provider must have verified the address.** `trustedProviders` is
   deliberately left empty, so what is trusted is Google's own `email_verified`
@@ -263,8 +264,8 @@ network stack can keep using `localhost`.
 
 ## Optional tweaks
 
-All of these go on Google's settings in `oauthProviders()`
-(`apps/api/src/auth/infrastructure/oauth-providers.config.ts`):
+All of these go on Google's settings, beside its credentials and
+`signInPolicy`, in `apps/api/src/auth/infrastructure/oauth-providers.config.ts`:
 
 | Option                     | Effect                                                               |
 | -------------------------- | -------------------------------------------------------------------- |
@@ -277,10 +278,10 @@ All of these go on Google's settings in `oauthProviders()`
 
 Google and GitHub arrive together, and each has a part of its own in every
 file they touch. To keep Google alone, delete GitHub's: its entry in each
-app's `lib/social-providers.ts`, its line in `oauthProviders()`, its part of
-the `oauth` schema and env names in `oauth.config.ts`, its `github_oauth` row
-in the capability table and its entry in `CLIENT_CAPABILITIES`, and its lines
-in `.env.example`.
+app's `lib/social-providers.ts`, its line in `oauth-providers.config.ts`, its
+part of the `oauth` schema and env names in `oauth.config.ts`, its
+`github_oauth` row in the capability table and its entry in
+`CLIENT_CAPABILITIES`, and its lines in `.env.example`.
 
 ## Troubleshooting
 
