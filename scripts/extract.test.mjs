@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import {
   anchorAt,
   anchorBeside,
+  carriedWhole,
   coOwnedBlocks,
   ownerOf,
   pluginsHolding,
@@ -117,8 +118,25 @@ test('anchorBeside names the block it sits with, and nothing further down', () =
   assert.equal(anchorBeside(blocks, 2), 'api-integrations-env');
 
   // But a block this one sits inside is not a sibling: its end is not a slot.
-  const nested = ['# flama:begin web', '# flama:end posthog', '# flama:end web', '# flama:plugins x'];
+  const nested = [
+    '# flama:begin web',
+    '# flama:end posthog',
+    '# flama:end web',
+    '# flama:plugins x',
+  ];
   assert.equal(anchorBeside(nested.join('\n'), 0), null);
+});
+
+test('carriedWhole carries a replaced file as a snapshot, even beside an anchor', () => {
+  const feature = { replaces: ['src/providers.ts'] };
+  // Every block at a slot: blocks.
+  assert.equal(carriedWhole(feature, 'src/app.ts', ['imports', 'modules']), false);
+  // A block with no anchor is a shipped feature's fence: the file comes whole.
+  assert.equal(carriedWhole(feature, 'src/app.ts', ['imports', null]), true);
+  // A file the feature replaces is its version of the file, whatever sits
+  // beside its blocks: an anchor there belongs to the starter's version.
+  assert.equal(carriedWhole(feature, 'src/providers.ts', ['imports']), true);
+  assert.equal(carriedWhole({}, 'src/providers.ts', ['imports']), false);
 });
 
 test('coOwnedBlocks reports where each block closes', () => {

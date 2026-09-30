@@ -141,8 +141,12 @@ are the only mark it makes. So the plugin carries the starter's copy of each
 file it has blocks in (`snapshots/`), and the installer merges the blocks onto
 the project's copy with `git merge-file` — a project that has edited the file
 since still takes them, and one that edited the same lines stops the install.
-A plugin whose feature the starter does not ship needs no snapshots: every
-block it has sits at a slot.
+A plugin whose feature the starter does not ship needs no snapshots — every
+block it has sits at a slot — but for a file it `replaces`. The starter ships
+its own version of that file, and the feature's is the same lines with the
+feature's blocks fenced among them. The starter's prune takes those out whole,
+leaving no fence, so the plugin carries its version as a snapshot and the same
+merge makes it the project's; removing the plugin gives the starter's back.
 
 Files the feature keeps inside another's tree are skipped by an install into a
 project without it: `filesNeed` names the feature (its screens in `apps/web`),
