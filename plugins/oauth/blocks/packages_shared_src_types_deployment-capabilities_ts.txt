@@ -1,0 +1,4 @@
+  // flama:begin oauth
+  'google_oauth',
+  'github_oauth',
+  // flama:end oauth

@@ -31,6 +31,7 @@ pnpm plugin:remove cli
 | `billing` | `apps/api/src/billing` — Stripe subscriptions: checkout, customer portal, webhooks, revenue metrics |
 | `bull-board` | `apps/api/src/bull-board` — `BullBoardModule`, the Bull Board dashboard over the API's queues at `/admin/queues`, behind HTTP Basic auth and mounted only when `BULL_BOARD_USERNAME` and `BULL_BOARD_PASSWORD` are set |
 | `storage-s3` | The S3-compatible storage driver (AWS, Hetzner Object Storage, MinIO) with presigned reads: `apps/api/src/config/s3-storage.service.ts`, in the API's storage drivers as `STORAGE_PROVIDER=s3`, with its `s3` config section, its `S3_*` settings and the `s3_storage` capability |
+| `oauth` | Google and GitHub sign-in: each app's `lib/social-providers.ts` (id, name, capability and brand icon per provider) passed to `FlamaApp.create({ socialProviders })`, their Better Auth settings in its own version of the API's `oauth-providers.config.ts`, the `oauth` config section, the `google_oauth` and `github_oauth` capabilities and their `GOOGLE_*` / `GITHUB_*` settings; each provider is a part of its own, so a project keeps one by deleting the other's |
 | `email` | Email delivery: the SMTP (nodemailer) and Resend drivers beside the kernel's console one, `apps/api/src/config/nodemailer-email.service.ts` and `resend-email.service.ts`, in the API's email drivers as `EMAIL_PROVIDER=nodemailer` or `resend`, each with its own config section and settings, and the `email_delivery` capability. Each is separable: a project keeping one deletes the other's files and lines |
 | `remote-config` | Remote config in the mobile app: `apps/mobile/lib/remote-config.ts`, the app's tunables under the kernel's `ConfigManager`, cached in MMKV and refreshed from the JSON document at `EXPO_PUBLIC_CONFIG_URL`, read with `useConfig()` (requires `mobile`) |
 | `organizations` | Multi-tenancy — organizations, members, invitations, workspaces, access grants and onboarding. Ships in the starter; this is how a project that pruned it gets it back |
@@ -143,8 +144,12 @@ are the only mark it makes. So the plugin carries the starter's copy of each
 file it has blocks in (`snapshots/`), and the installer merges the blocks onto
 the project's copy with `git merge-file` — a project that has edited the file
 since still takes them, and one that edited the same lines stops the install.
-A plugin whose feature the starter does not ship needs no snapshots: every
-block it has sits at a slot.
+A plugin whose feature the starter does not ship needs no snapshots — every
+block it has sits at a slot — but for a file it `replaces`. The starter ships
+its own version of that file, and the feature's is the same lines with the
+feature's blocks fenced among them. The starter's prune takes those out whole,
+leaving no fence, so the plugin carries its version as a snapshot and the same
+merge makes it the project's; removing the plugin gives the starter's back.
 
 Files the feature keeps inside another's tree are skipped by an install into a
 project without it: `filesNeed` names the feature (its screens in `apps/web`),

@@ -167,6 +167,20 @@ export function coOwnedBlocks(content, id) {
   return found;
 }
 
+/**
+ * Whether a file the prune edited is carried whole, as a snapshot, rather
+ * than as blocks at the anchors beside them (`anchors`, one per block, null
+ * where a block has none).
+ *
+ * A block with no anchor is a feature the starter still ships, and a file the
+ * feature `replaces` is its own version of a file the starter ships: both come
+ * back by the installer's three-way merge, which a block at a slot cannot do —
+ * even when one of them happens to sit above an anchor.
+ */
+export function carriedWhole(feature, file, anchors) {
+  return Boolean(feature.replaces?.includes(file)) || !anchors.every(Boolean);
+}
+
 /** The first `flama:plugins <slot>` anchor at or after a line of the pruned file. */
 /**
  * The anchor immediately beside the block closing on `endLine`, or null.
@@ -429,7 +443,7 @@ async function main() {
       // restored at an anchor of its own, so each becomes its own entry.
       const found = removalHunks(git(scratch, 'diff', '-U0', '--', file));
       const anchors = found.map((block) => anchorBeside(after, block.at - 1));
-      if (anchors.every(Boolean)) {
+      if (!carriedWhole(feature, file, anchors)) {
         let n = 0;
         found.forEach((block, i) => {
           const anchor = anchors[i];
@@ -455,7 +469,8 @@ async function main() {
       // A block with no anchor beside it is a feature the starter still ships:
       // its fences are all the mark it leaves. The plugin carries the
       // starter's copy of the file, and the installer merges the blocks back
-      // three-way, so every block in this file comes back that way.
+      // three-way, so every block in this file comes back that way. So does a
+      // file the feature replaces: the copy is the feature's version of it.
       const source = `snapshots/${file}`;
       mkdirSync(dirname(join(out, source)), { recursive: true });
       cpSync(join(repo, file), join(out, source));
@@ -661,6 +676,10 @@ async function main() {
         // install records its own; a feature the starter ships replays its
         // snapshots against the base this says the prune left.
         ...(feature.slots ? { slots: feature.slots } : {}),
+        // Files the starter ships a version of and this feature replaces:
+        // carried as snapshots, and given back to the starter's version, with
+        // no fence left, by the prune that removes the plugin.
+        ...(feature.replaces ? { replaces: feature.replaces } : {}),
         ...(feature.keeps ? { keeps: feature.keeps } : {}),
         ...(feature.requires ? { requires: feature.requires } : {}),
         ...(feature.scripts ? { scripts: feature.scripts } : {}),

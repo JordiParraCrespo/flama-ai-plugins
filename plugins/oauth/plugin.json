@@ -1,0 +1,158 @@
+{
+  "id": "oauth",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Social sign-in with Google and GitHub",
+    "summary": "Google and GitHub sign-in: each app's `lib/social-providers.ts` (id, name, capability and brand icon per provider) passed to `FlamaApp.create({ socialProviders })`, their Better Auth settings in `apps/api/src/auth/infrastructure/oauth-providers.config.ts`, the `oauth` config section, the `google_oauth` and `github_oauth` capabilities and the `GOOGLE_*` / `GITHUB_*` settings. Each provider is a part of its own in every one of those: to keep one, delete the other's entry in each `social-providers.ts`, its line in `oauth-providers.config.ts`, its part of the `oauth` schema and env names, its capability row and `CLIENT_CAPABILITIES` entry and its `.env.example` lines",
+    "identifiers": [
+      "Google",
+      "google_oauth",
+      "github_oauth",
+      "GOOGLE_CLIENT_ID",
+      "GOOGLE_CLIENT_SECRET",
+      "GITHUB_CLIENT_ID",
+      "GITHUB_CLIENT_SECRET",
+      "oauthConfig",
+      "oauth.config",
+      "readOAuthConfig",
+      "social-providers.ts"
+    ],
+    "paths": [
+      "apps/api/src/capabilities/__tests__/oauth.capability.spec.ts",
+      "apps/api/src/config/oauth.config.ts",
+      "apps/docs/docs/getting-started/google-sign-in.md",
+      "apps/mobile/lib/social-providers.ts",
+      "apps/web/src/lib/social-providers.ts",
+      "e2e/tests/api/oauth.spec.ts",
+      "e2e/tests/web/oauth-buttons.spec.ts"
+    ],
+    "slots": {
+      ".env.example": [
+        "api-integrations-env"
+      ],
+      "apps/api/src/capabilities/capabilities.module.ts": [
+        "capabilities"
+      ],
+      "apps/api/src/config/index.ts": [
+        "api-config",
+        "api-config-imports"
+      ],
+      "apps/mobile/lib/flama.ts": [
+        "app-config",
+        "app-imports"
+      ],
+      "apps/web/src/lib/flama.ts": [
+        "app-config",
+        "app-imports"
+      ],
+      "packages/shared/src/types/deployment-capabilities.ts": [
+        "client-capabilities"
+      ],
+      "scripts/check-frontend-structure.mjs": [
+        "app-config-files"
+      ]
+    },
+    "replaces": [
+      "apps/api/src/auth/infrastructure/oauth-providers.config.ts"
+    ]
+  },
+  "files": {
+    "apps/api/src/capabilities/__tests__/oauth.capability.spec.ts": "files/apps/api/src/capabilities/__tests__/oauth.capability.spec.ts",
+    "apps/api/src/config/oauth.config.ts": "files/apps/api/src/config/oauth.config.ts",
+    "apps/mobile/lib/social-providers.ts": "files/apps/mobile/lib/social-providers.ts",
+    "apps/web/src/lib/social-providers.ts": "files/apps/web/src/lib/social-providers.ts",
+    "e2e/tests/api/oauth.spec.ts": "files/e2e/tests/api/oauth.spec.ts",
+    "e2e/tests/web/oauth-buttons.spec.ts": "files/e2e/tests/web/oauth-buttons.spec.ts",
+    "apps/docs/docs/getting-started/google-sign-in.md": "files/apps/docs/docs/getting-started/google-sign-in.md"
+  },
+  "filesNeed": {
+    "apps/mobile/lib/social-providers.ts": "mobile",
+    "apps/web/src/lib/social-providers.ts": "web",
+    "e2e/tests/api/oauth.spec.ts": "e2e",
+    "e2e/tests/web/oauth-buttons.spec.ts": "web",
+    "apps/docs/docs/getting-started/google-sign-in.md": "docs"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "api-integrations-env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "apps/api/src/capabilities/capabilities.module.ts",
+      "anchor": "capabilities",
+      "source": "blocks/apps_api_src_capabilities_capabilities_module_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/index.ts",
+      "anchor": "api-config-imports",
+      "source": "blocks/apps_api_src_config_index_ts.txt"
+    },
+    {
+      "file": "apps/api/src/config/index.ts",
+      "anchor": "api-config",
+      "source": "blocks/apps_api_src_config_index_ts_1.txt"
+    },
+    {
+      "file": "apps/mobile/lib/flama.ts",
+      "anchor": "app-imports",
+      "source": "blocks/apps_mobile_lib_flama_ts.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/mobile/lib/flama.ts",
+      "anchor": "app-config",
+      "source": "blocks/apps_mobile_lib_flama_ts_1.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/web/src/lib/flama.ts",
+      "anchor": "app-imports",
+      "source": "blocks/apps_web_src_lib_flama_ts.txt",
+      "needs": "web"
+    },
+    {
+      "file": "apps/web/src/lib/flama.ts",
+      "anchor": "app-config",
+      "source": "blocks/apps_web_src_lib_flama_ts_1.txt",
+      "needs": "web"
+    },
+    {
+      "file": "packages/shared/src/types/deployment-capabilities.ts",
+      "anchor": "client-capabilities",
+      "source": "blocks/packages_shared_src_types_deployment-capabilities_ts.txt"
+    },
+    {
+      "file": "scripts/check-frontend-structure.mjs",
+      "anchor": "app-config-files",
+      "source": "blocks/scripts_check-frontend-structure_mjs.txt",
+      "needs": "scripts/check-frontend-structure.mjs"
+    }
+  ],
+  "snapshots": [
+    {
+      "file": "apps/api/src/auth/infrastructure/oauth-providers.config.ts",
+      "source": "snapshots/apps/api/src/auth/infrastructure/oauth-providers.config.ts"
+    },
+    {
+      "file": "apps/docs/docs/architecture/api-architecture.md",
+      "source": "snapshots/apps/docs/docs/architecture/api-architecture.md",
+      "needs": "docs"
+    },
+    {
+      "file": "apps/docs/docs/architecture/overview.md",
+      "source": "snapshots/apps/docs/docs/architecture/overview.md",
+      "needs": "docs"
+    },
+    {
+      "file": "apps/docs/docs/getting-started/installation.md",
+      "source": "snapshots/apps/docs/docs/getting-started/installation.md",
+      "needs": "docs"
+    },
+    {
+      "file": "apps/docs/sidebars.ts",
+      "source": "snapshots/apps/docs/sidebars.ts",
+      "needs": "docs"
+    }
+  ]
+}

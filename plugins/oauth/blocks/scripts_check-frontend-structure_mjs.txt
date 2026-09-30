@@ -1,0 +1,3 @@
+  // flama:begin oauth
+  'social-providers.ts',
+  // flama:end oauth

@@ -9,7 +9,9 @@ const sidebars: SidebarsConfig = {
       items: [
         'getting-started/installation',
         'getting-started/project-structure',
+        // flama:begin oauth
         'getting-started/google-sign-in',
+        // flama:end oauth
       ],
     },
     {

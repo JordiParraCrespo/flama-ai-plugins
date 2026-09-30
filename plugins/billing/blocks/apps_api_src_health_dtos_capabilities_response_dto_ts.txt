@@ -1,5 +1,0 @@
-  // flama:begin billing
-
-  @ApiProperty({ description: 'Stripe billing is configured.' })
-  stripe_billing!: boolean;
-  // flama:end billing

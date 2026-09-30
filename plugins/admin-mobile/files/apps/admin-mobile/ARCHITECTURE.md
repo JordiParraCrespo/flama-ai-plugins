@@ -159,7 +159,8 @@ sibling consumer app (`apps/mobile`) on purpose:
 - **`flama.ts`** — `FlamaApp.create({ modules: adminModules })`. Loading the
   admin product's modules is what makes this app the control plane;
   `apps/mobile` runs the same file with `consumerModules`, which is why this
-  bundle never carries organizations or API tokens.
+  bundle never carries organizations or API tokens. It passes no
+  `socialProviders`, so the login screen offers no social sign-in.
 - **`auth-client.ts`** — Better Auth with `expoClient({ scheme, storagePrefix:
   'flama-admin', storage: SecureStore })`. The prefix differs from
   `apps/mobile`'s `flama`, so the two apps cannot share a secure-store slot on

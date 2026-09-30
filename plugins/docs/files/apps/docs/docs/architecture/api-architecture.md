@@ -56,10 +56,15 @@ The Better Auth instance lives in `auth/infrastructure/better-auth.config.ts` an
 | Database           | Native Postgres adapter over the shared `pg` pool                     |
 | Email / password   | `emailAndPassword` with `sendResetPassword` → BullMQ email queue      |
 | Email verification | `emailVerification.sendVerificationEmail` → BullMQ email queue        |
-| Social providers   | Google + GitHub (`socialProviders`), enabled when env vars are set    |
 | Mobile             | `@better-auth/expo` plugin (SecureStore cookie + deep-link callbacks) |
 | Custom user fields | `firstName`, `lastName`, `role`, `isActive` (additional fields)       |
 | Welcome email      | `databaseHooks.user.create.after` → BullMQ email queue                |
+<!-- flama:begin oauth -->
+
+Google and GitHub join `socialProviders` from
+`auth/infrastructure/oauth-providers.config.ts`, each only once its credentials
+are set.
+<!-- flama:end oauth -->
 
 ### Endpoints
 
@@ -211,7 +216,6 @@ The config factories, all Zod-validated:
 | `database` | `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`                      |
 | `redis`    | `REDIS_HOST`, `REDIS_PORT`                                                             |
 | `email`    | `EMAIL_PROVIDER`, `EMAIL_FROM`                                                         |
-| `oauth`    | `GOOGLE_CLIENT_ID/SECRET/CALLBACK`, `GITHUB_CLIENT_ID/SECRET/CALLBACK`                 |
 | `storage`  | `STORAGE_PROVIDER`, `UPLOAD_DIR`, `STORAGE_PUBLIC_URL`                                 |
 <!-- flama:begin storage-s3 -->
 
@@ -223,3 +227,8 @@ The S3 storage driver reads a factory of its own, `s3`: `S3_ENDPOINT`, `S3_REGIO
 The email drivers read factories of their own: `smtp` (`SMTP_HOST`, `SMTP_PORT`,
 `SMTP_USER`, `SMTP_PASS`) and `resend` (`RESEND_API_KEY`).
 <!-- flama:end email -->
+<!-- flama:begin oauth -->
+
+Social sign-in reads a factory of its own, `oauth`: `GOOGLE_CLIENT_ID`,
+`GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`.
+<!-- flama:end oauth -->

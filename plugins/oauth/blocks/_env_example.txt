@@ -1,0 +1,12 @@
+# flama:begin oauth
+# OAuth - Google (optional — leave unset to disable Google sign-in)
+# Authorized redirect URI: ${BETTER_AUTH_URL}/api/auth/callback/google
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# OAuth - GitHub (optional — leave unset to disable GitHub sign-in)
+# Authorization callback URL: ${BETTER_AUTH_URL}/api/auth/callback/github
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+# flama:end oauth
