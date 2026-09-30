@@ -29,10 +29,10 @@ See [Backend Packages](./backend-packages) for the shared package details and [A
 All backend packages follow the same pattern:
 
 1. **Abstract class** defines the interface (e.g. `EmailService`)
-2. **Concrete implementations** provide behavior (e.g. `ConsoleEmailService`, `ResendEmailService`)
+2. **Concrete implementations** provide behavior (e.g. `ConsoleEmailService`, `LocalStorageService`)
 3. **`@Global` DynamicModule** with a factory reads config to select the active implementation
 
-This allows swapping providers (e.g. console email in dev, Resend in prod) without changing any consumer code.
+This allows swapping implementations per deployment without changing any consumer code.
 
 ## Frontend
 

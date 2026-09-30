@@ -1,0 +1,4 @@
+  // flama:begin email
+  nodemailer: NodemailerEmailService,
+  resend: ResendEmailService,
+  // flama:end email

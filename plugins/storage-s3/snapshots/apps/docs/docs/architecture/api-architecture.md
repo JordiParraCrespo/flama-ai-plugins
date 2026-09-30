@@ -210,7 +210,7 @@ The config factories, all Zod-validated:
 | `app`      | `PORT`, `NODE_ENV`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_ADMIN_USER_IDS`, `FRONTEND_URL` |
 | `database` | `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`                      |
 | `redis`    | `REDIS_HOST`, `REDIS_PORT`                                                             |
-| `email`    | `EMAIL_PROVIDER`, `EMAIL_FROM`, `SMTP_*`, `RESEND_API_KEY`                             |
+| `email`    | `EMAIL_PROVIDER`, `EMAIL_FROM`                                                         |
 | `oauth`    | `GOOGLE_CLIENT_ID/SECRET/CALLBACK`, `GITHUB_CLIENT_ID/SECRET/CALLBACK`                 |
 | `storage`  | `STORAGE_PROVIDER`, `UPLOAD_DIR`, `STORAGE_PUBLIC_URL`                                 |
 <!-- flama:begin storage-s3 -->
@@ -218,3 +218,8 @@ The config factories, all Zod-validated:
 The S3 storage driver reads a factory of its own, `s3`: `S3_ENDPOINT`, `S3_REGION`,
 `S3_BUCKET`, `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY`.
 <!-- flama:end storage-s3 -->
+<!-- flama:begin email -->
+
+The email drivers read factories of their own: `smtp` (`SMTP_HOST`, `SMTP_PORT`,
+`SMTP_USER`, `SMTP_PASS`) and `resend` (`RESEND_API_KEY`).
+<!-- flama:end email -->
