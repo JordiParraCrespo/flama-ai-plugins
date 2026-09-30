@@ -145,6 +145,6 @@ switch stays pulled.
 
 - **Entitlement.** Who may use a feature is a role or a plan, not a flag.
 - **Deployment capabilities.** Whether email delivery is configured is `CapabilitiesService`.
-- **Remote config.** Copy, limits and endpoints for the mobile app are the
-  `ConfigManager` document — untargeted and unaudited.
+- **Remote config.** Copy, limits and endpoints are a `ConfigManager`
+  document — untargeted and unaudited.
 - **Analytics.** A provider records events; no flag is read from its own flag system.

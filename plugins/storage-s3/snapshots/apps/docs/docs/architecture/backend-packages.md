@@ -41,15 +41,9 @@ export class AppModule {}
 
 ## `@flama/backend-email`
 
-Pluggable email service with React Email templates.
-
-### Implementations
-
-| Class                    | When to use                                                |
-| ------------------------ | ---------------------------------------------------------- |
-| `ConsoleEmailService`    | Development — logs email content to console                |
-| `NodemailerEmailService` | SMTP — renders React templates, sends via nodemailer       |
-| `ResendEmailService`     | Production — renders React templates, sends via Resend API |
+Transactional email behind an abstract `EmailService`: the module that binds it
+to a driver, the console driver, and the React Email templates a delivering
+driver renders.
 
 ### Templates
 
@@ -61,13 +55,24 @@ Located in `src/templates/`, built with `@react-email/components`:
 
 ### Configuration
 
-Set `EMAIL_PROVIDER` to `console`, `nodemailer`, or `resend`.
+The API passes the drivers it runs on to `EmailModule.register` — its
+`emailDrivers` map, in `apps/api/src/config/email.config.ts` — and
+`EMAIL_PROVIDER` names one of them; the API's config accepts exactly those
+names. `console`, the default, logs every email instead of delivering it.
+<!-- flama:begin email -->
+
+`nodemailer` sends through SMTP (`apps/api/src/config/nodemailer-email.service.ts`,
+reading its own `smtp` config section, `SMTP_*`) and `resend` through the
+Resend API (`apps/api/src/config/resend-email.service.ts`, reading `resend`,
+`RESEND_API_KEY`). Both render the package's templates and send from
+`EMAIL_FROM`.
+<!-- flama:end email -->
 
 ```typescript
-import { EmailModule } from "@flama/backend-email";
+import { ConsoleEmailService, EmailModule } from "@flama/backend-email";
 
 @Module({
-  imports: [EmailModule.register()],
+  imports: [EmailModule.register({ console: ConsoleEmailService })],
 })
 export class AppModule {}
 ```

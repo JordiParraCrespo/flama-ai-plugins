@@ -1,0 +1,5 @@
+// flama:begin email
+
+import { resendConfig } from './resend.config';
+import { smtpConfig } from './smtp.config';
+// flama:end email

@@ -22,7 +22,7 @@ mobile.
 | `packages/frontend/admin`     | `@flama/frontend-admin`     | The control plane: `admin-users`, `roles`                                                             |
 | `packages/frontend/api-client`| `@flama/api-client`         | The typed client generated from the API's OpenAPI spec                                                |
 | `packages/frontend/web`       | `@flama/frontend-web`       | What both Vite apps share, by concern: `shell`, `auth`, `table`, `layout`, `forms`, `theme`, `i18n`, `analytics`, `platform`, `roles` |
-| `packages/frontend/mobile`    | `@flama/frontend-mobile`    | What both Expo apps share: `analytics`, `config`, `forms`, `i18n`, `layout`, `platform`, `theme`       |
+| `packages/frontend/mobile`    | `@flama/frontend-mobile`    | What both Expo apps share: `analytics`, `forms`, `i18n`, `layout`, `platform`, `theme`                 |
 
 Imports run one way:
 

@@ -10,8 +10,6 @@ import { MobileRoot } from '@flama/design-system-mobile/mobile-root';
 import { FlamaProvider } from '@flama/frontend-core/react';
 import {
   AppErrorFallback,
-  ConfigManagerContext,
-  configManager,
   ErrorBoundary,
   NAV_THEME,
   ScreenErrorFallback,
@@ -21,7 +19,6 @@ import { ThemeProvider } from '@react-navigation/native';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme, vars } from 'nativewind';
-import { useEffect } from 'react';
 import { View } from 'react-native';
 import { AuthGate } from '../features/auth/screens/auth-gate';
 import { app } from '../lib/flama';
@@ -32,33 +29,25 @@ export default function RootLayout() {
   const theme = colorScheme === 'dark' ? darkVars : lightVars;
   const isDark = colorScheme === 'dark';
 
-  // Synchronises with a system outside React: the remote config manager,
-  // loaded once per app launch.
-  useEffect(() => {
-    void configManager.load();
-  }, []);
-
   return (
     <ErrorBoundary fallback={() => <AppErrorFallback />}>
       <MobileRoot>
-        <ConfigManagerContext.Provider value={configManager}>
-          <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions as never}>
-            <FlamaProvider app={app}>
-              <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-                <View
-                  style={vars(theme)}
-                  className={isDark ? 'dark flex-1 bg-background' : 'flex-1 bg-background'}
-                >
-                  <StatusBar style={isDark ? 'light' : 'dark'} />
-                  <ScreenViewTracker />
-                  <ErrorBoundary fallback={(reset) => <ScreenErrorFallback onReset={reset} />}>
-                    <AuthGate />
-                  </ErrorBoundary>
-                </View>
-              </ThemeProvider>
-            </FlamaProvider>
-          </PersistQueryClientProvider>
-        </ConfigManagerContext.Provider>
+        <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions as never}>
+          <FlamaProvider app={app}>
+            <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+              <View
+                style={vars(theme)}
+                className={isDark ? 'dark flex-1 bg-background' : 'flex-1 bg-background'}
+              >
+                <StatusBar style={isDark ? 'light' : 'dark'} />
+                <ScreenViewTracker />
+                <ErrorBoundary fallback={(reset) => <ScreenErrorFallback onReset={reset} />}>
+                  <AuthGate />
+                </ErrorBoundary>
+              </View>
+            </ThemeProvider>
+          </FlamaProvider>
+        </PersistQueryClientProvider>
       </MobileRoot>
     </ErrorBoundary>
   );

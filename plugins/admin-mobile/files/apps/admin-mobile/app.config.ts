@@ -21,16 +21,6 @@ const plugins: ExpoConfig['plugins'] = [
   ],
 ];
 
-if (process.env.SENTRY_ORG && process.env.SENTRY_PROJECT) {
-  plugins.push([
-    '@sentry/react-native/expo',
-    {
-      organization: process.env.SENTRY_ORG,
-      project: process.env.SENTRY_PROJECT,
-    },
-  ]);
-}
-
 const config: ExpoConfig = {
   name: 'Flama Control',
   slug: 'flama-control',
