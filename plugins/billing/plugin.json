@@ -204,11 +204,6 @@
       "source": "blocks/apps_api_src_capabilities_capabilities_module_ts.txt"
     },
     {
-      "file": "apps/api/src/health/dtos/capabilities.response.dto.ts",
-      "anchor": "client-capabilities",
-      "source": "blocks/apps_api_src_health_dtos_capabilities_response_dto_ts.txt"
-    },
-    {
       "file": "apps/docs/docs/errors.md",
       "anchor": "integration-errors",
       "source": "blocks/apps_docs_docs_errors_md.txt",
