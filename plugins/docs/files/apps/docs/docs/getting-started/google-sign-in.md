@@ -23,15 +23,14 @@ provider on.
 | Name mapping          | `apps/api/src/auth/infrastructure/oauth-providers.config.ts` (`splitName`)           | Splits Google's `name` into the app's `firstName` / `lastName`                      |
 | Capability detection  | `apps/api/src/capabilities/capabilities.module.ts`                                   | Resolves `google_oauth` from config at boot, logs it, serves it over HTTP           |
 | Capability endpoint   | `GET /api/v1/health/capabilities`                                                    | Tells clients whether the provider is configured                                    |
-| Web button            | `apps/web/src/lib/social-providers.tsx`, drawn by the kit's `SocialLoginButtons`     | Renders only when the capability read says Google is available                      |
-| Mobile button         | `apps/mobile/lib/social-providers.tsx`, drawn by the kit's `SocialLoginButtons`      | The same, and deep-links back via the `flama://` scheme                             |
+| Web button            | `apps/web/src/lib/social-providers.ts`, drawn by the kit's `SocialLoginButtons`      | Renders only when the capability read says Google is available                      |
+| Mobile button         | `apps/mobile/lib/social-providers.ts`, drawn by the kit's `SocialLoginButtons`       | The same, and deep-links back via the `flama://` scheme                             |
 | Sign-up gating        | `apps/api/src/auth/infrastructure/oauth-providers.config.ts` (`disableImplicitSignUp`) | Refuses a Google account with no user here, unless the caller asked to register   |
 | Account linking       | `apps/api/src/auth/infrastructure/better-auth.config.ts` (`account.accountLinking`)  | Attaches Google to an existing email/password account on the same verified address |
 | Post-sign-up hooks    | `apps/api/src/auth/infrastructure/better-auth.config.ts` (`databaseHooks`)           | Welcome email, default `user` role                                                  |
 
 A missing `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` is not an error — it is a
-disabled capability. The API boots normally, the button hides itself, and the
-login page explains what to set.
+disabled capability. The API boots normally and the button hides itself.
 
 ## 1. Create a Google Cloud project
 
@@ -277,12 +276,11 @@ All of these go on Google's settings in `oauthProviders()`
 ## Only one of the two providers
 
 Google and GitHub arrive together, and each has a part of its own in every
-file they touch. To keep Google alone, delete GitHub's: its entry and mark in
-each app's `lib/social-providers.tsx`, its line in `oauthProviders()`, its
-part of the `oauth` schema and env names in `oauth.config.ts`, its
-`github_oauth` row in the capability table, `CLIENT_CAPABILITIES` and
-`CapabilitiesResponseDto`, and its lines in `.env.example`. Then run
-`pnpm generate:api-client`.
+file they touch. To keep Google alone, delete GitHub's: its entry in each
+app's `lib/social-providers.ts`, its line in `oauthProviders()`, its part of
+the `oauth` schema and env names in `oauth.config.ts`, its `github_oauth` row
+in the capability table and its entry in `CLIENT_CAPABILITIES`, and its lines
+in `.env.example`.
 
 ## Troubleshooting
 

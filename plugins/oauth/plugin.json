@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Social sign-in with Google and GitHub",
-    "summary": "Google and GitHub sign-in: each app's `lib/social-providers.tsx` (the providers and their marks) passed to `FlamaApp.create({ socialProviders })`, their Better Auth settings in `apps/api/src/auth/infrastructure/oauth-providers.config.ts`, the `oauth` config section, the `google_oauth` and `github_oauth` capabilities and the `GOOGLE_*` / `GITHUB_*` settings. Each provider is a part of its own in every one of those: to keep one, delete the other's entry and mark in each `social-providers.tsx`, its line in `oauthProviders()`, its part of the `oauth` schema and env names, its capability row, `CLIENT_CAPABILITIES` entry and DTO property and its `.env.example` lines, then regenerate the API client",
+    "summary": "Google and GitHub sign-in: each app's `lib/social-providers.ts` (id, name, capability and brand icon per provider) passed to `FlamaApp.create({ socialProviders })`, their Better Auth settings in `apps/api/src/auth/infrastructure/oauth-providers.config.ts`, the `oauth` config section, the `google_oauth` and `github_oauth` capabilities and the `GOOGLE_*` / `GITHUB_*` settings. Each provider is a part of its own in every one of those: to keep one, delete the other's entry in each `social-providers.ts`, its line in `oauthProviders()`, its part of the `oauth` schema and env names, its capability row and `CLIENT_CAPABILITIES` entry and its `.env.example` lines",
     "identifiers": [
       "Google",
       "google_oauth",
@@ -17,16 +17,17 @@
       "readOAuthConfig",
       "oauthProviders",
       "oauth-providers.config",
-      "social-providers.tsx"
+      "social-providers.ts"
     ],
     "paths": [
       "apps/api/src/auth/infrastructure/oauth-providers.config.ts",
       "apps/api/src/capabilities/__tests__/oauth.capability.spec.ts",
       "apps/api/src/config/oauth.config.ts",
       "apps/docs/docs/getting-started/google-sign-in.md",
-      "apps/mobile/lib/social-providers.tsx",
-      "apps/web/src/lib/social-providers.tsx",
-      "e2e/tests/api/oauth.spec.ts"
+      "apps/mobile/lib/social-providers.ts",
+      "apps/web/src/lib/social-providers.ts",
+      "e2e/tests/api/oauth.spec.ts",
+      "e2e/tests/web/oauth-buttons.spec.ts"
     ],
     "slots": {
       ".env.example": [
@@ -43,9 +44,6 @@
         "api-config",
         "api-config-imports"
       ],
-      "apps/api/src/health/dtos/capabilities.response.dto.ts": [
-        "client-capabilities"
-      ],
       "apps/mobile/lib/flama.ts": [
         "app-config",
         "app-imports"
@@ -60,25 +58,23 @@
       "scripts/check-frontend-structure.mjs": [
         "app-config-files"
       ]
-    },
-    "regenerate": [
-      "generate:api-client",
-      "generate:openapi"
-    ]
+    }
   },
   "files": {
     "apps/api/src/auth/infrastructure/oauth-providers.config.ts": "files/apps/api/src/auth/infrastructure/oauth-providers.config.ts",
     "apps/api/src/capabilities/__tests__/oauth.capability.spec.ts": "files/apps/api/src/capabilities/__tests__/oauth.capability.spec.ts",
     "apps/api/src/config/oauth.config.ts": "files/apps/api/src/config/oauth.config.ts",
-    "apps/mobile/lib/social-providers.tsx": "files/apps/mobile/lib/social-providers.tsx",
-    "apps/web/src/lib/social-providers.tsx": "files/apps/web/src/lib/social-providers.tsx",
+    "apps/mobile/lib/social-providers.ts": "files/apps/mobile/lib/social-providers.ts",
+    "apps/web/src/lib/social-providers.ts": "files/apps/web/src/lib/social-providers.ts",
     "e2e/tests/api/oauth.spec.ts": "files/e2e/tests/api/oauth.spec.ts",
+    "e2e/tests/web/oauth-buttons.spec.ts": "files/e2e/tests/web/oauth-buttons.spec.ts",
     "apps/docs/docs/getting-started/google-sign-in.md": "files/apps/docs/docs/getting-started/google-sign-in.md"
   },
   "filesNeed": {
-    "apps/mobile/lib/social-providers.tsx": "mobile",
-    "apps/web/src/lib/social-providers.tsx": "web",
+    "apps/mobile/lib/social-providers.ts": "mobile",
+    "apps/web/src/lib/social-providers.ts": "web",
     "e2e/tests/api/oauth.spec.ts": "e2e",
+    "e2e/tests/web/oauth-buttons.spec.ts": "web",
     "apps/docs/docs/getting-started/google-sign-in.md": "docs"
   },
   "blocks": [
@@ -111,11 +107,6 @@
       "file": "apps/api/src/config/index.ts",
       "anchor": "api-config",
       "source": "blocks/apps_api_src_config_index_ts_1.txt"
-    },
-    {
-      "file": "apps/api/src/health/dtos/capabilities.response.dto.ts",
-      "anchor": "client-capabilities",
-      "source": "blocks/apps_api_src_health_dtos_capabilities_response_dto_ts.txt"
     },
     {
       "file": "apps/mobile/lib/flama.ts",
