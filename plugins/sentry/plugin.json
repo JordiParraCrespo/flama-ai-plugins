@@ -1,0 +1,84 @@
+{
+  "id": "sentry",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Sentry error reporting",
+    "summary": "Sentry in the mobile app: `apps/mobile/sentry.ts`, imported at launch, initialises the SDK when `EXPO_PUBLIC_SENTRY_DSN` is set and reports the errors the app logs, which is where the kit's error boundaries put what they catch; the Expo config plugin uploads source maps from release builds when `SENTRY_ORG` and `SENTRY_PROJECT` are set, and Metro builds its base config through Sentry's factory so each bundle carries the debug ID its source maps are uploaded under",
+    "identifiers": [
+      "Sentry",
+      "@sentry/",
+      "getSentryExpoConfig",
+      "EXPO_PUBLIC_SENTRY_DSN",
+      "SENTRY_ORG",
+      "SENTRY_PROJECT"
+    ],
+    "paths": [
+      "apps/mobile/sentry.ts",
+      "apps/mobile/types/sentry-env.d.ts"
+    ],
+    "slots": {
+      ".env.example": [
+        "mobile-env"
+      ],
+      "apps/mobile/app.config.ts": [
+        "expo-plugins"
+      ],
+      "apps/mobile/index.ts": [
+        "launch"
+      ],
+      "apps/mobile/metro.config.js": [
+        "metro-config-factory"
+      ]
+    },
+    "requires": [
+      "mobile"
+    ],
+    "json": [
+      {
+        "file": "apps/mobile/package.json",
+        "path": [
+          "dependencies"
+        ],
+        "set": {
+          "@sentry/react-native": "~7.11.0"
+        },
+        "setAt": [
+          18
+        ]
+      }
+    ]
+  },
+  "files": {
+    "apps/mobile/sentry.ts": "files/apps/mobile/sentry.ts",
+    "apps/mobile/types/sentry-env.d.ts": "files/apps/mobile/types/sentry-env.d.ts"
+  },
+  "filesNeed": {
+    "apps/mobile/sentry.ts": "mobile",
+    "apps/mobile/types/sentry-env.d.ts": "mobile"
+  },
+  "blocks": [
+    {
+      "file": ".env.example",
+      "anchor": "mobile-env",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": "apps/mobile/app.config.ts",
+      "anchor": "expo-plugins",
+      "source": "blocks/apps_mobile_app_config_ts.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/mobile/index.ts",
+      "anchor": "launch",
+      "source": "blocks/apps_mobile_index_ts.txt",
+      "needs": "mobile"
+    },
+    {
+      "file": "apps/mobile/metro.config.js",
+      "anchor": "metro-config-factory",
+      "source": "blocks/apps_mobile_metro_config_js.txt",
+      "needs": "mobile"
+    }
+  ]
+}
