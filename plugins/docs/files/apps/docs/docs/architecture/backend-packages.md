@@ -15,7 +15,7 @@ Cross-cutting concerns shared across all NestJS apps.
 | `AppError`                                  | Catalog error — an `HttpException` carrying a `code`, a stable title and a per-occurrence `detail`                   |
 | `AllExceptionsFilter`                       | Global filter rendering every exception as an [RFC 7807 problem document](../errors.md) (`application/problem+json`) |
 | `ProblemDetailsDto` / `ApiProblemResponse`  | Swagger model + decorator for documenting error responses                                                            |
-| `RequestContextInterceptor`                 | Sets a correlation ID per request via `AsyncLocalStorage`                                                            |
+| `RequestContextMiddleware`                  | Opens the request's correlation ID (`RequestContextService`) before guards run, echoed as `x-correlation-id` |
 | `RequestContextService`                     | Static wrapper — `run()`, `getCorrelationId()`, `setCorrelationId()`                                                 |
 | `Mapper<Entity, ServiceModel, ResponseDto>` | 3-layer mapper interface with `toRepository`, `toService`, `toController`                                            |
 | `SanitizePipe`                              | Recursively strips HTML tags from all string inputs                                                                  |
@@ -27,16 +27,19 @@ Cross-cutting concerns shared across all NestJS apps.
 ```typescript
 import {
   AllExceptionsFilter,
-  RequestContextInterceptor,
+  RequestContextMiddleware,
 } from "@flama/backend-core";
 
 @Module({
-  providers: [
-    { provide: APP_FILTER, useClass: AllExceptionsFilter },
-    { provide: APP_INTERCEPTOR, useClass: RequestContextInterceptor },
-  ],
+  providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  // Middleware, not an interceptor: guards run before interceptors, and a
+  // guard's 401/403/429 must carry the correlation id too.
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestContextMiddleware).forRoutes("*");
+  }
+}
 ```
 
 ## `@flama/backend-email`
