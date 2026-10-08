@@ -21,8 +21,9 @@ vet:
 test:
 	$(GO) test -count=1 ./...
 
-# The race detector needs cgo and a C compiler, which the CI runners lack;
-# run it locally before pushing anything concurrent.
+# The race detector needs cgo and a C compiler; CI runs it in its own job on
+# a hosted runner that has one. Run it locally before pushing anything
+# concurrent.
 test-race:
 	CGO_ENABLED=1 $(GO) test -race -count=1 ./...
 

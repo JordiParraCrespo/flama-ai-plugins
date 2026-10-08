@@ -67,3 +67,30 @@ func TestProductionRejectsThePlaceholderBootstrapKey(t *testing.T) {
 		t.Fatalf("development keeps the placeholder working out of the box: %v", err)
 	}
 }
+
+func TestAdminAddrIsOptionalAndValidated(t *testing.T) {
+	cfg, err := Parse(lookup(map[string]string{"RUNNER_BOOTSTRAP_API_KEY": key}))
+	if err != nil || cfg.AdminAddr != "" {
+		t.Fatalf("admin listener should default to off: %q %v", cfg.AdminAddr, err)
+	}
+	cfg, err = Parse(lookup(map[string]string{"RUNNER_BOOTSTRAP_API_KEY": key, "RUNNER_ADMIN_ADDR": "127.0.0.1:9006"}))
+	if err != nil || cfg.AdminAddr != "127.0.0.1:9006" {
+		t.Fatalf("%q %v", cfg.AdminAddr, err)
+	}
+	_, err = Parse(lookup(map[string]string{"RUNNER_BOOTSTRAP_API_KEY": key, "RUNNER_ADMIN_ADDR": "9006"}))
+	if err == nil || !strings.Contains(err.Error(), "RUNNER_ADMIN_ADDR") {
+		t.Fatalf("a bare port should be refused: %v", err)
+	}
+}
+
+func TestParsePortNeedsNoSecrets(t *testing.T) {
+	if port, err := ParsePort(lookup(map[string]string{})); err != nil || port != 3006 {
+		t.Fatalf("%d %v", port, err)
+	}
+	if port, err := ParsePort(lookup(map[string]string{"RUNNER_PORT": "4000"})); err != nil || port != 4000 {
+		t.Fatalf("%d %v", port, err)
+	}
+	if _, err := ParsePort(lookup(map[string]string{"RUNNER_PORT": "x"})); err == nil {
+		t.Fatal("a bad port should fail")
+	}
+}

@@ -91,7 +91,7 @@ func TestSubscribeAndPublish(t *testing.T) {
 }
 
 // A WebSocket must outlive the HTTP request scope: when the request context
-// is cancelled (as the SIGTERM base context is on shutdown), the read loop
+// is cancelled (as httpx.Serve does when the drain overruns), the read loop
 // must not tear the connection down before hub.Close delivers its
 // going-away frame. This reproduces that ordering and asserts the client
 // still sees a clean 1001.
@@ -102,7 +102,7 @@ func TestShutdownClosesGoingAwayDespiteRequestCancel(t *testing.T) {
 	handler := Handler(hub, &problem.Writer{}, logger, nil)
 
 	// Each request's context is cancelled the moment the handler starts,
-	// standing in for the base context dying on SIGTERM.
+	// standing in for the server giving up on its requests.
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		reqCtx, cancel := context.WithCancel(auth.WithPrincipal(r.Context(), principal))
 		cancel()

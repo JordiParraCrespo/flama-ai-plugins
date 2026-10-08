@@ -22,6 +22,8 @@ with real ones, or the whole context with yours, and keep the shell.
 | Authorization     | `internal/scopes` on `packages/go/auth/scope` | This service's `resource:read|write` catalog; `write` implies `read`                   |
 | WebSocket         | `packages/go/ws`                            | Hub with topic subscriptions, backpressure, ping keepalive, graceful going-away          |
 | Health            | `packages/go/health`                        | `/healthz`, `/readyz` with registered checkers, `/health/capabilities`                   |
+| Lifecycle         | `packages/go/core/lifecycle`                | Every resource opened at boot is closed in reverse on shutdown, or unwound if boot fails |
+| Metrics, profiling | `packages/go/core/metrics`, `httpx.AdminHandler` | Optional internal listener: Prometheus `/metrics`, `/debug/pprof/`                |
 | Logging           | `packages/go/core/logging`                  | `slog`, JSON in production, one access-log line per request with the correlation id     |
 | Architecture test | `internal/arch`                            | Fails the build when an import crosses a hexagon boundary                                |
 
@@ -80,6 +82,48 @@ Subscribe to `jobs/<id>` for one job only.
 Every failure is a problem document; the codes are listed on the docs site's
 error reference under "Runner service".
 
+### Admin listener
+
+Set `RUNNER_ADMIN_ADDR` (e.g. `127.0.0.1:9006`, the `.env.example` value)
+and a second listener serves what operators, not callers, need. It is off
+when the variable is empty, which is how compose and Helm deploy it.
+
+| Path             | Purpose                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `/metrics`       | Prometheus text: WebSocket connections, queue depth and capacity, running jobs, jobs finished by status, build info, Go runtime |
+| `/debug/pprof/`  | The Go profiler: heap, goroutines, CPU (`/debug/pprof/profile?seconds=30`), trace  |
+
+Nothing on it is authenticated — a heap profile is for whoever reaches the
+port — so bind it to loopback or a private interface and never publish it.
+
+```bash
+curl -s localhost:9006/metrics
+go tool pprof http://localhost:9006/debug/pprof/heap
+```
+
+## Command line
+
+The binary serves when run with no arguments, which is what the image does.
+Two subcommands exist for the distroless image, which has no shell or curl:
+
+```bash
+runner version       # the -ldflags stamp, or the VCS revision of a plain go build
+runner healthcheck   # GET /healthz on 127.0.0.1:$RUNNER_PORT; exit 0 when it answers 200
+```
+
+`docker/docker-compose.prod.yml` uses `["CMD", "/runner", "healthcheck"]`.
+
+## Shutdown
+
+On SIGTERM the listener stops accepting and in-flight requests finish —
+their contexts are not the signal's. Then, within the same
+`RUNNER_SHUTDOWN_TIMEOUT` budget, what boot opened closes in reverse: every
+WebSocket gets `1001 Going Away`, the job workers are waited on (their jobs
+were cancelled with the signal), the database pool closes, the admin
+listener last. A request or a runner still going when the budget is spent is
+abandoned and logged, not waited on: a persisted job left `running` is
+failed by the next start.
+
 ## Credentials
 
 - **Bootstrap key** — `RUNNER_BOOTSTRAP_API_KEY`. Holds every scope, exists
@@ -105,6 +149,8 @@ All variables are documented in the root `.env.example` under "Runner
 ```bash
 docker build -f apps/runner/Dockerfile -t flama-runner .
 docker run --rm -p 3006:3006 -e RUNNER_BOOTSTRAP_API_KEY=… flama-runner
+docker exec <container> /runner healthcheck
 ```
 
-Static binary on a distroless base, non-root, ~10 MB.
+Static binary on a distroless base, non-root, ~10 MB. The binary is its
+own healthcheck (see "Command line").

@@ -40,6 +40,11 @@ idioms.
   and calls `server.New`. No wiring lives in `main`.
 - `internal/server` is the **composition root**: the only package that names
   concrete adapters. A context's `module.go` may pick its own defaults.
+- Whatever `server.New` opens — a pool, a listener, a worker pool — registers
+  its cleanup on the server's `core/lifecycle` stack the moment it exists.
+  A failing `New` closes the stack to unwind what it opened; `Shutdown` is
+  closing it, last opened first. Never close a resource by hand in an error
+  branch, and give every cleanup a deadline it can be abandoned at.
 - A bounded context is `internal/<name>/{domain,app,adapters/*,module.go}`.
   `domain` imports nothing but `core/problem`, `auth/scope` and the app's
   `scopes`; `app` adds `auth` and `core`; adapters import their own context
@@ -91,11 +96,25 @@ idioms.
   `chi` is the only acceptable addition if groups outgrow `httpx.Router`.
 - Never set a global write timeout on the server — it kills WebSockets. Bound
   headers (`ReadHeaderTimeout`) and bodies (`httpx.MaxBytes`) instead.
+- A request's context is not the signal context. On SIGTERM `httpx.Serve`
+  stops accepting, lets in-flight requests finish within
+  `RUNNER_SHUTDOWN_TIMEOUT`, then runs the shutdown hooks (sockets get
+  `1001`, workers are waited on, pools close); only a request still running
+  when the budget is spent sees its context cancelled.
+- `/metrics` and `/debug/pprof/` live on the optional admin listener
+  (`RUNNER_ADMIN_ADDR`, `httpx.AdminHandler`), never on the public router.
+  It is unauthenticated: loopback or a private interface, never published.
+  A new gauge or counter is a function registered on the server's
+  `core/metrics` registry over a number something already keeps; there is
+  no Prometheus client.
 - One goroutine writes to a socket. Publishers enqueue on a bounded channel
   and a full channel closes the client (`ws/conn.go`); never block a publisher
   on a slow consumer.
 - Long-lived work takes a `context.Context` and stops when it is cancelled;
   `Cancel` on a job is a context cancellation, not a flag the runner polls.
+  Waiting for that work takes a context too: a runner that ignores
+  cancellation is abandoned at the shutdown deadline and logged, never
+  waited on forever.
 
 ## Config and environment
 
@@ -108,10 +127,26 @@ idioms.
 
 ## Tooling
 
-- `make -C packages/go build vet lint test` (golangci-lint, config in the
-  root `.golangci.yml`) is what `.github/workflows/runner.yml` runs across
-  the workspace; `make test-race` is local only (the runners have no C
-  compiler). All three must be clean before a push that touches goroutines.
+- `make -C packages/go build vet lint test test-race` (golangci-lint, config
+  in the root `.golangci.yml`) is what `.github/workflows/runner.yml` runs
+  across the workspace: build, vet, lint and test on `gha-vm`, the race
+  detector in its own job on GitHub's hosted image (which has the C compiler
+  cgo needs), and `govulncheck` over every module. All of them must be clean
+  before a push; run `make test-race` locally for anything concurrent.
+- Code that parses outside input — a header, a frame, a file, a scope — has
+  a native fuzz target (`func FuzzX(f *testing.F)` in a `*_fuzz_test.go`)
+  with a seed corpus of real and hostile cases, and checks a property beyond
+  "does not panic" (round trips, what may be accepted). `go test` runs the
+  seeds; run the fuzzer itself with
+  `go test -run='^$' -fuzz='^FuzzX$' -fuzztime=30s ./path`. A crasher it
+  writes to `testdata/fuzz/` is committed with the fix, as a regression seed.
+- The Go version is the `toolchain` line in the root `go.work` (CI's
+  setup-go installs exactly that, and `govulncheck` scans its standard
+  library); every module's `go.mod` carries the same `go` and `toolchain`
+  lines, and `apps/runner/Dockerfile` builds on the same minor
+  (`golang:<minor>-alpine`). A bump changes all three together. Stay on a
+  supported release: `govulncheck` fails on standard-library fixes that
+  only ship in newer Go.
 - Add a dependency only when the standard library cannot do the job, and pin
   it in `go.mod` with `go mod tidy`.
 - Tests use `httptest` end to end (`internal/server/server_test.go`) and the

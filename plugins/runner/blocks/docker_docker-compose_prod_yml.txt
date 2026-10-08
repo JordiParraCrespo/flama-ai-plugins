@@ -18,6 +18,15 @@
       # Empty keeps service tokens off (see GET /health/capabilities).
       RUNNER_JWT_SECRET: ${RUNNER_JWT_SECRET:-}
       ERROR_TYPE_BASE_URL: ${ERROR_TYPE_BASE_URL:-https://flama.dev/errors}
+    healthcheck:
+      # The image is distroless (no shell, no curl), so the binary probes
+      # itself: `runner healthcheck` GETs /healthz on RUNNER_PORT. Liveness,
+      # not readiness: a full job queue fails /readyz, not this.
+      test: ["CMD", "/runner", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     # Not published: only the API (on the compose network) talks to it.
     expose:
       - "3006"

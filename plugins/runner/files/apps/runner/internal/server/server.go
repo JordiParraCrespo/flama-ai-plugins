@@ -6,7 +6,9 @@ package server
 
 import (
 	"context"
+	"errors"
 	"log/slog"
+	"net"
 	"net/http"
 	"time"
 
@@ -17,7 +19,10 @@ import (
 	"github.com/jordiparracrespo/flama-ai/apps/runner/internal/jobs"
 	jobspg "github.com/jordiparracrespo/flama-ai/apps/runner/internal/jobs/adapters/postgres"
 	jobsapp "github.com/jordiparracrespo/flama-ai/apps/runner/internal/jobs/app"
+	"github.com/jordiparracrespo/flama-ai/apps/runner/internal/jobs/domain"
 	"github.com/jordiparracrespo/flama-ai/packages/go/auth"
+	"github.com/jordiparracrespo/flama-ai/packages/go/core/lifecycle"
+	"github.com/jordiparracrespo/flama-ai/packages/go/core/metrics"
 	"github.com/jordiparracrespo/flama-ai/packages/go/core/problem"
 	"github.com/jordiparracrespo/flama-ai/packages/go/health"
 	"github.com/jordiparracrespo/flama-ai/packages/go/httpx"
@@ -41,13 +46,34 @@ type Server struct {
 	Jobs    *jobs.Module
 	APIKeys *apikeys.Module
 	Health  *health.Module
-	// pool is non-nil when RUNNER_DATABASE_URL is set; closed on Shutdown.
-	pool   *pgxpool.Pool
-	logger *slog.Logger
+	Metrics *metrics.Registry
+
+	// closers holds everything New opened, in the order it was opened;
+	// Shutdown (or a failing New) closes it in reverse.
+	closers lifecycle.Stack
+	// admin is the internal listener, nil when RUNNER_ADMIN_ADDR is empty.
+	admin *adminServer
+	// stopWorkers cancels the job workers' context. Start detaches that
+	// context from the signal, so workers keep draining the queue while
+	// in-flight requests (which may enqueue) finish; Shutdown cancels it.
+	stopWorkers context.CancelFunc
+	logger      *slog.Logger
 }
 
-// New builds the application. Nothing starts running until Start.
-func New(ctx context.Context, cfg *config.Config, logger *slog.Logger) (*Server, error) {
+// New builds the application. Nothing starts running until Start, but
+// resources are acquired here — the database pool, the admin port — so a
+// misconfiguration fails boot. Every one is registered on the server's
+// cleanup stack as it is acquired, and any error unwinds what came before.
+func New(ctx context.Context, cfg *config.Config, logger *slog.Logger) (_ *Server, err error) {
+	s := &Server{logger: logger, Metrics: &metrics.Registry{}}
+	defer func() {
+		if err != nil {
+			if cerr := s.closers.Close(ctx); cerr != nil {
+				err = errors.Join(err, cerr)
+			}
+		}
+	}()
+
 	problems := &problem.Writer{TypeBaseURL: cfg.ErrorTypeBaseURL, Logger: logger}
 
 	// Optional capability: service tokens.
@@ -67,6 +93,17 @@ func New(ctx context.Context, cfg *config.Config, logger *slog.Logger) (*Server,
 
 	hub := ws.NewHub(logger.With(slog.String("module", "ws")), ws.DefaultOptions())
 
+	// The internal listener binds now, so a taken port fails boot, and
+	// serves from Start. Anything that fails after this unwinds it.
+	if cfg.AdminAddr != "" {
+		admin, err := listenAdmin(ctx, cfg.AdminAddr, s.Metrics, logger)
+		if err != nil {
+			return nil, err
+		}
+		s.admin = admin
+		s.closers.Add("admin listener", admin.close)
+	}
+
 	// Optional capability: Postgres persistence. Empty URL keeps the
 	// in-memory stores (Repository nil in the module options).
 	var (
@@ -80,12 +117,13 @@ func New(ctx context.Context, cfg *config.Config, logger *slog.Logger) (*Server,
 			return nil, err
 		}
 		pool = p
+		// Registered before the workers and the hub, so it closes after
+		// them; Serve calls Shutdown only once requests have drained.
+		s.closers.Add("postgres pool", func(context.Context) error { pool.Close(); return nil })
 		if keysRepo, err = keyspg.New(ctx, pool); err != nil {
-			pool.Close()
 			return nil, err
 		}
 		if jobsRepo, err = jobspg.New(ctx, pool); err != nil {
-			pool.Close()
 			return nil, err
 		}
 	}
@@ -151,25 +189,128 @@ func New(ctx context.Context, cfg *config.Config, logger *slog.Logger) (*Server,
 		api.Handle("GET /v1/ws", ws.Handler(hub, problems, logger, jobsModule.Authorize()))
 	})
 
-	return &Server{Handler: root, Hub: hub, Jobs: jobsModule, APIKeys: keys, Health: healthModule, pool: pool, logger: logger}, nil
+	s.Handler, s.Hub, s.Jobs, s.APIKeys, s.Health = root, hub, jobsModule, keys, healthModule
+	registerMetrics(s.Metrics, cfg.Version, hub, jobsModule)
+
+	// Shutdown order, last registered first: say goodbye on every socket,
+	// then wait for the workers (bounded — a runner ignoring cancellation
+	// is abandoned at the deadline, not waited on forever).
+	s.closers.Add("job workers", func(ctx context.Context) error {
+		if s.stopWorkers != nil {
+			s.stopWorkers()
+		}
+		return s.Jobs.Service.Wait(ctx)
+	})
+	s.closers.Add("websocket hub", func(ctx context.Context) error { hub.Close(ctx); return nil })
+
+	return s, nil
 }
 
-// Start launches background work (the job workers). It returns at once.
+// Start launches background work (the job workers, the admin listener). It
+// returns at once. The workers outlive ctx: a signal ends ctx as the HTTP
+// drain begins, and a request still draining may enqueue a job it has
+// already answered 202 for, so the workers stop only when Shutdown runs,
+// after the drain.
 func (s *Server) Start(ctx context.Context) {
-	s.Jobs.Start(ctx)
+	workers, stop := context.WithCancel(context.WithoutCancel(ctx))
+	s.stopWorkers = stop
+	s.Jobs.Start(workers)
 	// Reconcile jobs a previous run left behind (persistent store only).
-	if err := s.Jobs.Recover(ctx); err != nil {
+	if err := s.Jobs.Recover(workers); err != nil {
 		s.logger.Error("job recovery failed", slog.Any("error", err))
 	}
+	if s.admin != nil {
+		s.admin.serve()
+	}
 }
 
-// Shutdown closes long-lived connections and waits for workers.
-func (s *Server) Shutdown(ctx context.Context) {
-	s.Hub.Close(ctx)
-	s.Jobs.Service.Wait()
-	if s.pool != nil {
-		s.pool.Close()
+// AdminAddr is the address the internal listener is bound to, or "" when it
+// is off. Tests bind 127.0.0.1:0 and read the port back from here.
+func (s *Server) AdminAddr() string {
+	if s.admin == nil {
+		return ""
 	}
+	return s.admin.ln.Addr().String()
+}
+
+// Shutdown closes what New opened, in reverse: the WebSocket hub, the job
+// workers, the database pool, the admin listener (last, so /metrics and
+// pprof can watch a slow shutdown). httpx.Serve calls it once the HTTP
+// drain is over, with what is left of the shutdown budget; nothing here
+// outlives that deadline.
+func (s *Server) Shutdown(ctx context.Context) {
+	if err := s.closers.Close(ctx); err != nil {
+		s.logger.Warn("shutdown incomplete", slog.Any("error", err))
+	}
+}
+
+// registerMetrics is what /metrics reports: the Go runtime, and the
+// numbers the hub and the job queue already keep.
+func registerMetrics(r *metrics.Registry, version string, hub *ws.Hub, jobsModule *jobs.Module) {
+	metrics.RegisterRuntime(r)
+	svc := jobsModule.Service
+	r.Register("runner_build_info", "The running version.", metrics.Gauge, func() []metrics.Sample {
+		return []metrics.Sample{{Labels: []metrics.Label{{Name: "version", Value: version}}, Value: 1}}
+	})
+	r.GaugeFunc("runner_ws_connections", "Open WebSocket connections.", func() float64 { return float64(hub.Len()) })
+	r.GaugeFunc("runner_jobs_queue_depth", "Jobs queued and not yet picked up by a worker.", func() float64 { return float64(svc.Depth()) })
+	r.GaugeFunc("runner_jobs_queue_capacity", "Queued jobs beyond which POST /v1/jobs answers 429.", func() float64 { return float64(svc.Capacity()) })
+	r.GaugeFunc("runner_jobs_running", "Jobs a worker is executing.", func() float64 { return float64(svc.Running()) })
+	r.Register("runner_jobs_finished_total", "Jobs this process took to a terminal status, by status.", metrics.Counter, func() []metrics.Sample {
+		finished := svc.Finished()
+		out := make([]metrics.Sample, 0, len(finished))
+		for _, status := range []domain.Status{domain.StatusSucceeded, domain.StatusFailed, domain.StatusCancelled} {
+			out = append(out, metrics.Sample{Labels: []metrics.Label{{Name: "status", Value: string(status)}}, Value: float64(finished[status])})
+		}
+		return out
+	})
+}
+
+// adminServer is the internal listener: bound in New, served from Start,
+// closed by the cleanup stack.
+type adminServer struct {
+	ln     net.Listener
+	srv    *http.Server
+	logger *slog.Logger
+}
+
+func listenAdmin(ctx context.Context, addr string, reg *metrics.Registry, logger *slog.Logger) (*adminServer, error) {
+	ln, err := (&net.ListenConfig{}).Listen(ctx, "tcp", addr)
+	if err != nil {
+		return nil, err
+	}
+	logger = logger.With(slog.String("module", "admin"))
+	return &adminServer{
+		ln: ln,
+		srv: &http.Server{
+			Handler:           httpx.AdminHandler(reg.Handler()),
+			ReadHeaderTimeout: 10 * time.Second,
+			ErrorLog:          slog.NewLogLogger(logger.Handler(), slog.LevelWarn),
+		},
+		logger: logger,
+	}, nil
+}
+
+func (a *adminServer) serve() {
+	a.logger.Info("admin listener serving /metrics and /debug/pprof", slog.String("addr", a.ln.Addr().String()))
+	go func() {
+		if err := a.srv.Serve(a.ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			a.logger.Error("admin listener stopped", slog.Any("error", err))
+		}
+	}()
+}
+
+// close stops the listener whether or not serve ever ran (Shutdown only
+// closes listeners Serve was handed).
+func (a *adminServer) close(ctx context.Context) error {
+	err := a.srv.Shutdown(ctx)
+	if err != nil {
+		err = errors.Join(err, a.srv.Close())
+	}
+	if cerr := a.ln.Close(); cerr != nil && !errors.Is(cerr, net.ErrClosed) {
+		err = errors.Join(err, cerr)
+	}
+	return err
 }
 
 type saturated struct{}

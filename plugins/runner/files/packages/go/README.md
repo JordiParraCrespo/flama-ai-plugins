@@ -8,16 +8,17 @@ directives so it stays buildable and tidy-able on its own.
 
 | Module       | npm name           | Purpose                                                                          |
 | ------------ | ------------------ | -------------------------------------------------------------------------------- |
-| `core`       | `@flama/go-core`   | `problem`: RFC 7807 documents mirroring the API's; `logging`: slog setup         |
+| `core`       | `@flama/go-core`   | `problem`: RFC 7807 documents mirroring the API's; `logging`: slog setup; `lifecycle`: the cleanup stack; `metrics`: Prometheus text exposition |
 | `config`     | `@flama/go-config` | Root `.env` loader mirroring `@flama/env`; typed accessors that collect errors   |
-| `httpx`      | `@flama/go-httpx`  | `net/http` router with middleware groups, error-returning handlers, JSON, server |
+| `httpx`      | `@flama/go-httpx`  | `net/http` router with middleware groups, error-returning handlers, JSON, server with a graceful drain, admin routes (`/metrics`, pprof) |
 | `health`     | `@flama/go-health` | `/healthz`, `/readyz` with registered checkers, `/health/capabilities`           |
 | `auth`       | `@flama/go-auth`   | Bearer middleware, `Principal`, scope grammar and guard, HS256 service tokens    |
 | `ws`         | `@flama/go-ws`     | WebSocket hub: topics, backpressure, keepalive, graceful going-away              |
 | `postgres`   | `@flama/go-postgres` | Pooled `pgx` connection, forward-only SQL migrator (advisory-locked), readiness checker |
 
 Dependency flow: `core` ← `httpx` ← `health`, `auth` ← `ws`; `config` and
-`postgres` stand alone. A module never imports an app.
+`postgres` stand alone. `core` imports only the standard library, its
+`lifecycle` and `metrics` packages included. A module never imports an app.
 
 ## How Turborepo sees them
 
@@ -35,6 +36,7 @@ linted and tested by `go` itself, through the Makefile below locally and
 
 ```bash
 make -C packages/go build vet lint test   # whole workspace, from go.work
+make -C packages/go test-race             # the same tests under the race detector (needs a C compiler)
 make -C packages/go tidy                  # go mod tidy for every module
 ```
 
@@ -91,9 +93,9 @@ concern, tied together by a `go.work` at the repo root:
 
 | Module   | Turborepo name     | Provides                                                   |
 | -------- | ------------------ | ---------------------------------------------------------- |
-| `core`   | `@flama/go-core`   | RFC 7807 documents, slog setup                             |
+| `core`   | `@flama/go-core`   | RFC 7807 documents, slog setup, cleanup stack, metrics     |
 | `config` | `@flama/go-config` | Root `.env` loader, typed accessors that collect errors    |
-| `httpx`  | `@flama/go-httpx`  | Router with middleware groups, JSON helpers, server        |
+| `httpx`  | `@flama/go-httpx`  | Router with middleware groups, JSON helpers, server, admin routes |
 | `auth`   | `@flama/go-auth`   | Bearer middleware, `Principal`, scope grammar, JWT         |
 | `health` | `@flama/go-health` | Liveness, readiness, capabilities                          |
 | `ws`     | `@flama/go-ws`     | WebSocket hub with backpressure and keepalive              |
@@ -124,6 +126,16 @@ build relies on.
   structured access logs, body limits and a trusted-proxy setting.
 - **WebSocket** hub with topic subscriptions, per-connection backpressure,
   ping keepalive and a `1001 Going Away` on shutdown.
+- **Shutdown** that drains: in-flight requests finish within the budget,
+  then a cleanup stack (`core/lifecycle`) closes sockets, workers and the
+  pool in reverse order of opening, abandoning at the deadline whatever
+  ignores it. The same stack unwinds a boot that fails half-way.
+- **Operations**: an optional internal listener (`RUNNER_ADMIN_ADDR`) with
+  Prometheus `/metrics` and `/debug/pprof/`, and a binary that is its own
+  healthcheck (`runner healthcheck`, `runner version`) for the distroless
+  image.
+- **Fuzz targets** on every parser of outside input: scopes, the bearer
+  header and service tokens, WebSocket frames, `.env` lines, API keys.
 - **Jobs** as the example context: submit, list, cancel over REST; every
   transition pushed over the socket; a worker pool with cancellation.
 
@@ -131,10 +143,12 @@ build relies on.
 
 The standard library is the framework. Since Go 1.22 `net/http` routes by
 method and path parameter, which removed the reason to reach for Gin, Echo,
-Fiber or Gorilla's mux. The template adds exactly two dependencies:
-`coder/websocket` and `golang-jwt`. Reach for `chi` only if you need route
-groups the stdlib mux cannot express, and for `pgx` plus `goose` when the
-in-memory repositories give way to Postgres.
+Fiber or Gorilla's mux. The template adds exactly three dependencies:
+`coder/websocket`, `golang-jwt` and `pgx` for the optional Postgres stores.
+Reach for `chi` only if you need route groups the stdlib mux cannot
+express. Metrics are the Prometheus text format written by hand over
+functions the service registers (`core/metrics`); bring in
+`prometheus/client_golang` when you need histograms, not before.
 
 ### Running and building
 
@@ -145,7 +159,8 @@ docker build -f apps/runner/Dockerfile .        # distroless, non-root, ~10 MB
 ```
 
 CI builds, vets, lints and tests the whole workspace in its own workflow,
-`.github/workflows/runner.yml` (the race detector needs a C compiler the
-runners lack, so `make test-race` is a local step); the image is built with
-the others, because `apps/runner` has a Dockerfile. See
+`.github/workflows/runner.yml`, which also runs the race detector (on
+GitHub's hosted image: it needs a C compiler the `gha-vm` runners lack) and
+`govulncheck` over every module; the image is built with the others,
+because `apps/runner` has a Dockerfile. See
 `apps/runner/ARCHITECTURE.md` for the "add a bounded context" cookbook.

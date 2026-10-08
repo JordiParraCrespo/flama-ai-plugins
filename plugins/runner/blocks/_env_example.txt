@@ -37,6 +37,11 @@ RUNNER_TRUST_PROXY=0
 RUNNER_SHUTDOWN_TIMEOUT=
 # Maximum JSON request body in bytes (default 1048576)
 RUNNER_MAX_BODY_BYTES=
+# Optional internal listener (host:port) serving Prometheus metrics at
+# /metrics and the Go profiler at /debug/pprof/. Unauthenticated, so bind it
+# to loopback or a private interface and never publish it. Empty keeps it
+# off, which is the production default.
+RUNNER_ADMIN_ADDR=127.0.0.1:9006
 # Worker goroutines executing jobs (default 4) and the queued-job cap beyond
 # which POST /v1/jobs answers 429 (default 1024)
 RUNNER_JOB_WORKERS=

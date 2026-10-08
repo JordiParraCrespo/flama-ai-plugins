@@ -148,6 +148,10 @@
   },
   "snapshots": [
     {
+      "file": ".github/CODEOWNERS",
+      "source": "snapshots/.github/CODEOWNERS"
+    },
+    {
       "file": "apps/api/src/app.module.ts",
       "source": "snapshots/apps/api/src/app.module.ts"
     },

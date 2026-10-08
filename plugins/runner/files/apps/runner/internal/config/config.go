@@ -10,6 +10,7 @@ package config
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -48,6 +49,11 @@ type Config struct {
 	// service-token verifier and issuing endpoint; /capabilities says so.
 	JWT *JWTConfig
 
+	// AdminAddr is the optional internal listener for /metrics and
+	// /debug/pprof (host:port). Empty keeps it off. It is unauthenticated,
+	// so it binds loopback or a private interface and is never published.
+	AdminAddr string
+
 	// Jobs tunes the example bounded context.
 	Jobs JobsConfig
 }
@@ -70,12 +76,35 @@ type JobsConfig struct {
 // Load resolves configuration. Outside production it also applies the root
 // `.env`, located by walking up from the working directory.
 func Load() (*Config, error) {
-	if mode, _ := config.ParseMode(os.Getenv("RUNNER_ENV")); mode != config.Production {
-		if err := config.LoadWorkspaceDotenv(); err != nil {
-			return nil, fmt.Errorf("load .env: %w", err)
-		}
+	if err := loadDotenv(); err != nil {
+		return nil, err
 	}
 	return Parse(os.LookupEnv)
+}
+
+// LoadPort resolves only the listen port, the one thing `runner healthcheck`
+// needs: the probe must work without the secrets a full Load requires.
+func LoadPort() (int, error) {
+	if err := loadDotenv(); err != nil {
+		return 0, err
+	}
+	return ParsePort(os.LookupEnv)
+}
+
+// ParsePort reads RUNNER_PORT exactly as Parse does.
+func ParsePort(lookup config.Lookup) (int, error) {
+	env := config.NewEnv(lookup)
+	port := env.Int("RUNNER_PORT", 3006)
+	return port, env.Err()
+}
+
+func loadDotenv() error {
+	if mode, _ := config.ParseMode(os.Getenv("RUNNER_ENV")); mode != config.Production {
+		if err := config.LoadWorkspaceDotenv(); err != nil {
+			return fmt.Errorf("load .env: %w", err)
+		}
+	}
+	return nil
 }
 
 // Parse builds a Config from a lookup function so tests never touch the
@@ -104,6 +133,7 @@ func Parse(lookup config.Lookup) (*Config, error) {
 		MaxBodyBytes:     int64(env.Int("RUNNER_MAX_BODY_BYTES", 1<<20)),
 		BootstrapAPIKey:  env.Secret("RUNNER_BOOTSTRAP_API_KEY", 32),
 		DatabaseURL:      env.Optional("RUNNER_DATABASE_URL"),
+		AdminAddr:        env.Optional("RUNNER_ADMIN_ADDR"),
 		Jobs: JobsConfig{
 			Workers:   env.Int("RUNNER_JOB_WORKERS", 4),
 			QueueSize: env.Int("RUNNER_JOB_QUEUE_SIZE", 1024),
@@ -113,6 +143,12 @@ func Parse(lookup config.Lookup) (*Config, error) {
 	// The value .env.example ships is long enough to pass, and public.
 	if mode == config.Production && strings.HasPrefix(cfg.BootstrapAPIKey, "change-me") {
 		env.Failf("RUNNER_BOOTSTRAP_API_KEY is the .env.example placeholder; generate one with `openssl rand -base64 32`")
+	}
+
+	if cfg.AdminAddr != "" {
+		if _, _, err := net.SplitHostPort(cfg.AdminAddr); err != nil {
+			env.Failf("RUNNER_ADMIN_ADDR must be host:port (e.g. 127.0.0.1:9006): %v", err)
+		}
 	}
 
 	if secret := env.Optional("RUNNER_JWT_SECRET"); secret != "" {

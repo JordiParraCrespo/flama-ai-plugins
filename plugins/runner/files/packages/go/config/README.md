@@ -13,7 +13,11 @@ own `internal/config` is the list of what it reads.
 
 - `FindWorkspaceRoot(dir)` walks up until it finds `pnpm-workspace.yaml`.
 - `LoadDotenv(root)` applies `.env.local` then `.env`; a value already in the
-  environment is never touched, a missing file is not an error.
+  environment is never touched, a missing file is not an error. Lines read
+  the way `dotenv` reads them: `export ` is optional, a quoted value may be
+  followed by a `# comment`, and a line with a key outside `[A-Za-z0-9_.-]`
+  or a NUL is skipped rather than failing the load (`os.Setenv` would refuse
+  it, and the service would not boot over one stray line).
 
 `env.go`
 

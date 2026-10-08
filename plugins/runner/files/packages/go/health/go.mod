@@ -1,6 +1,8 @@
 module github.com/jordiparracrespo/flama-ai/packages/go/health
 
-go 1.24
+go 1.25.0
+
+toolchain go1.25.14
 
 require github.com/jordiparracrespo/flama-ai/packages/go/httpx v0.0.0
 

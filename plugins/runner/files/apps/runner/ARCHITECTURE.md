@@ -10,14 +10,17 @@ the shared modules under `packages/go/` (the Go counterpart of
 ```
 packages/go/                  shared toolkit, one Go module each (see its README)
   core/problem core/logging   RFC 7807 documents, slog setup
+  core/lifecycle              cleanup stack: LIFO, deadline-bounded, idempotent
+  core/metrics                Prometheus text exposition over registered funcs
   config/                     root .env loader, typed env accessors
-  httpx/                      router, middleware, JSON, server lifecycle
+  httpx/                      router, middleware, JSON, server lifecycle, admin routes
   auth/ auth/scope            Principal, bearer middleware, scope grammar + guard, JWT
   health/                     /healthz /readyz /health/capabilities
   ws/                         hub, connection, envelope, upgrade handler
 
 apps/runner/
-cmd/server/main.go            signals, config, logger → server.New → httpx.Serve
+cmd/server/main.go            signals, config, logger → server.New → httpx.Serve;
+                              `version` and `healthcheck` subcommands
 internal/
   server/                     composition root: the only importer of adapters
   config/                     the variables this service reads → Config
@@ -103,7 +106,46 @@ writer goroutine; a client that cannot keep up is closed rather than allowed
 to stall a publisher. The hub is domain-agnostic — a context supplies a
 `ws.Authorizer` for the topics it owns (`jobs/adapters/ws.Authorize`), and
 the composition root passes it to the upgrade handler. Shutdown closes every
-socket with `1001 Going Away` before the HTTP drain.
+socket with `1001 Going Away` once the HTTP drain is over; the sockets are
+hijacked connections, so they keep streaming events while requests drain.
+
+## Lifecycle
+
+`server.New` acquires what the service needs — the admin port, the database
+pool — and registers each cleanup on a `core/lifecycle` stack the moment the
+resource exists. Any later error closes the stack, so a boot that fails
+half-way releases the port and the pool instead of leaking them, with no
+cleanup written by hand in an error branch. `Start` launches the workers and
+the admin listener.
+
+Shutdown is `httpx.Serve` and that stack, one `RUNNER_SHUTDOWN_TIMEOUT`
+budget for both:
+
+```
+SIGTERM ─ listener closes ─ in-flight requests finish (their context is not the signal's)
+        └ Server.Shutdown = stack.Close, last opened first:
+            websocket hub   1001 Going Away to every socket
+            job workers     cancel, then wait; a runner ignoring cancellation is abandoned and logged
+            postgres pool   after everything that could hold a connection
+            admin listener  last, so /metrics and pprof can watch a slow shutdown
+```
+
+The job workers do not run on the signal context: a request still draining
+may enqueue a job it has answered `202` for, so the workers keep taking
+jobs until `Shutdown` cancels them, after the drain. The wait is for
+runners to return. Whatever is still
+running at the deadline is reported by name and left behind — a persisted
+job stays `running` and the next start fails it (`Service.Recover`).
+
+## Operations
+
+The admin listener (`RUNNER_ADMIN_ADDR`, off when empty) is a second
+`http.Server` on `httpx.AdminHandler`: `/metrics` and `/debug/pprof/`, apart
+from the public router and unauthenticated, so it binds loopback or a
+private interface. `/metrics` is a `core/metrics` registry the composition
+root fills with functions over numbers the code already keeps — `Hub.Len`,
+the queue's depth and capacity, running jobs, `Service.Finished` by status —
+plus the Go runtime. A new metric is one more registration there.
 
 ## Adding a bounded context
 
@@ -136,6 +178,7 @@ socket with `1001 Going Away` before the HTTP drain.
 - **OpenAPI**: write `api/openapi.yaml` by hand or generate it with
   `oapi-codegen`, then point `pnpm generate:api-client` at it so the NestJS
   side talks through a typed client.
-- **Metrics/tracing**: add a `/metrics` handler and an OpenTelemetry
-  middleware in `platform`; nothing else changes.
+- **Tracing**: an OpenTelemetry middleware on the root router; nothing else
+  changes. Metrics are done (see "Operations"); histograms are the point to
+  swap `core/metrics` for `prometheus/client_golang`.
 - **Rate limiting**: a per-principal token bucket as one more `httpx.Middleware`.
