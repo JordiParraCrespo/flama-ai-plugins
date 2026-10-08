@@ -46,6 +46,11 @@
       "source": "blocks/docker_docker-compose_prod_yml.txt"
     },
     {
+      "file": ".github/dependabot.yml",
+      "anchor": "dependabot",
+      "source": "blocks/_github_dependabot_yml.txt"
+    },
+    {
       "file": "helm/flama/values.yaml",
       "anchor": "services",
       "source": "blocks/helm_flama_values_yaml.txt",
