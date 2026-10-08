@@ -52,8 +52,12 @@ type Server struct {
 	// Shutdown (or a failing New) closes it in reverse.
 	closers lifecycle.Stack
 	// admin is the internal listener, nil when RUNNER_ADMIN_ADDR is empty.
-	admin  *adminServer
-	logger *slog.Logger
+	admin *adminServer
+	// stopWorkers cancels the job workers' context. Start detaches that
+	// context from the signal, so workers keep draining the queue while
+	// in-flight requests (which may enqueue) finish; Shutdown cancels it.
+	stopWorkers context.CancelFunc
+	logger      *slog.Logger
 }
 
 // New builds the application. Nothing starts running until Start, but
@@ -191,18 +195,28 @@ func New(ctx context.Context, cfg *config.Config, logger *slog.Logger) (_ *Serve
 	// Shutdown order, last registered first: say goodbye on every socket,
 	// then wait for the workers (bounded — a runner ignoring cancellation
 	// is abandoned at the deadline, not waited on forever).
-	s.closers.Add("job workers", s.Jobs.Service.Wait)
+	s.closers.Add("job workers", func(ctx context.Context) error {
+		if s.stopWorkers != nil {
+			s.stopWorkers()
+		}
+		return s.Jobs.Service.Wait(ctx)
+	})
 	s.closers.Add("websocket hub", func(ctx context.Context) error { hub.Close(ctx); return nil })
 
 	return s, nil
 }
 
 // Start launches background work (the job workers, the admin listener). It
-// returns at once.
+// returns at once. The workers outlive ctx: a signal ends ctx as the HTTP
+// drain begins, and a request still draining may enqueue a job it has
+// already answered 202 for, so the workers stop only when Shutdown runs,
+// after the drain.
 func (s *Server) Start(ctx context.Context) {
-	s.Jobs.Start(ctx)
+	workers, stop := context.WithCancel(context.WithoutCancel(ctx))
+	s.stopWorkers = stop
+	s.Jobs.Start(workers)
 	// Reconcile jobs a previous run left behind (persistent store only).
-	if err := s.Jobs.Recover(ctx); err != nil {
+	if err := s.Jobs.Recover(workers); err != nil {
 		s.logger.Error("job recovery failed", slog.Any("error", err))
 	}
 	if s.admin != nil {

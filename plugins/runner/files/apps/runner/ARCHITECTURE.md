@@ -125,13 +125,15 @@ budget for both:
 SIGTERM ─ listener closes ─ in-flight requests finish (their context is not the signal's)
         └ Server.Shutdown = stack.Close, last opened first:
             websocket hub   1001 Going Away to every socket
-            job workers     wait; a runner ignoring cancellation is abandoned and logged
+            job workers     cancel, then wait; a runner ignoring cancellation is abandoned and logged
             postgres pool   after everything that could hold a connection
             admin listener  last, so /metrics and pprof can watch a slow shutdown
 ```
 
-The job workers run on the signal context, so their jobs are cancelled the
-moment SIGTERM arrives; the wait is for runners to return. Whatever is still
+The job workers do not run on the signal context: a request still draining
+may enqueue a job it has answered `202` for, so the workers keep taking
+jobs until `Shutdown` cancels them, after the drain. The wait is for
+runners to return. Whatever is still
 running at the deadline is reported by name and left behind — a persisted
 job stays `running` and the next start fails it (`Service.Recover`).
 

@@ -425,3 +425,47 @@ func TestShutdownClosesTheStack(t *testing.T) {
 		t.Fatal("admin listener still accepting after Shutdown")
 	}
 }
+
+// A signal ends the context Start was given as the HTTP drain begins, and a
+// request still draining may enqueue a job it answers 202 for. The workers
+// must still be there to run it; only Shutdown, after the drain, stops them.
+func TestWorkersOutliveTheSignalUntilShutdown(t *testing.T) {
+	env := map[string]string{"RUNNER_BOOTSTRAP_API_KEY": bootstrap, "RUNNER_ENV": "test", "RUNNER_JOB_WORKERS": "1"}
+	cfg, err := config.Parse(func(k string) (string, bool) { v, ok := env[k]; return v, ok })
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv, err := New(context.Background(), cfg, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	signal, stop := context.WithCancel(context.Background())
+	srv.Start(signal)
+	ts := httptest.NewServer(srv.Handler)
+	defer ts.Close()
+
+	stop() // SIGTERM: the drain starts, the request below is still in flight
+
+	res, body := call(t, ts, http.MethodPost, "/v1/jobs", bootstrap, map[string]any{"kind": "sleep", "payload": map[string]int{"durationMs": 10}})
+	if res.StatusCode != 202 {
+		t.Fatalf("%d %s", res.StatusCode, body)
+	}
+	var job struct{ ID string }
+	_ = json.Unmarshal(body, &job)
+
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		_, body = call(t, ts, http.MethodGet, "/v1/jobs/"+job.ID, bootstrap, nil)
+		if strings.Contains(string(body), `"status":"succeeded"`) {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("job accepted after the signal never ran: %s", body)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	srv.Shutdown(ctx)
+}
