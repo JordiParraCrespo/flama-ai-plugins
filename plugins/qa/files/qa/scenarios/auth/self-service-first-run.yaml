@@ -25,7 +25,7 @@ docsRefs:
 codeRefs:
   - apps/web/src/routes/_auth/register.tsx
   - apps/web/src/routes/onboarding.tsx
-  - apps/api/src/organizations/organizations.controller.ts
+  - apps/api/src/organizations/commands/create-organization/create-organization.http.controller.ts
 
 preconditions:
   - 'The `reset` fixture, so the newcomer can register again.'

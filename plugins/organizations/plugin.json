@@ -243,10 +243,6 @@
       "source": "snapshots/packages/shared/src/permissions/endpoint-policies.ts"
     },
     {
-      "file": "scripts/check-api-structure.mjs",
-      "source": "snapshots/scripts/check-api-structure.mjs"
-    },
-    {
       "file": "apps/mcp/src/tools/index.ts",
       "source": "snapshots/apps/mcp/src/tools/index.ts",
       "needs": "mcp"
