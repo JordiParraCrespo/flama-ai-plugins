@@ -1,6 +1,8 @@
 module github.com/jordiparracrespo/flama-ai/packages/go/ws
 
-go 1.24
+go 1.25.0
+
+toolchain go1.25.14
 
 require (
 	github.com/coder/websocket v1.8.15

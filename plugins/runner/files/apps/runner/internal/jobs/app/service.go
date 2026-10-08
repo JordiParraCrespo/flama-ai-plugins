@@ -8,7 +8,9 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sort"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/jordiparracrespo/flama-ai/apps/runner/internal/jobs/domain"
@@ -31,6 +33,10 @@ type Service struct {
 	mu      sync.Mutex
 	running map[string]context.CancelFunc
 	wg      sync.WaitGroup
+
+	// finished counts terminal transitions this process made, by status,
+	// for metrics. Read-only map after New; the counters are atomic.
+	finished map[domain.Status]*atomic.Uint64
 }
 
 // Options wire the service.
@@ -75,6 +81,9 @@ func New(opts Options) *Service {
 		queue:   make(chan string, opts.QueueSize),
 		workers: opts.Workers,
 		running: map[string]context.CancelFunc{},
+		finished: map[domain.Status]*atomic.Uint64{
+			domain.StatusSucceeded: {}, domain.StatusFailed: {}, domain.StatusCancelled: {},
+		},
 	}
 }
 
@@ -128,7 +137,7 @@ func (s *Service) Submit(ctx context.Context, in SubmitInput) (domain.Job, error
 		}
 		return domain.Job{}, domain.ErrQueueFull.WithDetail("capacity %d", cap(s.queue))
 	}
-	s.pub.Publish(ctx, domain.Event{Name: domain.EventQueued, Job: job})
+	s.publish(ctx, domain.Event{Name: domain.EventQueued, Job: job})
 	return job, nil
 }
 
@@ -168,7 +177,7 @@ func (s *Service) Cancel(ctx context.Context, id string) (domain.Job, error) {
 		cancel()
 	}
 	s.mu.Unlock()
-	s.pub.Publish(ctx, domain.Event{Name: domain.EventCancelled, Job: job})
+	s.publish(ctx, domain.Event{Name: domain.EventCancelled, Job: job})
 	return job, nil
 }
 
@@ -231,7 +240,7 @@ func (s *Service) Recover(ctx context.Context) error {
 			return fmt.Errorf("fail interrupted job %s: %w", j.ID, err)
 		}
 		s.logger.InfoContext(ctx, "failed interrupted job on startup", slog.String("jobId", j.ID))
-		s.pub.Publish(ctx, domain.Event{Name: domain.EventFinished, Job: updated})
+		s.publish(ctx, domain.Event{Name: domain.EventFinished, Job: updated})
 	}
 
 	queued := domain.StatusQueued
@@ -254,8 +263,62 @@ func (s *Service) Recover(ctx context.Context) error {
 	return nil
 }
 
-// Wait blocks until every worker has exited.
-func (s *Service) Wait() { s.wg.Wait() }
+// Wait blocks until every worker has exited, or until ctx ends. Workers
+// stop when the context given to Start is cancelled, but a runner that
+// ignores its context keeps its worker busy; Wait does not let that hold a
+// shutdown past its deadline. It logs the jobs still running when it gives
+// up and returns ctx's error. Those jobs stay `running` in a persistent
+// store, and the next start fails them (Recover).
+func (s *Service) Wait(ctx context.Context) error {
+	done := make(chan struct{})
+	go func() {
+		s.wg.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+		return nil
+	case <-ctx.Done():
+	}
+	s.mu.Lock()
+	abandoned := make([]string, 0, len(s.running))
+	for id := range s.running {
+		abandoned = append(abandoned, id)
+	}
+	s.mu.Unlock()
+	sort.Strings(abandoned)
+	s.logger.WarnContext(ctx, "stopped waiting for job workers",
+		slog.Any("error", ctx.Err()),
+		slog.Int("abandoned", len(abandoned)),
+		slog.Any("jobIds", abandoned),
+	)
+	return fmt.Errorf("job workers still running %v: %w", abandoned, ctx.Err())
+}
+
+// Running is the number of jobs a worker is executing, for metrics.
+func (s *Service) Running() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return len(s.running)
+}
+
+// Finished is how many jobs this process took to each terminal status since
+// it started, for metrics. Restarts reset it, as counters do.
+func (s *Service) Finished() map[domain.Status]uint64 {
+	out := make(map[domain.Status]uint64, len(s.finished))
+	for status, n := range s.finished {
+		out[status] = n.Load()
+	}
+	return out
+}
+
+// publish emits an event and counts the terminal ones.
+func (s *Service) publish(ctx context.Context, ev domain.Event) {
+	if n, ok := s.finished[ev.Job.Status]; ok && (ev.Name == domain.EventFinished || ev.Name == domain.EventCancelled) {
+		n.Add(1)
+	}
+	s.pub.Publish(ctx, ev)
+}
 
 // Depth is the number of queued job ids, for readiness and metrics.
 func (s *Service) Depth() int { return len(s.queue) }
@@ -279,7 +342,7 @@ func (s *Service) execute(ctx context.Context, log *slog.Logger, id string) {
 		log.Error("could not mark job running", slog.String("jobId", id), slog.Any("error", err))
 		return
 	}
-	s.pub.Publish(ctx, domain.Event{Name: domain.EventStarted, Job: job})
+	s.publish(ctx, domain.Event{Name: domain.EventStarted, Job: job})
 
 	runCtx, cancel := context.WithCancel(ctx)
 	s.mu.Lock()
@@ -327,7 +390,7 @@ func (s *Service) execute(ctx context.Context, log *slog.Logger, id string) {
 	} else {
 		log.Info("job succeeded", slog.String("jobId", id), slog.String("kind", job.Kind), slog.Duration("took", now.Sub(startedAt)))
 	}
-	s.pub.Publish(ctx, domain.Event{Name: domain.EventFinished, Job: current})
+	s.publish(ctx, domain.Event{Name: domain.EventFinished, Job: current})
 }
 
 // run isolates a runner panic to the job it was executing.

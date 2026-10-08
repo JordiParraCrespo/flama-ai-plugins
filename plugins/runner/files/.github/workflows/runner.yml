@@ -1,10 +1,11 @@
 name: Runner
 
 # The Go service and the modules it is built from (apps/runner,
-# packages/go/*): build, vet, lint and test, with the Go toolchain the Node
-# jobs in ci.yml do not carry. This workflow arrives with the runner and
-# leaves with it. It is not path-filtered, so it always reports and can be
-# required; a pull request that touches no Go passes after the diff.
+# packages/go/*): build, vet, lint and test, the race detector, and a
+# vulnerability scan, with the Go toolchain the Node jobs in ci.yml do not
+# carry. This workflow arrives with the runner and leaves with it. It is not
+# path-filtered, so every job always reports and can be required; a pull
+# request that touches no Go passes each one after the diff.
 on:
   push:
     branches: [main]
@@ -13,25 +14,39 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
 
+# Nothing here writes to the repository or the registry.
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # The repo root is not a module, so `./...` does not resolve there; the
+  # module path spans every module go.work declares.
+  PKGS: github.com/jordiparracrespo/flama-ai/...
+  GOLANGCI_LINT_VERSION: v2.5.0
+  # The newest govulncheck that builds with Go 1.25 (v1.8.0 needs 1.26); a
+  # newer one would switch toolchains and scan that Go's standard library
+  # instead of the one the runner is built with.
+  GOVULNCHECK_VERSION: v1.7.0
+
 jobs:
-  go:
-    name: Go
+  # A push to main always checks; a pull request or merge group only when
+  # its diff reaches a Go module, go.work, the linter config or this file.
+  # One gate, read by every job below, so the pattern lives in one place.
+  changes:
+    name: Go changes
     runs-on: gha-vm
     if: github.event.pull_request.draft != true
-    env:
-      # The repo root is not a module, so `./...` does not resolve there; the
-      # module path spans every module go.work declares.
-      PKGS: github.com/jordiparracrespo/flama-ai/...
+    outputs:
+      go: ${{ steps.diff.outputs.go }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-      # A push to main always checks; a pull request or merge group only when
-      # its diff reaches a Go module, go.work, the linter config or this file.
+          persist-credentials: false
       - id: diff
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
@@ -40,29 +55,110 @@ jobs:
             | grep -qE '^(apps/runner/|packages/go/|go\.work|\.golangci\.yml$|\.github/workflows/runner\.yml$)'; then
             echo "go=true" >> "$GITHUB_OUTPUT"
           fi
-      - if: steps.diff.outputs.go == 'true'
-        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+
+  go:
+    name: Go
+    needs: changes
+    runs-on: gha-vm
+    steps:
+      - if: needs.changes.outputs.go == 'true'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - if: needs.changes.outputs.go == 'true'
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
           go-version-file: go.work
           cache-dependency-path: |
             apps/runner/go.sum
             packages/go/*/go.sum
       - name: Build
-        if: steps.diff.outputs.go == 'true'
+        if: needs.changes.outputs.go == 'true'
         run: go build "$PKGS"
       - name: Vet
-        if: steps.diff.outputs.go == 'true'
+        if: needs.changes.outputs.go == 'true'
         run: go vet "$PKGS"
-      # Includes apps/runner/internal/arch, the layer boundaries. The gha-vm
-      # runners ship no C compiler, and -race needs cgo; run the race detector
-      # locally (make test-race).
+      # Includes apps/runner/internal/arch, the layer boundaries, and every
+      # fuzz target's seed corpus (testdata/fuzz) as a regression test.
       - name: Test
-        if: steps.diff.outputs.go == 'true'
+        if: needs.changes.outputs.go == 'true'
         run: go test -count=1 "$PKGS"
+      # The action only installs the pinned release (checksum-verified, no
+      # script from a branch head); golangci-lint itself runs below because
+      # it needs one directory pattern per module, which the action's single
+      # working directory cannot express.
+      - if: needs.changes.outputs.go == 'true'
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: ${{ env.GOLANGCI_LINT_VERSION }}
+          install-only: true
       - name: Lint
-        if: steps.diff.outputs.go == 'true'
+        if: needs.changes.outputs.go == 'true'
+        # `go list -m` in workspace mode lists exactly the modules go.work
+        # declares.
+        run: golangci-lint run $(go list -m -f '{{.Dir}}/...')
+
+  # The race detector needs cgo and a C compiler. The gha-vm runners ship
+  # none, so this job runs on GitHub's hosted image, which has gcc.
+  race:
+    name: Go (race)
+    needs: changes
+    runs-on: ubuntu-latest
+    steps:
+      # Records every outbound call the job makes; audit only, as in
+      # scorecard.yml. GitHub-hosted runners only, hence this job alone.
+      - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        with:
+          egress-policy: audit
+      - if: needs.changes.outputs.go == 'true'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - if: needs.changes.outputs.go == 'true'
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version-file: go.work
+          cache-dependency-path: |
+            apps/runner/go.sum
+            packages/go/*/go.sum
+      - name: Test with the race detector
+        if: needs.changes.outputs.go == 'true'
+        env:
+          CGO_ENABLED: "1"
+        run: go test -race -count=1 "$PKGS"
+
+  # Known vulnerabilities in the code paths the modules actually call, from
+  # the Go vulnerability database, against the standard library of the
+  # toolchain go.work pins (`toolchain go1.25.x`, which setup-go installs).
+  vulncheck:
+    name: Go (vulnerabilities)
+    needs: changes
+    runs-on: gha-vm
+    steps:
+      - if: needs.changes.outputs.go == 'true'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - if: needs.changes.outputs.go == 'true'
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version-file: go.work
+          cache-dependency-path: |
+            apps/runner/go.sum
+            packages/go/*/go.sum
+      - name: govulncheck
+        if: needs.changes.outputs.go == 'true'
+        # Set on this step only: setup-go reads go.work's toolchain line
+        # unless GOTOOLCHAIN=local is already in its environment.
+        env:
+          GOTOOLCHAIN: local
+        # govulncheck runs inside one module at a time; every module go.work
+        # declares is scanned, and any finding fails the job.
         run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.5.0
-          # golangci-lint needs directory patterns, one per module; `go list -m`
-          # in workspace mode lists exactly the modules go.work declares.
-          golangci-lint run $(go list -m -f '{{.Dir}}/...')
+          status=0
+          for dir in $(go list -m -f '{{.Dir}}'); do
+            echo "::group::${dir#"$GITHUB_WORKSPACE"/}"
+            (cd "$dir" && go run "golang.org/x/vuln/cmd/govulncheck@$GOVULNCHECK_VERSION" ./...) || status=1
+            echo "::endgroup::"
+          done
+          exit "$status"

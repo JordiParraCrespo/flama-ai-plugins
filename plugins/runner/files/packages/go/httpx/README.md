@@ -33,8 +33,23 @@ and compatible with any third-party middleware.
 `server.go`
 
 - `ServerOptions` and `Serve(ctx, logger, opts, handler, onShutdown...)`:
-  listens until the context is cancelled, runs the hooks, then drains for
-  `ShutdownTimeout`. No global write timeout, so WebSockets survive.
+  listens (on `Addr`, or on `Listener` when one is handed over) until the
+  context is cancelled, then shuts down within one `ShutdownTimeout`
+  budget. Request contexts are not derived from the signal context, so
+  in-flight requests finish during the drain instead of failing on
+  SIGTERM; hijacked connections (WebSockets) keep streaming. After the
+  drain the hooks run with what is left of the budget — close sockets,
+  wait for workers, release pools — so nothing a request still holds is
+  closed under it. A request still running when the budget is spent has
+  its context cancelled and its connection closed. No global write
+  timeout, so WebSockets survive.
+
+`admin.go`
+
+- `AdminHandler(metrics)`: the routes of an internal listener, apart from
+  the public router — `GET /metrics` (the handler passed in, normally a
+  `metrics.Registry`) and `net/http/pprof` under `/debug/pprof/`.
+  Unauthenticated by design: bind it to loopback or a private interface.
 
 ## How to use it
 

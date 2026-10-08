@@ -9,6 +9,12 @@
 
 - A new problem is a catalog entry via `problem.New(code, status, title)` in the service that owns it; the shared codes here are the ones every service reports.
 - Log fields go through the `slog` logger `logging.New` builds; no other logger.
+- Something a constructor opens is closed through a `lifecycle.Stack`, not
+  by hand in each error branch; a metric is a function on a
+  `metrics.Registry` over a value the service already keeps.
+- This module stays on the standard library. A metric type the text format
+  cannot express without storing samples (histograms) is the point to adopt
+  `prometheus/client_golang`, not to grow `metrics`.
 - Anything a second service would copy belongs here; anything one service
   owns stays in that service under `internal/`.
 

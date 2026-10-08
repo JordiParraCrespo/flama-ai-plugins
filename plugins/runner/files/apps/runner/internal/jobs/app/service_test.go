@@ -5,7 +5,9 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -136,7 +138,9 @@ func TestCancelWinsOverLateCompletion(t *testing.T) {
 	}
 	close(release)
 	cancel()
-	svc.Wait()
+	if err := svc.Wait(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 
 	final, _ := repo.FindByID(context.Background(), job.ID)
 	if final.Status != domain.StatusCancelled {
@@ -193,7 +197,9 @@ func TestCancelBeforeRegistrationNeverRuns(t *testing.T) {
 	}
 	time.Sleep(20 * time.Millisecond)
 	cancel()
-	svc.Wait()
+	if err := svc.Wait(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 
 	select {
 	case <-ran:
@@ -269,5 +275,76 @@ func TestRecoverRequeuesQueuedAndFailsInterrupted(t *testing.T) {
 			t.Fatalf("recovery incomplete: q1=%s r1=%s", q1.Status, r1.Status)
 		}
 		time.Sleep(5 * time.Millisecond)
+	}
+}
+
+// A runner that ignores cancellation must not hold a shutdown past its
+// deadline: Wait gives up, names the job it abandoned, and returns.
+func TestWaitRespectsTheDeadline(t *testing.T) {
+	repo := newMemRepo()
+	started := make(chan struct{})
+	release := make(chan struct{})
+	defer close(release)
+	svc := newService(repo, RunnerFunc(func(context.Context, domain.Job) error {
+		close(started)
+		<-release // ignores ctx on purpose
+		return nil
+	}), 4)
+	ctx, cancel := context.WithCancel(context.Background())
+	svc.Start(ctx)
+	job, err := svc.Submit(callerCtx(), SubmitInput{Kind: "r"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	<-started
+	if svc.Running() != 1 {
+		t.Fatalf("running %d", svc.Running())
+	}
+	cancel()
+
+	waitCtx, waitCancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer waitCancel()
+	begin := time.Now()
+	err = svc.Wait(waitCtx)
+	if took := time.Since(begin); took > time.Second {
+		t.Fatalf("Wait blocked %v past its deadline", took)
+	}
+	if !errors.Is(err, context.DeadlineExceeded) || !strings.Contains(err.Error(), job.ID) {
+		t.Fatalf("Wait should report the abandoned job: %v", err)
+	}
+}
+
+func TestFinishedCountsTerminalTransitions(t *testing.T) {
+	repo := newMemRepo()
+	fail := errors.New("nope")
+	var calls atomic.Int32
+	svc := newService(repo, RunnerFunc(func(context.Context, domain.Job) error {
+		if calls.Add(1) == 1 {
+			return nil
+		}
+		return fail
+	}), 4)
+	ctx, cancel := context.WithCancel(context.Background())
+	svc.Start(ctx)
+	for i := 0; i < 2; i++ {
+		if _, err := svc.Submit(callerCtx(), SubmitInput{Kind: "r"}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	deadline := time.Now().Add(2 * time.Second)
+	for {
+		f := svc.Finished()
+		if f[domain.StatusSucceeded]+f[domain.StatusFailed] == 2 || time.Now().After(deadline) {
+			break
+		}
+		time.Sleep(time.Millisecond)
+	}
+	cancel()
+	if err := svc.Wait(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	f := svc.Finished()
+	if f[domain.StatusSucceeded] != 1 || f[domain.StatusFailed] != 1 || f[domain.StatusCancelled] != 0 {
+		t.Fatalf("finished %v", f)
 	}
 }

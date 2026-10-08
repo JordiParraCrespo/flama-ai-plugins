@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("{\"type\":\"event\",\"topic\":\"jobs\",\"event\":\"job.\xa9\xa9\xa9started\",\"payload\":{\"&\": [0,100000, null]}}")
