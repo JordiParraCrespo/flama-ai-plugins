@@ -20,8 +20,8 @@ docsRefs:
   - AUTHORIZATION.md
   - .agents/rules/rbac-roles.md
 codeRefs:
-  - apps/api/src/organizations/members.controller.ts
-  - apps/api/src/organizations/invitations.controller.ts
+  - apps/api/src/organizations/queries/list-members/list-members.http.controller.ts
+  - apps/api/src/organizations/queries/list-organization-invitations/list-organization-invitations.http.controller.ts
 
 preconditions:
   - 'The `empty` fixture for the reader, with `volume` applied beside it so the
