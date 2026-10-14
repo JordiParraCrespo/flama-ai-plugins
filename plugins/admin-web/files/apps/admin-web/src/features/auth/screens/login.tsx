@@ -1,9 +1,10 @@
-import { useLogin } from '@flama/frontend-core/react';
+import { isTwoFactorRequired, useLogin } from '@flama/frontend-core/react';
 import {
   AuthSubtitle,
   AuthTitle,
   OAuthCallbackNotice,
   SocialLoginButtons,
+  TwoFactorChallenge,
 } from '@flama/frontend-web';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +21,25 @@ export function LoginScreen({
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { mutate, isPending, error } = useLogin();
+  const { mutate, isPending, error, reset } = useLogin();
+
+  const enterApp = () => {
+    // Split rather than pass the whole string as `to`: the target may
+    // carry search params (`/settings?section=security`), and `to` is a
+    // path — everything after the `?` would be swallowed into the pathname.
+    const [pathname, query] = (redirectTo ?? '/users').split('?');
+    navigate({
+      to: pathname,
+      search: Object.fromEntries(new URLSearchParams(query ?? '')),
+    });
+  };
+
+  // The password was right and the account has two-factor on: the sign-in is
+  // not a failure, it owes a code. Derived from the mutation rather than kept
+  // as state, so "back" is just forgetting that attempt.
+  if (isTwoFactorRequired(error)) {
+    return <TwoFactorChallenge onSuccess={enterApp} onCancel={reset} />;
+  }
 
   return (
     <>
@@ -57,18 +76,7 @@ export function LoginScreen({
             });
           }
 
-          mutate(values, {
-            onSuccess: () => {
-              // Split rather than pass the whole string as `to`: the target may
-              // carry search params (`/settings?section=security`), and `to` is a
-              // path — everything after the `?` would be swallowed into the pathname.
-              const [pathname, query] = (redirectTo ?? '/users').split('?');
-              navigate({
-                to: pathname,
-                search: Object.fromEntries(new URLSearchParams(query ?? '')),
-              });
-            },
-          });
+          mutate(values, { onSuccess: enterApp });
         }}
       />
 
