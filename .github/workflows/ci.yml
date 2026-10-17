@@ -65,7 +65,7 @@ jobs:
           path: .flama-ai
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 22
+          node-version: 26
       - name: Unit tests
         run: node --test scripts/*.test.mjs
       # A shared block's body is carried for projects that pruned its other
@@ -99,7 +99,7 @@ jobs:
           package_json_file: .flama-ai/package.json
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 22
+          node-version: 26
       # The round trip proves a plugin installs; it does not prove the code it
       # installs compiles. Nothing else does either, now that `apps/cli` has
       # left the starter — so its build, tests and lint run here, against the

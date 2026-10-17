@@ -102,7 +102,7 @@ runner:
 
 postgres:
   enabled: true
-  image: postgres:16-alpine
+  image: postgres:18-alpine
   storage: 10Gi
   env:
     POSTGRES_USER: flama
@@ -111,7 +111,7 @@ postgres:
 
 redis:
   enabled: true
-  image: redis:7-alpine
+  image: redis:8-alpine
   storage: 1Gi
 
 ingress:
