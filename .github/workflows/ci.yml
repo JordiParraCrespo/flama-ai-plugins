@@ -151,8 +151,11 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 26
+      # `--no-install`: the plugin adds a package the lockfile has never seen,
+      # and CI makes the installer's own install frozen. The next step installs
+      # with the lockfile unfrozen; the extension regenerates nothing.
       - name: Install the plugin
-        run: node .flama-ai/scripts/plugins/plugin.mjs add extension --from "$GITHUB_WORKSPACE"
+        run: node .flama-ai/scripts/plugins/plugin.mjs add extension --from "$GITHUB_WORKSPACE" --no-install
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
         working-directory: .flama-ai
