@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_QUOTE, readSnapshot } from '../snapshot';
+import { MAX_QUOTE } from '@/runtime/quote';
+import { readSnapshot } from '../snapshot';
 
 /**
  * What the content script reads off a page. What breaks if these fail: a

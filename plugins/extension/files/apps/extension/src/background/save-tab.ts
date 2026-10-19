@@ -1,6 +1,7 @@
 import { chromeMessage } from '@/runtime/i18n';
 import type { Clip } from '@/runtime/items';
 import { MessageError, sendToTab } from '@/runtime/messaging';
+import { toQuote } from '@/runtime/quote';
 import { flashBadge, injectContentScript, isScriptable } from '@/runtime/tabs';
 import { addClip } from './clips';
 
@@ -33,7 +34,7 @@ export async function saveTab(tabId: number, quote?: string): Promise<Clip> {
   const clip = await addClip({
     url: snapshot.url,
     title: snapshot.title.trim() || snapshot.url,
-    quote: (quote ?? snapshot.selection).trim(),
+    quote: toQuote(quote ?? snapshot.selection),
   });
   // The toast is a courtesy: a page that navigated away cannot show it, and
   // the clip is already kept.

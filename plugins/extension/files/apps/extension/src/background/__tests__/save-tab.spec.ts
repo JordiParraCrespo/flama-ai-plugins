@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createFakeChrome, type FakeChrome } from '@/runtime/__tests__/fake-chrome';
 import type { Clip } from '@/runtime/items';
 import { listen, MessageError } from '@/runtime/messaging';
+import { MAX_QUOTE } from '@/runtime/quote';
 import { SAVE_ERRORS, saveTab, saveTabQuietly } from '../save-tab';
 
 /**
@@ -72,6 +73,12 @@ describe('saveTab', () => {
 
   it('prefers the text a context-menu click hands over to the page selection', async () => {
     await expect(saveTab(7, ' from the menu ')).resolves.toMatchObject({ quote: 'from the menu' });
+  });
+
+  it('caps and collapses a context-menu selection as it does a page selection', async () => {
+    const clip = await saveTab(7, `  one\n\n  two ${'x'.repeat(MAX_QUOTE * 2)}`);
+    expect(clip.quote).toHaveLength(MAX_QUOTE);
+    expect(clip.quote.startsWith('one two x')).toBe(true);
   });
 
   it('refuses a page Chrome closes to extensions, saying why, without injecting', async () => {

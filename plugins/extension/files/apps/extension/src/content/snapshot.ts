@@ -1,7 +1,5 @@
 import type { PageSnapshot } from '@/runtime/protocol';
-
-/** Long enough for a paragraph, short enough that a whole article is not a "selection". */
-export const MAX_QUOTE = 2_000;
+import { toQuote } from '@/runtime/quote';
 
 /**
  * What a page shows, read when asked and not before. Only what the person can
@@ -17,7 +15,7 @@ export function readSnapshot(document: Document, selection: Selection | null): P
   return {
     url: document.URL,
     title: document.title,
-    selection: (selection?.toString() ?? '').replace(/\s+/g, ' ').trim().slice(0, MAX_QUOTE),
+    selection: toQuote(selection?.toString() ?? ''),
     description: description.trim(),
   };
 }
