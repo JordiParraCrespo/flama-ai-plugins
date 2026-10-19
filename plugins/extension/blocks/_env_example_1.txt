@@ -1,0 +1,18 @@
+# flama:begin extension
+# ------------------------------------------------------------------------------
+# Chrome extension (apps/extension) — EXTENSION_PUBLIC_* values are public:
+# baked into the package at build time, which anyone can unzip
+# ------------------------------------------------------------------------------
+
+# The API origin. Also the manifest's one host permission, which is what lets
+# the session cookie ride along with the extension's requests.
+EXTENSION_PUBLIC_API_URL=http://localhost:3001
+# The web app, for the flows the extension opens it for (sign-up, password reset)
+EXTENSION_PUBLIC_WEB_URL=http://localhost:3000
+# Public key that pins the unpacked build's extension id, so EXTENSION_IDS can
+# name it. `pnpm --filter @flama/extension keygen` prints both lines. Empty
+# leaves the id to Chrome; `pnpm --filter @flama/extension zip` strips it,
+# because the Web Store assigns its own.
+EXTENSION_PUBLIC_KEY=
+# flama:end extension
+

@@ -1,0 +1,3 @@
+      # flama:begin extension
+      - test-extension
+      # flama:end extension

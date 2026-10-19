@@ -1,0 +1,9 @@
+// flama:begin extension
+// The Chrome extension's pages sign in from `chrome-extension://<id>`: one
+// origin per id in EXTENSION_IDS (the development build's, the store's).
+const extensionOrigins = (process.env.EXTENSION_IDS ?? '')
+  .split(',')
+  .map((id) => id.trim())
+  .filter(Boolean)
+  .map((id) => `chrome-extension://${id}`);
+// flama:end extension

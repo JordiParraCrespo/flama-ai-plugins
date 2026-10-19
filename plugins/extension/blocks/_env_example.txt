@@ -1,0 +1,7 @@
+# flama:begin extension
+# Comma-separated ids of the Chrome extensions the API trusts as origins
+# (`chrome-extension://<id>`): the unpacked development build's, pinned by
+# EXTENSION_PUBLIC_KEY, and the Web Store's once it is published. Empty trusts
+# none, and the extension cannot sign in.
+EXTENSION_IDS=
+# flama:end extension
