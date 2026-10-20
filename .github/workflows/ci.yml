@@ -129,3 +129,57 @@ jobs:
       - name: Lint
         run: pnpm exec biome check apps/cli
         working-directory: .flama-ai
+
+  # The Chrome extension, installed and exercised the way the CLI is above,
+  # and then loaded into a real Chromium: the starter no longer ships it, so
+  # this job is the only place its code is built, tested and run. The
+  # Playwright suite answers the API itself; nothing else needs to be up.
+  installed-extension:
+    name: Build and run the installed extension
+    needs: starter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: JordiParraCrespo/flama-ai
+          ref: ${{ needs.starter.outputs.ref }}
+          path: .flama-ai
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          package_json_file: .flama-ai/package.json
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 26
+      # `--no-install`: the plugin adds a package the lockfile has never seen,
+      # and CI makes the installer's own install frozen. The next step installs
+      # with the lockfile unfrozen; the extension regenerates nothing.
+      - name: Install the plugin
+        run: node .flama-ai/scripts/plugins/plugin.mjs add extension --from "$GITHUB_WORKSPACE" --no-install
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+        working-directory: .flama-ai
+      - name: Build
+        run: pnpm turbo run build --filter=@flama/extension...
+        working-directory: .flama-ai
+      - name: Test
+        run: pnpm turbo run test --filter=@flama/extension
+        working-directory: .flama-ai
+      - name: Lint
+        run: pnpm exec biome check apps/extension
+        working-directory: .flama-ai
+      - name: Architecture boundaries
+        run: pnpm --filter @flama/extension arch
+        working-directory: .flama-ai
+      - name: Frontend structure and compiler
+        run: pnpm check:structure && pnpm check:compiler
+        working-directory: .flama-ai
+      - name: Chromium
+        run: pnpm --filter @flama/extension exec playwright install --with-deps chromium
+        working-directory: .flama-ai
+      - name: The extension in Chromium
+        run: pnpm --filter @flama/extension e2e
+        working-directory: .flama-ai
+      - name: The store archive
+        run: pnpm --filter @flama/extension zip
+        working-directory: .flama-ai

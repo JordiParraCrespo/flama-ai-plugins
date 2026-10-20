@@ -1,0 +1,3 @@
+  // flama:begin extension
+  'packages/frontend/web',
+  // flama:end extension

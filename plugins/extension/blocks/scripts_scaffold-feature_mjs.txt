@@ -1,0 +1,9 @@
+  // flama:begin extension
+  extension: {
+    dir: 'apps/extension',
+    features: 'src/features',
+    product: 'consumer',
+    allow: [],
+    platform: 'web',
+  },
+  // flama:end extension

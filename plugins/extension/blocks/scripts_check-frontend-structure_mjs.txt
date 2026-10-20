@@ -1,0 +1,12 @@
+  // flama:begin extension
+  {
+    app: 'apps/extension',
+    // Chrome's entrypoints — the popup, the side panel, the options page —
+    // are the routes: each composes, none contains.
+    routes: 'src/entrypoints',
+    features: 'src/features',
+    product: 'consumer',
+    allow: [],
+    kit: 'web',
+  },
+  // flama:end extension

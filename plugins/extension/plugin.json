@@ -1,0 +1,334 @@
+{
+  "id": "extension",
+  "flama": "0.0.0",
+  "feature": {
+    "title": "Chrome extension",
+    "summary": "apps/extension — the Manifest V3 Chrome extension the next one starts from: a popup, a side panel and an options page over the consumer product and a service worker, with sign-in (password and two-factor) against the API's session cookie wired through every page",
+    "identifiers": [
+      "apps/extension",
+      "@flama/extension",
+      "EXTENSION_PUBLIC_",
+      "EXTENSION_IDS"
+    ],
+    "paths": [
+      "apps/extension"
+    ],
+    "slots": {
+      ".agents/hooks/arch-check.sh": [
+        "extension"
+      ],
+      ".env.example": [
+        "api-urls",
+        "env"
+      ],
+      ".github/workflows/ci.yml": [
+        "ci-needs",
+        "jobs"
+      ],
+      "apps/api/src/auth/infrastructure/better-auth.config.ts": [
+        "auth-consts",
+        "trusted-origins"
+      ],
+      "scripts/check-frontend-structure.mjs": [
+        "extension"
+      ],
+      "scripts/check-react-compiler.baseline.mjs": [
+        "compiler-baseline"
+      ],
+      "scripts/check-react-compiler.mjs": [
+        "compiler-targets"
+      ],
+      "scripts/scaffold-feature.mjs": [
+        "extension"
+      ]
+    },
+    "json": [
+      {
+        "file": "turbo.json",
+        "path": [
+          "tasks",
+          "build",
+          "env"
+        ],
+        "remove": [
+          "EXTENSION_PUBLIC_*"
+        ]
+      }
+    ],
+    "shared": [
+      {
+        "path": "packages/frontend/design-system/web",
+        "identifiers": [
+          "packages/frontend/design-system/web",
+          "@flama/design-system-web"
+        ],
+        "neededBy": [
+          "web",
+          "extension"
+        ]
+      },
+      {
+        "path": "packages/frontend/core",
+        "identifiers": [
+          "packages/frontend/core",
+          "@flama/frontend-core"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "packages/frontend/consumer",
+        "identifiers": [
+          "packages/frontend/consumer",
+          "@flama/frontend-consumer"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "packages/frontend/react-hooks",
+        "identifiers": [
+          "packages/frontend/react-hooks",
+          "@flama/react-hooks"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "packages/frontend/web",
+        "identifiers": [
+          "packages/frontend/web",
+          "@flama/frontend-web"
+        ],
+        "neededBy": [
+          "web",
+          "extension"
+        ]
+      },
+      {
+        "path": "packages/frontend/api-client",
+        "identifiers": [
+          "packages/frontend/api-client",
+          "@flama/api-client"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "scripts/check-frontend-structure.mjs",
+        "identifiers": [
+          "check-frontend-structure",
+          "check:structure"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "scripts/check-react-compiler.mjs",
+        "identifiers": [
+          "check-react-compiler",
+          "check:compiler"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "scripts/check-react-compiler.baseline.mjs",
+        "identifiers": [],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "scripts/check-react-compiler.test.mjs",
+        "identifiers": [],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "scripts/scaffold-feature.mjs",
+        "identifiers": [
+          "scaffold-feature.mjs"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": ".agents/skills/scaffold-feature",
+        "identifiers": [
+          ".agents/skills/scaffold-feature",
+          "/scaffold-feature"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "packages/tsconfig/depcruise/frontend-app.cjs",
+        "identifiers": [
+          "depcruise/frontend-app"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      },
+      {
+        "path": "packages/tsconfig/depcruise/frontend-kit.cjs",
+        "identifiers": [
+          "depcruise/frontend-kit"
+        ],
+        "neededBy": [
+          "web",
+          "mobile",
+          "extension"
+        ]
+      }
+    ]
+  },
+  "files": {
+    "apps/extension": "files/apps/extension"
+  },
+  "blocks": [
+    {
+      "file": ".agents/hooks/arch-check.sh",
+      "anchor": "extension",
+      "source": "blocks/_agents_hooks_arch-check_sh.txt"
+    },
+    {
+      "file": ".env.example",
+      "anchor": "api-urls",
+      "source": "blocks/_env_example.txt"
+    },
+    {
+      "file": ".env.example",
+      "anchor": "env",
+      "source": "blocks/_env_example_1.txt"
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "anchor": "jobs",
+      "source": "blocks/_github_workflows_ci_yml.txt"
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "anchor": "ci-needs",
+      "source": "blocks/_github_workflows_ci_yml_1.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "auth-consts",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts.txt"
+    },
+    {
+      "file": "apps/api/src/auth/infrastructure/better-auth.config.ts",
+      "anchor": "trusted-origins",
+      "source": "blocks/apps_api_src_auth_infrastructure_better-auth_config_ts_1.txt"
+    },
+    {
+      "file": "scripts/check-frontend-structure.mjs",
+      "anchor": "extension",
+      "source": "blocks/scripts_check-frontend-structure_mjs.txt",
+      "needs": "scripts/check-frontend-structure.mjs"
+    },
+    {
+      "file": "scripts/check-react-compiler.baseline.mjs",
+      "anchor": "compiler-baseline",
+      "source": "blocks/scripts_check-react-compiler_baseline_mjs.txt",
+      "needs": "scripts/check-react-compiler.baseline.mjs"
+    },
+    {
+      "file": "scripts/check-react-compiler.mjs",
+      "anchor": "compiler-targets",
+      "source": "blocks/scripts_check-react-compiler_mjs.txt",
+      "needs": "scripts/check-react-compiler.mjs"
+    },
+    {
+      "file": "scripts/scaffold-feature.mjs",
+      "anchor": "extension",
+      "source": "blocks/scripts_scaffold-feature_mjs.txt",
+      "needs": "scripts/scaffold-feature.mjs"
+    }
+  ],
+  "coOwned": [
+    {
+      "file": ".github/workflows/ci.yml",
+      "anchor": "design-lint",
+      "order": [
+        "web",
+        "mobile",
+        "extension"
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__design-lint.txt"
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "anchor": "frontend-structure",
+      "order": [
+        "web",
+        "mobile",
+        "extension"
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__frontend-structure.txt"
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "anchor": "react-compiler",
+      "order": [
+        "web",
+        "mobile",
+        "extension"
+      ],
+      "source": "blocks/shared/github_workflows_ci_yml__react-compiler.txt"
+    },
+    {
+      "file": "scripts/check-frontend-structure.mjs",
+      "anchor": "web-kits",
+      "order": [
+        "web",
+        "extension"
+      ],
+      "needs": "scripts/check-frontend-structure.mjs",
+      "source": "blocks/shared/scripts_check_frontend_structure_mjs__web-kits.txt"
+    },
+    {
+      "file": "scripts/scaffold-feature.mjs",
+      "anchor": "web-templates",
+      "order": [
+        "web",
+        "extension"
+      ],
+      "needs": "scripts/scaffold-feature.mjs",
+      "source": "blocks/shared/scripts_scaffold_feature_mjs__web-templates.txt"
+    }
+  ]
+}
