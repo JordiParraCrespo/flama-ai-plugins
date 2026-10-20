@@ -1,35 +1,35 @@
 # @flama/extension
 
-The consumer product in Chrome: a Manifest V3 extension that saves the page
-you are on to Flama and keeps your account one click away. It is the starting
-point for a product's own extension — every part of an extension is here once,
-working, tested, and small enough to read in an afternoon:
+A Manifest V3 Chrome extension over the consumer product, built as the base
+the next extension starts from. Its one feature is the one every extension
+needs first: **signing in**. It covers email and password with two-factor, an
+authenticated request to the API, signing out, and every open page agreeing on
+who is signed in. Whatever the extension is for, it goes on top of that.
 
-| Surface | What it is | Where |
+| Surface | What it shows | Where |
 | --- | --- | --- |
-| **Popup** | The toolbar button (`Alt+Shift+F`): the page under it and one thing to do with it | `src/entrypoints/popup.tsx` |
-| **Side panel** | A room beside any tab, open as long as you want it: the saved pages, live | `src/entrypoints/sidepanel.tsx` |
-| **Options page** | Account, appearance, shortcuts, and what the extension can see; opened on first install | `src/entrypoints/options.tsx` |
-| **Service worker** | The menu, the shortcut (`Alt+Shift+S`) and the work that must outlive a page | `src/background/` |
-| **Content script** | Injected into one tab when the person asks; reads the page, shows a toast | `src/content/` |
+| **Popup** | The toolbar button (`Alt+Shift+F`): sign-in, or the account and the way onward | `src/entrypoints/popup.tsx` |
+| **Side panel** | A room beside any tab: sign-in, or the account. A real extension's main screen goes here | `src/entrypoints/sidepanel.tsx` |
+| **Options page** | Account, appearance, the shortcut, and what the extension can reach; opened on first install | `src/entrypoints/options.tsx` |
+| **Service worker** | Opens the options page on install; where work with no page to run in goes | `src/background/` |
 
-It signs in with the same Better Auth session the web app uses — the API's
-httpOnly cookie — and reaches the API through the same kernel
+It signs in with the same Better Auth session the web app uses, the API's
+httpOnly cookie. It reaches the API through the same kernel
 (`@flama/frontend-core`) and product package (`@flama/frontend-consumer`). The
 screens are built from `@flama/design-system-web` and the web kit, so the
 extension looks like the product because it is the product.
 
 ## Stack
 
-- Vite, building three bundles into one `dist/` (pages, service worker,
-  content script — `vite.config.ts` says why three), driven by
-  `scripts/build.mjs`
+- Vite, building the pages and the service worker into one `dist/`, and a
+  content script too once you add one (`vite.config.ts` says why each is its
+  own bundle), driven by `scripts/build.mjs`
 - The manifest written as typed code (`manifest.config.ts`), generated at
   build time, its permission list held by a test
 - React 19 with the React Compiler, Tailwind v4, `@flama/design-system-web`
 - TanStack Query, persisted to `chrome.storage.local`, so the popup opens on
   the last answers instead of a spinner
-- react-i18next over `@flama/translations` (`extension.*`); Chrome's own
+- react-i18next over `@flama/translations` (`extension.*`). Chrome's own
   strings (`_locales/`) are written from the same catalog
 - Typed messaging and typed, validated storage over `chrome.*`
   (`src/runtime/`), the only code that calls Chrome
@@ -37,7 +37,7 @@ extension looks like the product because it is the product.
 
 ## Run it
 
-Configuration comes from the **root `.env`**; only `EXTENSION_PUBLIC_*` values
+Configuration comes from the **root `.env`**. Only `EXTENSION_PUBLIC_*` values
 reach the bundle.
 
 ```bash
@@ -54,8 +54,8 @@ on every rebuild.
 
 ### Signing in from the extension
 
-The API admits an extension by its origin, `chrome-extension://<id>`, and an
-unpacked extension's id comes from its folder path — different on every
+The API admits an extension by its origin, `chrome-extension://<id>`. An
+unpacked extension's id comes from its folder path, which is different on every
 machine. `keygen` prints a public key that fixes it, and the id it produces:
 
 ```bash
@@ -82,12 +82,31 @@ pnpm --filter @flama/extension arch     # dependency-cruiser
 ```
 
 `e2e` loads `dist/` into Chromium (`pnpm --filter @flama/extension exec
-playwright install chromium` once) and
-answers the API itself, so it needs nothing else running.
+playwright install chromium` once) and plays the API itself, so it needs
+nothing else running. It signs in with a password, with two-factor and with a
+wrong password, and checks that a sign-in in the popup reaches an open side
+panel and that a sign-out there reaches back.
+
+## Building your extension on it
+
+1. Name it: `extension.chrome` in `@flama/translations` (the name, the
+   description), the icons in `public/icons/`, `version` in `package.json`.
+2. Ask for what it needs and no more, in `manifest.config.ts`, with the test
+   beside it updated. Read a page with `activeTab` + `scripting` after the
+   person invokes the extension, not host access to every site. Prefer an
+   `optional_permissions` entry requested inside the click that needs it.
+3. Put its screens where the account pane is (`features/profile/sections/account-overview.tsx`
+   in the popup and the side panel), as features named after a module of the
+   kernel or the consumer package (`node scripts/scaffold-feature.mjs --app extension --module <module>`).
+4. Give work with no page (a menu, a shortcut, an alarm) to the service worker,
+   asked by message. Read or change pages with a content script: write
+   `src/content/index.ts` and it is built as `content.js`.
+
+[`ARCHITECTURE.md`](./ARCHITECTURE.md) has each of these as a recipe.
 
 ## Publishing
 
-1. Bump `version` in `package.json` — Chrome refuses an update whose version is
+1. Bump `version` in `package.json`. Chrome refuses an update whose version is
    not higher.
 2. `pnpm --filter @flama/extension build && pnpm --filter @flama/extension zip`.
    `zip` refuses a development build, drops the source maps and the `key`
@@ -95,13 +114,13 @@ answers the API itself, so it needs nothing else running.
    `dist/` always zips to the same bytes.
 3. Upload `release/flama-extension-<version>.zip` in the Chrome Web Store
    developer dashboard. Point `EXTENSION_PUBLIC_API_URL` at production before
-   building — it is also the manifest's host permission.
+   building: it is also the manifest's host permission.
 4. Add the published id to the API's `EXTENSION_IDS`.
 
 The listing's name and description come from `extension.chrome` in
-`@flama/translations`, per locale. The privacy section of the options page is
-the permission list in words; keep the two in step (`manifest.spec.ts` fails
-when the list changes).
+`@flama/translations`, per locale. The options page's privacy section is the
+permission list in words; keep the two in step (`manifest.spec.ts` fails when
+the list changes).
 
 ## Layout
 
@@ -112,30 +131,22 @@ public/                  icons, theme-init.js (the theme before first paint)
 scripts/                 build, store-zip, keygen, the reload server, the zip writer
 src/
 ├── entrypoints/         popup.tsx sidepanel.tsx options.tsx — compose, never contain
-├── background/          the service worker: menus, the shortcut, saving a tab
-├── content/             the content script: reading a page, the toast
+├── background/          the service worker
 ├── runtime/             the only code that calls chrome.*: protocol, messaging,
-│                        storage, items, tabs, i18n, dev reload
-├── features/<module>/   auth, profile, user-settings, clips — kind directories
+│                        storage, tabs, dev reload
+├── features/<module>/   auth, profile, user-settings — kind directories
 ├── lib/                 flama.ts, auth-client.ts, nav.ts, query.ts
 ├── providers/           the root every page renders in
 └── styles/globals.css
 playwright/              the built extension, in Chromium
 ```
 
-How the parts fit, and the cookbook for adding one, is
-[`ARCHITECTURE.md`](./ARCHITECTURE.md).
-
 ## Not in the box
 
 - **Social sign-in.** A provider's redirect cannot land back in a popup that
   closed when it lost focus. Use `chrome.identity.launchWebAuthFlow` from the
   service worker (add the `identity` permission), and add
-  `https://<id>.chromiumapp.org/` to the provider's redirect URLs; then pass
+  `https://<id>.chromiumapp.org/` to the provider's redirect URLs. Then pass
   `socialProviders` in `src/lib/flama.ts` as the web app does.
-- **Content scripts on every page.** Nothing is declared in the manifest's
-  `content_scripts`, deliberately: the install prompt asks for access to no
-  website. A feature that truly needs to run on a site's every load declares
-  that site in `host_permissions` and says why in its review.
 - **Firefox and Safari.** The code is plain MV3, but nothing here is tested
   there.

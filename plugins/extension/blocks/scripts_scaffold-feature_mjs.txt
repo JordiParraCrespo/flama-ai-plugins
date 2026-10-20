@@ -3,7 +3,7 @@
     dir: 'apps/extension',
     features: 'src/features',
     product: 'consumer',
-    allow: ['clips'],
+    allow: [],
     platform: 'web',
   },
   // flama:end extension

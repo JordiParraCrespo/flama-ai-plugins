@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 /**
  * `chrome.*` is called from `src/runtime/`, and from the two programs that
- * are nothing but Chrome event wiring: the service worker and the content
- * script. Pages, features and providers go through the runtime's functions.
+ * are nothing but Chrome event wiring: the service worker and, when an
+ * extension adds one, the content script. Pages, features and providers go through the runtime's functions.
  *
  * What breaks if this fails: a feature that calls `chrome.tabs` directly
  * cannot be unit-tested without a browser, and the next person to need the

@@ -4,8 +4,8 @@ import { createFakeChrome, type FakeChrome } from './fake-chrome';
 
 /**
  * The bus every context talks over. What breaks if these fail: a handler's
- * error arrives as `undefined` and the popup shows "Saved"; a web page's
- * message is answered; two contexts answer one message.
+ * error arrives as `undefined` and the caller carries on as if it worked; a
+ * web page's message is answered; two contexts answer one message.
  */
 describe('messaging', () => {
   let fake: FakeChrome;
@@ -19,61 +19,58 @@ describe('messaging', () => {
     vi.unstubAllGlobals();
   });
 
-  it('carries a request to the context that answers it and the answer back', async () => {
-    fake.as('worker');
-    const handler = vi.fn(async ({ id }: { id: string }) => {
-      expect(id).toBe('clip-1');
-      return undefined;
-    });
-    listen({ 'clips/remove': handler });
+  it('carries a message to the context that answers it and the answer back', async () => {
+    fake.as('sidepanel');
+    const handler = vi.fn(async () => undefined);
+    listen({ 'session/changed': handler });
 
     fake.as('popup');
-    await expect(send('clips/remove', { id: 'clip-1' })).resolves.toBeUndefined();
+    await expect(send('session/changed')).resolves.toBeUndefined();
     expect(handler).toHaveBeenCalledOnce();
   });
 
   it("re-throws a handler's failure at the caller, code included", async () => {
     fake.as('worker');
     listen({
-      'clips/save-tab': () => {
-        throw new MessageError('nope', 'restricted');
+      'session/changed': () => {
+        throw new MessageError('nope', 'signed-out');
       },
     });
 
     fake.as('popup');
-    const failure = send('clips/save-tab', { tabId: 1 });
+    const failure = send('session/changed');
     await expect(failure).rejects.toBeInstanceOf(MessageError);
-    await expect(failure).rejects.toMatchObject({ message: 'nope', code: 'restricted' });
+    await expect(failure).rejects.toMatchObject({ message: 'nope', code: 'signed-out' });
   });
 
   it('answers nothing that did not come from this extension', async () => {
     fake.as('worker');
     const handler = vi.fn(async () => undefined);
-    listen({ 'clips/clear': handler });
+    listen({ 'session/changed': handler });
 
     await expect(
-      fake.sendFrom({ id: 'some-other-extension' }, { flama: 1, type: 'clips/clear' }),
+      fake.sendFrom({ id: 'some-other-extension' }, { flama: 1, type: 'session/changed' }),
     ).rejects.toThrow('Receiving end does not exist');
     expect(handler).not.toHaveBeenCalled();
   });
 
   it('leaves a message it has no handler for to the context that has one', async () => {
+    fake.as('worker');
+    listen({});
     fake.as('sidepanel');
     listen({ 'session/changed': async () => undefined });
-    fake.as('worker');
-    listen({ 'clips/clear': async () => undefined });
 
     fake.as('popup');
-    await expect(send('clips/clear')).resolves.toBeUndefined();
+    await expect(send('session/changed')).resolves.toBeUndefined();
   });
 
   it('ignores anything on the bus that is not one of our envelopes', async () => {
     fake.as('worker');
     const handler = vi.fn(async () => undefined);
-    listen({ 'clips/clear': handler });
+    listen({ 'session/changed': handler });
 
     fake.as('popup');
-    await expect(chrome.runtime.sendMessage({ type: 'clips/clear' })).rejects.toThrow();
+    await expect(chrome.runtime.sendMessage({ type: 'session/changed' })).rejects.toThrow();
     expect(handler).not.toHaveBeenCalled();
   });
 
@@ -98,10 +95,10 @@ describe('messaging', () => {
 
   it('stops answering once the listener is removed', async () => {
     fake.as('worker');
-    const stop = listen({ 'clips/clear': async () => undefined });
+    const stop = listen({ 'session/changed': async () => undefined });
     stop();
 
     fake.as('popup');
-    await expect(send('clips/clear')).rejects.toThrow('Receiving end does not exist');
+    await expect(send('session/changed')).rejects.toThrow('Receiving end does not exist');
   });
 });

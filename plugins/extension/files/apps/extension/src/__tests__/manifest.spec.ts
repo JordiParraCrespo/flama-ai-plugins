@@ -14,13 +14,7 @@ const manifest = defineManifest({ version: '1.2.3', apiUrl: 'https://api.flama.d
 
 describe('manifest', () => {
   it('asks for exactly these permissions — a change here is a decision, not a diff', () => {
-    expect(manifest.permissions).toEqual([
-      'activeTab',
-      'contextMenus',
-      'scripting',
-      'sidePanel',
-      'storage',
-    ]);
+    expect(manifest.permissions).toEqual(['sidePanel', 'storage']);
     expect(manifest.optional_permissions).toBeUndefined();
   });
 

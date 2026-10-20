@@ -1,17 +1,19 @@
-import { expect, test } from './fixtures';
+import { expect, PASSWORD, TOTP, test, USER } from './fixtures';
 
 /**
- * The extension in Chrome. What breaks if these fail: Chrome refuses the
- * manifest, or the worker throws on start — and the extension is greyed out
- * on chrome://extensions for everyone who updates; a page renders blank; a
- * removal in the side panel never reaches the worker that owns the list.
+ * The extension in Chrome, signing in against the API. What breaks if these
+ * fail: Chrome refuses the manifest, or the worker throws on start — and the
+ * extension is greyed out for everyone who updates; sign-in or its two-factor
+ * step stops reaching the API; a sign-in in one page leaves another page
+ * believing nobody is signed in.
  */
 
-test('Chrome accepts the manifest and the worker starts with it', async ({ worker }) => {
+test('Chrome accepts the manifest, and it asks for no website', async ({ worker }) => {
   const manifest = await worker.evaluate(() => chrome.runtime.getManifest());
 
   expect(manifest.manifest_version).toBe(3);
   expect(manifest.name).toBe('Flama');
+  expect(manifest.permissions).toEqual(['sidePanel', 'storage']);
   expect(manifest.host_permissions).toEqual(['http://localhost:3001/*']);
 });
 
@@ -23,102 +25,84 @@ test('a first install opens the options page, which asks a signed-out person to 
 
   expect(options.url()).toBe(`chrome-extension://${extensionId}/options.html`);
   await expect(options.getByRole('heading', { name: 'Sign in to Flama' })).toBeVisible();
-  await expect(options.getByText('It asks Chrome for access to no website.')).toBeVisible();
+  await expect(options.getByText('reads none of the pages you visit')).toBeVisible();
 });
 
-test('the popup asks a signed-out person to sign in', async ({ context, extensionId }) => {
+test('signing in from the popup shows the account the API returns', async ({
+  context,
+  extensionId,
+}) => {
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
 
-  await expect(popup.getByRole('heading', { name: 'Sign in to Flama' })).toBeVisible();
-  await expect(popup.getByLabel('Email')).toBeVisible();
+  await popup.getByLabel('Email', { exact: true }).fill(USER.email);
+  await popup.getByLabel('Password', { exact: true }).fill(PASSWORD);
+  await popup.getByRole('button', { name: 'Sign in' }).click();
+
+  await expect(popup.getByText('Ada Lovelace')).toBeVisible();
+  await expect(popup.getByText(USER.email)).toBeVisible();
+  await expect(popup.getByText('Connected to localhost:3001')).toBeVisible();
 });
 
-test.describe('signed in', () => {
-  test.use({ signedIn: true });
+test('a wrong password stays on the sign-in screen and says so', async ({
+  context,
+  extensionId,
+}) => {
+  const popup = await context.newPage();
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
 
-  test('the popup says when the page under it is closed to extensions', async ({
+  await popup.getByLabel('Email', { exact: true }).fill(USER.email);
+  await popup.getByLabel('Password', { exact: true }).fill('not it');
+  await popup.getByRole('button', { name: 'Sign in' }).click();
+
+  await expect(popup.getByRole('alert')).toBeVisible();
+  await expect(popup.getByRole('heading', { name: 'Sign in to Flama' })).toBeVisible();
+});
+
+test.describe('with two-factor on', () => {
+  test.use({ twoFactor: true });
+
+  test('the password step asks for a code, and the code signs in', async ({
     context,
     extensionId,
   }) => {
-    // Opened as a tab, the popup's active tab is itself: an extension page,
-    // which no extension may script.
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${extensionId}/popup.html`);
 
-    await expect(popup.getByText('Flama cannot read this page')).toBeVisible();
-    await expect(popup.getByRole('button', { name: 'Save this page' })).toHaveCount(0);
+    await popup.getByLabel('Email', { exact: true }).fill(USER.email);
+    await popup.getByLabel('Password', { exact: true }).fill(PASSWORD);
+    await popup.getByRole('button', { name: 'Sign in' }).click();
+
+    const code = popup.getByRole('textbox').first();
+    await expect(code).toBeVisible();
+    await code.fill(TOTP);
+    await popup.getByRole('button', { name: /verify/i }).click();
+
+    await expect(popup.getByText('Ada Lovelace')).toBeVisible();
   });
+});
 
-  test('the side panel lists saved pages and removes one through the worker', async ({
-    context,
-    worker,
-    extensionId,
-  }) => {
-    await worker.evaluate(() =>
-      chrome.storage.local.set({
-        clips: [
-          {
-            id: 'b',
-            url: 'https://example.com/b',
-            title: 'Second page',
-            quote: 'a quote',
-            savedAt: new Date().toISOString(),
-          },
-          {
-            id: 'a',
-            url: 'https://example.com/a',
-            title: 'First page',
-            quote: '',
-            savedAt: new Date(Date.now() - 3_600_000).toISOString(),
-          },
-        ],
-      }),
-    );
+test('a sign-in in the popup reaches an open side panel, and a sign-out there reaches back', async ({
+  context,
+  extensionId,
+}) => {
+  const panel = await context.newPage();
+  await panel.goto(`chrome-extension://${extensionId}/sidepanel.html`);
+  await expect(panel.getByRole('heading', { name: 'Sign in to Flama' })).toBeVisible();
 
-    const panel = await context.newPage();
-    await panel.goto(`chrome-extension://${extensionId}/sidepanel.html`);
-    const rows = panel.getByRole('listitem');
-    await expect(rows).toHaveCount(2);
-    // The profile, fetched with the session cookie, behind the account button.
-    await expect(panel.getByRole('button', { name: 'Account' })).toContainText('AL');
-    await expect(rows.first()).toContainText('Second page');
-    await expect(rows.first()).toContainText('a quote');
+  const popup = await context.newPage();
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  await popup.getByLabel('Email', { exact: true }).fill(USER.email);
+  await popup.getByLabel('Password', { exact: true }).fill(PASSWORD);
+  await popup.getByRole('button', { name: 'Sign in' }).click();
+  await expect(popup.getByText('Ada Lovelace')).toBeVisible();
 
-    await rows.first().hover();
-    await rows.first().getByRole('button', { name: 'Remove' }).click();
+  // No reload: `session/changed` told the panel to look again.
+  await expect(panel.getByText('Ada Lovelace')).toBeVisible();
 
-    await expect(rows).toHaveCount(1);
-    await expect(rows.first()).toContainText('First page');
-    const stored = await worker.evaluate(
-      async () => (await chrome.storage.local.get('clips')).clips,
-    );
-    expect(stored).toHaveLength(1);
-  });
+  await panel.getByRole('button', { name: 'Account' }).click();
+  await panel.getByRole('menuitem', { name: 'Sign out' }).click();
 
-  test('a save from anywhere lands in an open side panel without a refresh', async ({
-    context,
-    worker,
-    extensionId,
-  }) => {
-    const panel = await context.newPage();
-    await panel.goto(`chrome-extension://${extensionId}/sidepanel.html`);
-    await expect(panel.getByText('Nothing saved yet')).toBeVisible();
-
-    await worker.evaluate(() =>
-      chrome.storage.local.set({
-        clips: [
-          {
-            id: 'x',
-            url: 'https://example.com/x',
-            title: 'Saved elsewhere',
-            quote: '',
-            savedAt: new Date().toISOString(),
-          },
-        ],
-      }),
-    );
-
-    await expect(panel.getByRole('listitem')).toContainText('Saved elsewhere');
-  });
+  await expect(panel.getByRole('heading', { name: 'Sign in to Flama' })).toBeVisible();
+  await expect(popup.getByRole('heading', { name: 'Sign in to Flama' })).toBeVisible();
 });

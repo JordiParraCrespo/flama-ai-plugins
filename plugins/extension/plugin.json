@@ -3,7 +3,7 @@
   "flama": "0.0.0",
   "feature": {
     "title": "Chrome extension",
-    "summary": "apps/extension — the Manifest V3 Chrome extension: a popup, a side panel and an options page over the consumer product, a service worker, and a content script injected only when the person asks; signed in with the API's session cookie",
+    "summary": "apps/extension — the Manifest V3 Chrome extension the next one starts from: a popup, a side panel and an options page over the consumer product and a service worker, with sign-in (password and two-factor) against the API's session cookie wired through every page",
     "identifiers": [
       "apps/extension",
       "@flama/extension",

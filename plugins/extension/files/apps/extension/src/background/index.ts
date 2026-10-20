@@ -1,9 +1,5 @@
 import { connectDevReload } from '@/runtime/dev-reload';
-import { listen } from '@/runtime/messaging';
 import { openOptions } from '@/runtime/tabs';
-import { clearClips, removeClip } from './clips';
-import { createMenus, onMenuClick } from './menus';
-import { saveTab, saveTabQuietly } from './save-tab';
 
 /**
  * The service worker: the extension's one long-lived program, which Chrome
@@ -13,30 +9,16 @@ import { saveTab, saveTabQuietly } from './save-tab';
  * the top level: Chrome hands the event that woke a worker only to listeners
  * added in its first turn.
  *
- * It holds no React and no session. It does what has to outlive a page (a
- * save the popup started and then closed on) and what has no page at all (the
- * menu, the shortcut).
+ * It holds no React and no session, and today it does one thing. Work that
+ * has no page (a context menu, a shortcut, an alarm) or must outlive one (a
+ * request the popup started and then closed on) belongs here: answer it with
+ * `listen({...})` from `@/runtime/messaging`, beside a row in the protocol.
  */
 
 chrome.runtime.onInstalled.addListener(({ reason }) => {
-  createMenus();
   // A first install opens the options page, which signs the person in and
-  // says what the extension can and cannot see.
+  // says what the extension can and cannot reach.
   if (reason === chrome.runtime.OnInstalledReason.INSTALL) void openOptions();
-});
-
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  void onMenuClick(info, tab);
-});
-
-chrome.commands.onCommand.addListener((command, tab) => {
-  if (command === 'save-page') void saveTabQuietly(tab?.id);
-});
-
-listen({
-  'clips/save-tab': ({ tabId }) => saveTab(tabId),
-  'clips/remove': ({ id }) => removeClip(id),
-  'clips/clear': () => clearClips(),
 });
 
 if (import.meta.env.DEV) connectDevReload();

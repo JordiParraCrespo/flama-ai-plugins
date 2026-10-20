@@ -11,14 +11,17 @@ import { broadcast } from '@/runtime/messaging';
  * password open the web app, which has the screens for them.
  *
  * Success needs no navigation — the session gate above re-renders on the auth
- * store — only a word to the other open pages.
+ * store — only a word to the other open pages. That word goes in the hook's
+ * options, never in `mutate(…, { onSuccess })`: the sign-in flips the auth
+ * store before it resolves, the gate unmounts this screen, and TanStack Query
+ * drops a `mutate` callback whose component is gone. The other pages would
+ * never hear of it.
  */
 export function SignInScreen() {
   const { t } = useTranslation();
   const resolveError = useErrorMessage();
-  const login = useLogin();
-
   const signedIn = () => void broadcast('session/changed');
+  const login = useLogin({ onSuccess: signedIn });
 
   if (isTwoFactorRequired(login.error)) {
     return <TwoFactorChallenge onSuccess={signedIn} onCancel={login.reset} />;
@@ -37,7 +40,7 @@ export function SignInScreen() {
             : undefined
         }
         onForgotPassword={() => void LINKS.forgotPassword()}
-        onSubmit={(values) => login.mutate(values, { onSuccess: signedIn })}
+        onSubmit={(values) => login.mutate(values)}
       />
 
       <p className="mt-6 text-center text-sm text-ink-600">

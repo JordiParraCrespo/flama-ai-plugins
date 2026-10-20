@@ -69,7 +69,7 @@ export async function send<K extends MessageType>(
   return unwrap(reply, type);
 }
 
-/** Ask the content script in one tab. It has to have been injected first. */
+/** Ask the content script in one tab, for an extension that has one. It has to have been injected first. */
 export async function sendToTab<K extends MessageType>(
   tabId: number,
   type: K,

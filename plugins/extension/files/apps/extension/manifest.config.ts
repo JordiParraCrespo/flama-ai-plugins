@@ -11,14 +11,16 @@
  *
  * The permissions are the least that makes the product work:
  *
- * - `activeTab` + `scripting` instead of host access to every site. The
- *   extension reads a page only after the person invokes it on that page — the
- *   toolbar button, the context menu, the keyboard shortcut — and Chrome grants
- *   that tab alone, for that moment. The install prompt asks for nothing.
  * - Host access to the API's origin only, which is what lets the session
  *   cookie ride along (Chrome treats a request to a host the extension holds
- *   permission for as same-site).
- * - `storage`, `sidePanel` and `contextMenus` for what they say.
+ *   permission for as same-site). No website: the install prompt asks for
+ *   access to none.
+ * - `storage` and `sidePanel` for what they say.
+ *
+ * An extension built on this one adds what its feature needs, and no more:
+ * `activeTab` + `scripting` to read a page the person invoked it on, rather
+ * than host access to every site; an `optional_permissions` entry requested
+ * inside the click that needs it, rather than one every install asks for.
  *
  * Every string a person reads is a `__MSG_*__` reference into `_locales/`,
  * which the build writes from `@flama/translations` (`extension.manifest`).
@@ -63,15 +65,11 @@ export function defineManifest(input: ManifestInput): chrome.runtime.ManifestV3 
     side_panel: { default_path: 'sidepanel.html' },
     options_ui: { page: 'options.html', open_in_tab: true },
     background: { service_worker: 'background.js', type: 'module' },
-    permissions: ['activeTab', 'contextMenus', 'scripting', 'sidePanel', 'storage'],
+    permissions: ['sidePanel', 'storage'],
     host_permissions: [`${apiOrigin}/*`],
     commands: {
       _execute_action: {
         suggested_key: { default: 'Alt+Shift+F' },
-      },
-      'save-page': {
-        suggested_key: { default: 'Alt+Shift+S' },
-        description: '__MSG_commandSavePage__',
       },
     },
     // MV3's default, written out so a change to it is a reviewed diff: no

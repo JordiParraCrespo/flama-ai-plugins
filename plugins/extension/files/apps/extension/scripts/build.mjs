@@ -5,22 +5,28 @@
  *   node scripts/build.mjs           # production: minified, no source maps
  *   node scripts/build.mjs --watch   # development: rebuild on save, reload Chrome
  *
- * Three Vite builds into one folder, in this order: the pages (which empties
- * `dist/` and writes `manifest.json`), the service worker, the content script.
- * Why three is the header of `vite.config.ts`.
+ * Up to three Vite builds into one folder, in this order: the pages (which
+ * empties `dist/` and writes `manifest.json`), the service worker, and the
+ * content script when there is one (`src/content/index.ts`). Why three is the
+ * header of `vite.config.ts`.
  *
  * With `--watch` it also runs the reload server (`reload-server.mjs`): every
  * rebuild tells the development build's service worker, which reloads the
  * extension. Load `dist/` once from chrome://extensions ("Load unpacked") and
  * leave it; there is nothing to click after that.
  */
+import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'vite';
 import { RELOAD_PORT, startReloadServer } from './reload-server.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const TARGETS = ['pages', 'background', 'content'];
+const TARGETS = [
+  'pages',
+  'background',
+  ...(existsSync(resolve(APP, 'src/content/index.ts')) ? ['content'] : []),
+];
 
 const watch = process.argv.includes('--watch');
 const mode = watch ? 'development' : 'production';

@@ -12,6 +12,13 @@ import { listen } from '@/runtime/messaging';
  * session is asked again: `useSessionRestore` re-reads it, flips the auth
  * store, and drops a cached answer that belonged to whoever was signed in
  * before.
+ *
+ * Reset, not invalidated. An invalidated session query keeps its old answer
+ * while it refetches, so the gate stays open; the restore flips the auth store
+ * *before* it drops the previous user's cache, and a page mounted in that gap
+ * subscribes to a query the drop then removes under it — it showed a skeleton
+ * forever. A reset sends the query back to pending: the gate holds its spinner
+ * until the restore and the drop are both done, and only then mounts the page.
  */
 export function useSessionSync(): void {
   const queryClient = useQueryClient();
@@ -20,7 +27,7 @@ export function useSessionSync(): void {
     () =>
       listen({
         'session/changed': async () => {
-          await queryClient.invalidateQueries({ queryKey: authKeys.session() });
+          await queryClient.resetQueries({ queryKey: authKeys.session() });
           return undefined;
         },
       }),

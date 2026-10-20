@@ -8,9 +8,9 @@ import type { ZodType, ZodTypeDef } from 'zod';
  * all of them, which makes it the one place state can live in an extension
  * whose service worker is stopped whenever it is idle. It is also untyped,
  * and what it holds was written by an older build as often as by this one. So
- * every item is declared once (`items.ts`) with a Zod schema and a fallback,
- * and a value that no longer parses reads as the fallback instead of crashing
- * the reader: an upgrade never bricks a profile.
+ * every item is declared once (in `items.ts`, beside the protocol) with a Zod
+ * schema and a fallback, and a value that no longer parses reads as the
+ * fallback instead of crashing the reader: an upgrade never bricks a profile.
  *
  * Writes are serialised per item within a context. Across contexts there is
  * no lock, so each item has one writer — `items.ts` says which — and every

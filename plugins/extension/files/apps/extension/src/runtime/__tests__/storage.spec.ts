@@ -6,7 +6,7 @@ import { createFakeChrome, type FakeChrome } from './fake-chrome';
 /**
  * Typed state over `chrome.storage`. What breaks if these fail: a value an
  * older build wrote crashes every page that reads it; two quick writes from
- * one page lose one; the kernel's `clear()` deletes the person's saved pages.
+ * one page lose one; the kernel's `clear()` deletes the extension's own items.
  */
 describe('storage', () => {
   let fake: FakeChrome;
@@ -85,12 +85,12 @@ describe('ChromeStorageService', () => {
   it("clears the kernel's own keys and leaves the extension's items alone", async () => {
     const kernel = new ChromeStorageService();
     await kernel.set('pending-social', 'github');
-    await chrome.storage.local.set({ clips: [] });
+    await chrome.storage.local.set({ settings: {} });
 
     await expect(kernel.get('pending-social')).resolves.toBe('github');
     await kernel.clear();
 
     await expect(kernel.get('pending-social')).resolves.toBeNull();
-    await expect(chrome.storage.local.get('clips')).resolves.toEqual({ clips: [] });
+    await expect(chrome.storage.local.get('settings')).resolves.toEqual({ settings: {} });
   });
 });

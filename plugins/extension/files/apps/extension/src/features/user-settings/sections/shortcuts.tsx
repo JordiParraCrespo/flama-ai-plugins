@@ -1,13 +1,13 @@
 import { Button, Kbd } from '@flama/design-system-web';
 import { Trans, useTranslation } from 'react-i18next';
 import { SettingsCard } from '@/features/user-settings/components/settings-card';
-import { useShortcuts } from '@/features/user-settings/hooks/use-shortcuts';
+import { useOpenShortcut } from '@/features/user-settings/hooks/use-open-shortcut';
 import { LINKS } from '@/lib/nav';
 
-/** The two keyboard shortcuts as Chrome has them bound, and where to change them. */
+/** The shortcut that opens the extension, as Chrome has it bound, and where to change it. */
 export function Shortcuts() {
   const { t } = useTranslation();
-  const { open, save } = useShortcuts();
+  const open = useOpenShortcut();
 
   return (
     <SettingsCard
@@ -15,7 +15,7 @@ export function Shortcuts() {
       description={
         <Trans
           i18nKey="extension.options.shortcutsDescription"
-          values={{ open: open || '—', save: save || '—' }}
+          values={{ open: open || '—' }}
           components={{ kbd: <Kbd /> }}
         />
       }

@@ -2,14 +2,16 @@ import { useAuthState } from '@flama/frontend-core/react';
 import { useTranslation } from 'react-i18next';
 import { SignInScreen } from '@/features/auth/screens/sign-in';
 import { SessionGate } from '@/features/auth/sections/session-gate';
-import { CurrentPage } from '@/features/clips/sections/current-page';
+import { AccountActions } from '@/features/profile/sections/account-actions';
+import { AccountOverview } from '@/features/profile/sections/account-overview';
 import { PageHeader } from '@/features/profile/sections/page-header';
 import { mount } from '@/providers/mount';
 
 /**
- * The toolbar popup: the page you are on, and saving it. Opened by the toolbar
- * button or Alt+Shift+F, closed the moment it loses focus — so it does one
- * thing, fast, and anything longer happens in the side panel.
+ * The toolbar popup, opened by the toolbar button or Alt+Shift+F and closed the
+ * moment it loses focus. Signed out it is the sign-in; signed in, the account
+ * and the way onward. An extension built on this base puts its one quick action
+ * here, and anything longer in the side panel.
  */
 function Popup() {
   const { t } = useTranslation();
@@ -25,7 +27,10 @@ function Popup() {
           </div>
         }
       >
-        <CurrentPage />
+        <div className="flex flex-col gap-5 p-5">
+          <AccountOverview />
+          <AccountActions />
+        </div>
       </SessionGate>
     </>
   );

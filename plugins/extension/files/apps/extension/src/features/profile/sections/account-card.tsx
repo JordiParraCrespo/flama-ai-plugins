@@ -9,7 +9,9 @@ import { broadcast } from '@/runtime/messaging';
 export function AccountCard() {
   const { t } = useTranslation();
   const { data: user } = useMyProfile();
-  const logout = useLogout();
+  // The broadcast is the hook's, not `mutate`'s: signing out unmounts this
+  // component before a `mutate` callback could run (see `SignInScreen`).
+  const logout = useLogout({ onSuccess: () => void broadcast('session/changed') });
 
   return (
     <div className="flex items-center justify-between gap-4">
@@ -18,9 +20,7 @@ export function AccountCard() {
         variant="secondary"
         size="sm"
         disabled={logout.isPending}
-        onClick={() =>
-          logout.mutate(undefined, { onSuccess: () => void broadcast('session/changed') })
-        }
+        onClick={() => logout.mutate()}
       >
         {t('extension.nav.signOut')}
       </Button>

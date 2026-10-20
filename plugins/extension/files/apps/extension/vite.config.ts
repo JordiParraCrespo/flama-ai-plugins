@@ -16,13 +16,14 @@ import pkg from './package.json' with { type: 'json' };
  * - `background` — the service worker. One ES module with every import inlined:
  *   a worker may not `import()` at all, and a chunk shared with the pages
  *   would carry their DOM assumptions into a context that has no DOM.
- * - `content` — the content script, injected into a page only when the person
- *   asks. A classic script (`iife`), because `scripting.executeScript` runs
- *   files, not modules, and small, because it is paid for on every page it
- *   touches.
+ * - `content` — a content script, for an extension that reads or changes the
+ *   pages a person visits. A classic script (`iife`), because
+ *   `scripting.executeScript` runs files, not modules, and small, because it is
+ *   paid for on every page it touches. This base ships none: write
+ *   `src/content/index.ts` and it is built as `content.js`.
  *
- * `scripts/build.mjs` runs the three in order (`EXTENSION_TARGET`), and writes
- * them into one `dist/` that is the unpacked extension.
+ * `scripts/build.mjs` runs them in order (`EXTENSION_TARGET`), and writes them
+ * into one `dist/` that is the unpacked extension.
  */
 type Target = 'pages' | 'background' | 'content';
 const target = (process.env.EXTENSION_TARGET ?? 'pages') as Target;

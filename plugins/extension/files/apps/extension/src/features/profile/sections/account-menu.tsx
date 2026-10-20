@@ -26,7 +26,9 @@ import { broadcast } from '@/runtime/messaging';
 export function AccountMenu() {
   const { t } = useTranslation();
   const { data: user } = useMyProfile();
-  const logout = useLogout();
+  // The broadcast is the hook's, not `mutate`'s: signing out unmounts this
+  // component before a `mutate` callback could run (see `SignInScreen`).
+  const logout = useLogout({ onSuccess: () => void broadcast('session/changed') });
   const windowId = useCurrentWindow();
 
   return (
@@ -61,12 +63,7 @@ export function AccountMenu() {
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          disabled={logout.isPending}
-          onClick={() =>
-            logout.mutate(undefined, { onSuccess: () => void broadcast('session/changed') })
-          }
-        >
+        <DropdownMenuItem disabled={logout.isPending} onClick={() => logout.mutate()}>
           <LogOut className="size-4" />
           {t('extension.nav.signOut')}
         </DropdownMenuItem>

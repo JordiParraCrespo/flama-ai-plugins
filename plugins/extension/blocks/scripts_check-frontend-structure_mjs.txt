@@ -6,7 +6,7 @@
     routes: 'src/entrypoints',
     features: 'src/features',
     product: 'consumer',
-    allow: ['clips'],
+    allow: [],
     kit: 'web',
   },
   // flama:end extension

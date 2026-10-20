@@ -9,8 +9,7 @@ import { defineConfig } from 'vitest/config';
  *
  * What runs here is everything below the pages: the messaging and storage
  * runtime against an in-memory `chrome` (`src/runtime/__tests__/fake-chrome.ts`),
- * the service worker's handlers, the content script against jsdom, and the
- * manifest itself. A real Chrome loading the built `dist/` is `playwright/`'s job.
+ * and the manifest itself — and a service-worker handler, once there is one. A real Chrome loading the built `dist/` is `playwright/`'s job.
  */
 export default defineConfig({
   test: frontendVitestProjects({
