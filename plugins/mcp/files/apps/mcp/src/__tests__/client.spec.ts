@@ -80,3 +80,23 @@ describe('problem details', () => {
     expect(error.message).toContain('<html>502</html>');
   });
 });
+
+describe('writes', () => {
+  it('sends the headers a write passes beside its body, such as an idempotency key', async () => {
+    // A create that is retried after a lost answer must find the first one,
+    // which the API can only do if the key reaches it.
+    const fetchImpl = vi.fn().mockResolvedValue(new Response('{}', { status: 201 }));
+    await clientWith(fetchImpl).post('/things', { name: 'a' }, { 'idempotency-key': 'k-1' });
+
+    const [, init] = fetchImpl.mock.calls[0];
+    expect((init.headers as Record<string, string>)['idempotency-key']).toBe('k-1');
+    expect((init.headers as Record<string, string>).authorization).toBe('Bearer flama_pat_test');
+  });
+
+  it('carries a delete’s query, so a delete can say what it accepts losing', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    await clientWith(fetchImpl).delete('/things/1', { force: true, reason: undefined });
+
+    expect(fetchImpl.mock.calls[0][0]).toBe('https://api.example.com/api/v1/things/1?force=true');
+  });
+});

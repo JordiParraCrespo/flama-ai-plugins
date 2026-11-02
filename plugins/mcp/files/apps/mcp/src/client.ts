@@ -76,8 +76,9 @@ export class FlamaClient {
     return this.request<T>('GET', path, undefined, query);
   }
 
-  post<T>(path: string, body?: unknown): Promise<T> {
-    return this.request<T>('POST', path, body);
+  /** `headers` carries what a write needs beside its body, such as an `Idempotency-Key`. */
+  post<T>(path: string, body?: unknown, headers?: Record<string, string>): Promise<T> {
+    return this.request<T>('POST', path, body, undefined, headers);
   }
 
   patch<T>(path: string, body?: unknown): Promise<T> {
@@ -88,8 +89,8 @@ export class FlamaClient {
     return this.request<T>('PUT', path, body);
   }
 
-  delete<T>(path: string): Promise<T> {
-    return this.request<T>('DELETE', path);
+  delete<T>(path: string, query?: Record<string, unknown>): Promise<T> {
+    return this.request<T>('DELETE', path, undefined, query);
   }
 
   private async request<T>(
@@ -97,6 +98,7 @@ export class FlamaClient {
     path: string,
     body?: unknown,
     query?: Record<string, unknown>,
+    headers?: Record<string, string>,
   ): Promise<T> {
     const url = new URL(`${this.baseUrl}${path}`);
     for (const [key, value] of Object.entries(query ?? {})) {
@@ -115,6 +117,7 @@ export class FlamaClient {
           authorization: `Bearer ${this.token}`,
           accept: 'application/json, application/problem+json',
           ...(body === undefined ? {} : { 'content-type': 'application/json' }),
+          ...headers,
         },
         body: body === undefined ? undefined : JSON.stringify(body),
         signal: controller.signal,
