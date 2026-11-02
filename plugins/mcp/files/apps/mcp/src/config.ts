@@ -31,16 +31,27 @@ const schema = z.object({
 
 export type McpConfig = z.infer<typeof schema>;
 
+/**
+ * A blank variable (`FLAMA_API_TOKEN=` in a `.env`) is an absent one, as the
+ * API's config reads it: otherwise it fails the schema with a bare Zod error
+ * instead of reaching the entrypoint's own "token required" message, or
+ * shadows a default with an empty string.
+ */
+function orUndefined(value: string | undefined): string | undefined {
+  return value === undefined || value.trim() === '' ? undefined : value;
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): McpConfig {
   return schema.parse({
-    apiUrl: env.FLAMA_API_URL,
-    apiToken: env.FLAMA_API_TOKEN,
+    apiUrl: orUndefined(env.FLAMA_API_URL),
+    apiToken: orUndefined(env.FLAMA_API_TOKEN),
     // MCP_PORT first: in a shared root .env, PORT belongs to the API (3001),
     // and the HTTP entrypoint must not collide with it.
-    port: env.MCP_PORT ?? env.PORT,
-    timeoutMs: env.FLAMA_TIMEOUT_MS,
-    toolsCacheTtlMs: env.FLAMA_TOOLS_CACHE_TTL_MS,
-    allowedOrigins: env.FLAMA_ALLOWED_ORIGINS?.split(',')
+    port: orUndefined(env.MCP_PORT) ?? orUndefined(env.PORT),
+    timeoutMs: orUndefined(env.FLAMA_TIMEOUT_MS),
+    toolsCacheTtlMs: orUndefined(env.FLAMA_TOOLS_CACHE_TTL_MS),
+    allowedOrigins: orUndefined(env.FLAMA_ALLOWED_ORIGINS)
+      ?.split(',')
       .map((origin) => origin.trim())
       .filter(Boolean),
   });
