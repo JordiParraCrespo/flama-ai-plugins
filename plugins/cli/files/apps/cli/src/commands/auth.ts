@@ -30,6 +30,10 @@ function loginCommand(): Command {
       'Comma-separated scopes for the token this creates (default: everything you may grant)',
     )
     .option('--name <name>', 'Name for the token this creates')
+    .option(
+      '--all-organizations',
+      'Leave the token unpinned instead of pinning it to your active organization',
+    )
     .action(async function (this: Command) {
       const options = this.opts<{
         email?: string;
@@ -37,6 +41,7 @@ function loginCommand(): Command {
         withToken?: string;
         permissions?: string;
         name?: string;
+        allOrganizations?: boolean;
       }>();
       const globals = globalOptions(this);
       const config = readConfig();
@@ -92,6 +97,7 @@ async function mintToken(input: {
     password?: string;
     permissions?: string;
     name?: string;
+    allOrganizations?: boolean;
   };
 }): Promise<{ token: string; tokenId: string }> {
   const email = input.options.email ?? (await ask('Email: '));
@@ -120,15 +126,32 @@ async function mintToken(input: {
   const session = new ApiClient({ apiUrl: input.apiUrl, token: sessionToken });
   const catalog = await session.get<PermissionCatalog>('/tokens/permissions');
   const scopes = chooseScopes(input.options.permissions, catalog.grantable);
+  const organizationId = input.options.allOrganizations
+    ? undefined
+    : await activeOrganizationOf(session);
 
   const created = await session.post<CreatedApiToken>('/tokens', {
     body: {
       name: input.options.name ?? `flama-cli on ${hostname()}`,
       scopes,
+      // A token acts inside an organization by default only when it names
+      // exactly one (`ApiAuthGuard`): unpinned, every organization-scoped rule
+      // that reads `${activeOrganizationId}` refuses it on a route that does
+      // not name the organization itself.
+      organizationIds: organizationId ? [organizationId] : null,
     },
   });
 
   return { token: created.token, tokenId: created.id };
+}
+
+/** The organization the signed-in session works in, if it has one. */
+async function activeOrganizationOf(session: ApiClient): Promise<string | undefined> {
+  const current = await session.get<{ session?: { activeOrganizationId?: string | null } } | null>(
+    '/api/auth/get-session',
+    { absolute: true },
+  );
+  return current?.session?.activeOrganizationId ?? undefined;
 }
 
 /** Requested scopes, validated against what this user may actually grant. */
