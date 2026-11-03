@@ -1,6 +1,11 @@
 import { normalizeScopes, PERMISSION_GROUPS, type Scope, sortScopes } from '@flama/shared';
 import { Command } from 'commander';
-import type { ApiToken, CreatedApiToken, PermissionCatalog } from '../lib/api-types';
+import type {
+  ApiToken,
+  CreatedApiToken,
+  CurrentCredential,
+  PermissionCatalog,
+} from '../lib/api-types';
 import { contextFor } from '../lib/context';
 import { CliError, ExitCode } from '../lib/errors';
 import { formatDate, formatList, render, style, success, table } from '../lib/output';
@@ -58,7 +63,10 @@ function createCommand(): Command {
     .description('Mint a new API token')
     .requiredOption('--name <name>', 'What this token is for')
     .requiredOption('--permissions <scopes>', 'Comma-separated scopes, e.g. users:read,roles:write')
-    .option('--organizations <ids>', 'Restrict the token to these organization ids')
+    .option(
+      '--organizations <ids>',
+      'Restrict the token to these organization ids (default: the ones your credential is pinned to)',
+    )
     .option('--expires-in <days>', 'Expire the token after this many days', Number)
     .option('--allow-ip <cidrs>', 'Only accept the token from these addresses or CIDR blocks')
     .action(async function (this: Command) {
@@ -80,11 +88,18 @@ function createCommand(): Command {
         );
       }
 
+      // Pinned, unless told otherwise, to the organizations the calling
+      // credential is pinned to: a token acts inside an organization by
+      // default only when it names exactly one.
+      const organizationIds =
+        splitList(options.organizations) ??
+        (await context.client.get<CurrentCredential>('/me/credential')).organizationIds;
+
       const created = await context.client.post<CreatedApiToken>('/tokens', {
         body: {
           name: options.name,
           scopes: sortScopes(scopes),
-          organizationIds: splitList(options.organizations),
+          organizationIds,
           expiresInDays: options.expiresIn ?? null,
           ipAllowlist: splitList(options.allowIp),
         },
