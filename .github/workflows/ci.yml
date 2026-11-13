@@ -112,7 +112,7 @@ jobs:
       - name: Install what the plugin requires
         run: node .flama-ai/scripts/plugins/plugin.mjs add api-tokens --from "$GITHUB_WORKSPACE" --no-install
       - name: Install the plugin
-        run: node .flama-ai/scripts/plugins/plugin.mjs add cli --from "$GITHUB_WORKSPACE"
+        run: node .flama-ai/scripts/plugins/plugin.mjs add cli --from "$GITHUB_WORKSPACE" --no-install
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
         working-directory: .flama-ai
