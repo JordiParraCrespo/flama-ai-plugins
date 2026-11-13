@@ -21,8 +21,16 @@ and revocable on its own:
 ```bash
 flama login --permissions users:read,roles:read   # narrower still
 flama login --with-token flama_pat_…              # use a token you already have
+flama login --all-organizations                   # leave the token unpinned
 flama logout                                      # revokes it server-side
 ```
+
+The token is pinned to the session's active organization, when it has one: a
+token acts inside an organization by default only when it names exactly one,
+so an unpinned token is refused by organization-scoped rules on any route that
+does not name the organization itself. `flama tokens create` pins a new token
+the same way as the credential that creates it, unless `--organizations` says
+otherwise.
 
 Config lives in `~/.config/flama/config.json` (mode `0600`), overridable with
 `FLAMA_CONFIG`. Profiles let one machine talk to several deployments:
