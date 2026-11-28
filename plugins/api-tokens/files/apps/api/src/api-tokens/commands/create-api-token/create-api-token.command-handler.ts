@@ -9,6 +9,7 @@ import { API_TOKEN_REPOSITORY } from '../../api-tokens.di-tokens';
 import type { ApiTokenRepositoryPort } from '../../database/api-token.repository.port';
 import { ApiTokenEntity } from '../../domain/api-token.entity';
 import { ApiTokenErrors } from '../../domain/api-token.errors';
+import { mintingRefusal } from '../../domain/minting-reach.policy';
 import { CreateApiTokenCommand } from './create-api-token.command';
 
 /** How many usable tokens one user may hold at a time. */
@@ -32,6 +33,10 @@ export interface CreateApiTokenResult {
  * credentials safe: **a token may never carry more reach than its creator**.
  * The creator's effective ability is rebuilt here from their roles rather than
  * trusted from the request, and every requested scope is checked against it.
+ * A token minted with a scoped credential (another token, an OAuth grant) is
+ * also held to that credential's scopes and organizations
+ * (`minting-reach.policy.ts`), so `tokens:write` cannot turn a narrow
+ * credential into a full-account key.
  */
 @CommandHandler(CreateApiTokenCommand)
 export class CreateApiTokenCommandHandler
@@ -55,11 +60,15 @@ export class CreateApiTokenCommandHandler
       { activeOrganizationId: command.actor.activeOrganizationId ?? null },
     );
 
-    const exceeded = ungrantableScopes(ability, command.scopes);
-    if (exceeded.length > 0) {
+    const refusal = mintingRefusal(
+      ungrantableScopes(ability, command.scopes),
+      command.actor.credential,
+      command,
+    );
+    if (refusal) {
       throw new AppError(ApiTokenErrors.SCOPES_EXCEED_GRANTER, {
-        detail: `The caller may not grant: ${exceeded.join(', ')}`,
-        extensions: { ungrantableScopes: exceeded },
+        detail: refusal.detail,
+        extensions: { ungrantableScopes: refusal.ungrantableScopes },
       });
     }
 
